@@ -1,0 +1,300 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Sex {
+  FEMALE
+  MALE
+  UNSPECIFIED
+}
+
+enum DataSource {
+  MANUAL
+  HOME
+  HOSPITAL
+  KINDERGARTEN
+  IMPORT
+}
+
+enum SleepKind {
+  NIGHT
+  NAP
+}
+
+enum MealType {
+  BREAKFAST
+  MORNING_SNACK
+  LUNCH
+  AFTERNOON_SNACK
+  DINNER
+  OTHER
+}
+
+enum BeverageType {
+  MILK
+  WATER
+  YOGURT_DRINK
+  OTHER
+}
+
+enum ActivityIntensity {
+  LIGHT
+  MODERATE
+  VIGOROUS
+}
+
+enum ActivityStructure {
+  FREE_PLAY
+  STRUCTURED
+  MIXED
+}
+
+enum Mood {
+  HAPPY
+  CALM
+  ANXIOUS
+  SAD
+  ANGRY
+  MIXED
+  OTHER
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  RESTORE
+  LOGIN
+  LOGOUT
+}
+
+model Household {
+  id           String                @id @default(cuid())
+  name         String
+  timeZone     String                @default("Asia/Shanghai")
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+  children     Child[]
+  sessions     AdminSession[]
+  auditLogs    AuditLog[]
+  growth       GrowthMeasurement[]
+  sleep        SleepSession[]
+  meals        Meal[]
+  mealItems    MealItem[]
+  beverages    BeverageIntake[]
+  activities   PhysicalActivity[]
+  emotions     EmotionRecord[]
+}
+
+model Child {
+  id                  String                @id @default(cuid())
+  householdId         String
+  household           Household             @relation(fields: [householdId], references: [id], onDelete: Restrict)
+  name                String
+  birthDate           DateTime              @db.Date
+  sex                 Sex                   @default(UNSPECIFIED)
+  birthHeightCm       Decimal?              @db.Decimal(5, 2)
+  birthWeightKg       Decimal?              @db.Decimal(5, 3)
+  motherHeightCm      Decimal?              @db.Decimal(5, 2)
+  fatherHeightCm      Decimal?              @db.Decimal(5, 2)
+  notes               String?
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  deletedAt           DateTime?
+  growthMeasurements GrowthMeasurement[]
+  sleepSessions       SleepSession[]
+  meals               Meal[]
+  beverages           BeverageIntake[]
+  activities          PhysicalActivity[]
+  emotions            EmotionRecord[]
+
+  @@index([householdId, deletedAt])
+  @@index([householdId, birthDate])
+}
+
+model GrowthMeasurement {
+  id                  String     @id @default(cuid())
+  householdId         String
+  household           Household  @relation(fields: [householdId], references: [id], onDelete: Restrict)
+  childId             String
+  child               Child      @relation(fields: [childId], references: [id], onDelete: Restrict)
+  measuredAt          DateTime
+  heightCm            Decimal?   @db.Decimal(5, 2)
+  weightKg            Decimal?   @db.Decimal(5, 3)
+  headCircumferenceCm Decimal?   @db.Decimal(5, 2)
+  source              DataSource @default(MANUAL)
+  place               String?
+  method              String?
+  device              String?
+  precisionNote       String?
+  notes               String?
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+  deletedAt           DateTime?
+
+  @@index([householdId, childId, measuredAt])
+  @@index([householdId, deletedAt])
+}
+
+model SleepSession {
+  id           String     @id @default(cuid())
+  householdId  String
+  household    Household  @relation(fields: [householdId], references: [id], onDelete: Restrict)
+  childId      String
+  child        Child      @relation(fields: [childId], references: [id], onDelete: Restrict)
+  kind         SleepKind
+  startedAt    DateTime
+  endedAt      DateTime
+  awakeMinutes Int?
+  wakeCount    Int?
+  observation  String?
+  source       DataSource @default(MANUAL)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  deletedAt    DateTime?
+
+  @@index([householdId, childId, startedAt])
+  @@index([householdId, deletedAt])
+}
+
+model Meal {
+  id          String     @id @default(cuid())
+  householdId String
+  household   Household  @relation(fields: [householdId], references: [id], onDelete: Restrict)
+  childId     String
+  child       Child      @relation(fields: [childId], references: [id], onDelete: Restrict)
+  type        MealType
+  occurredAt  DateTime
+  appetite    String?
+  notes       String?
+  source      DataSource @default(MANUAL)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  deletedAt   DateTime?
+  items       MealItem[]
+
+  @@index([householdId, childId, occurredAt])
+  @@index([householdId, deletedAt])
+}
+
+model MealItem {
+  id              String     @id @default(cuid())
+  householdId     String
+  household       Household  @relation(fields: [householdId], references: [id], onDelete: Restrict)
+  mealId          String
+  meal            Meal       @relation(fields: [mealId], references: [id], onDelete: Restrict)
+  name            String
+  category        String?
+  offeredAmount   Decimal?   @db.Decimal(8, 2)
+  consumedAmount  Decimal?   @db.Decimal(8, 2)
+  estimatedAmount Decimal?   @db.Decimal(8, 2)
+  amountUnit      String?
+  isNewFood       Boolean    @default(false)
+  reactionNote    String?
+  source          DataSource @default(MANUAL)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  deletedAt       DateTime?
+
+  @@index([householdId, mealId, deletedAt])
+}
+
+model BeverageIntake {
+  id          String       @id @default(cuid())
+  householdId String
+  household   Household    @relation(fields: [householdId], references: [id], onDelete: Restrict)
+  childId     String
+  child       Child        @relation(fields: [childId], references: [id], onDelete: Restrict)
+  type        BeverageType
+  volumeMl    Int?
+  occurredAt  DateTime
+  notes       String?
+  source      DataSource   @default(MANUAL)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  deletedAt   DateTime?
+
+  @@index([householdId, childId, occurredAt])
+  @@index([householdId, deletedAt])
+}
+
+model PhysicalActivity {
+  id             String            @id @default(cuid())
+  householdId    String
+  household      Household         @relation(fields: [householdId], references: [id], onDelete: Restrict)
+  childId        String
+  child          Child             @relation(fields: [childId], references: [id], onDelete: Restrict)
+  activityType   String
+  durationMinutes Int
+  outdoorMinutes Int?
+  intensity      ActivityIntensity
+  structure      ActivityStructure
+  occurredAt     DateTime
+  engagement     String?
+  notes          String?
+  source         DataSource        @default(MANUAL)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  deletedAt      DateTime?
+
+  @@index([householdId, childId, occurredAt])
+  @@index([householdId, deletedAt])
+}
+
+model EmotionRecord {
+  id                String     @id @default(cuid())
+  householdId       String
+  household         Household  @relation(fields: [householdId], references: [id], onDelete: Restrict)
+  childId           String
+  child             Child      @relation(fields: [childId], references: [id], onDelete: Restrict)
+  mood              Mood
+  tags              String[]
+  context            String?
+  durationMinutes    Int?
+  peerInteraction    String?
+  parentInteraction  String?
+  notes              String?
+  occurredAt         DateTime
+  source             DataSource @default(MANUAL)
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  deletedAt          DateTime?
+
+  @@index([householdId, childId, occurredAt])
+  @@index([householdId, deletedAt])
+}
+
+model AuditLog {
+  id          String      @id @default(cuid())
+  householdId String
+  household   Household   @relation(fields: [householdId], references: [id], onDelete: Restrict)
+  actorId     String
+  action      AuditAction
+  entityType  String
+  entityId    String
+  metadata    Json?
+  createdAt   DateTime    @default(now())
+
+  @@index([householdId, entityType, entityId, createdAt])
+  @@index([householdId, createdAt])
+}
+
+model AdminSession {
+  id              String     @id @default(cuid())
+  householdId     String
+  household       Household  @relation(fields: [householdId], references: [id], onDelete: Restrict)
+  tokenDigest     String     @unique
+  csrfTokenDigest String
+  expiresAt       DateTime
+  revokedAt       DateTime?
+  createdAt       DateTime   @default(now())
+  lastSeenAt      DateTime   @default(now())
+
+  @@index([householdId, expiresAt])
+}
+

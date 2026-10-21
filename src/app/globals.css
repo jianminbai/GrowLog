@@ -152,6 +152,113 @@ h2 {
   line-height: 1.65;
 }
 
+.login-shell {
+  display: grid;
+  gap: 2rem;
+  min-height: 100vh;
+  align-items: center;
+}
+
+.wordmark {
+  display: inline-block;
+  margin-bottom: 3rem;
+  color: var(--ink);
+  font-family: Georgia, serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.login-copy h1,
+.today-header h1 {
+  font-size: clamp(2.8rem, 8vw, 5rem);
+}
+
+.login-copy p {
+  max-width: 34rem;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+.login-panel {
+  border: 1px solid var(--line);
+  border-radius: 1.75rem;
+  background: rgba(255, 253, 248, 0.86);
+  padding: clamp(1.25rem, 5vw, 2.25rem);
+  box-shadow: 0 24px 70px rgba(30, 69, 57, 0.12);
+}
+
+.login-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.login-form label {
+  display: grid;
+  gap: 0.5rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.login-form input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 0.9rem;
+  background: var(--paper);
+  color: var(--ink);
+  padding: 0.85rem 1rem;
+  font: inherit;
+}
+
+.login-form input:focus-visible {
+  outline: 3px solid rgba(31, 107, 86, 0.25);
+  border-color: var(--green);
+}
+
+.login-submit {
+  border: 0;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+
+.login-submit:disabled {
+  cursor: wait;
+  opacity: 0.68;
+}
+
+.form-message {
+  margin: 0;
+  color: #a34536;
+  font-size: 0.84rem;
+}
+
+.today-shell {
+  min-height: 100vh;
+}
+
+.today-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.empty-state {
+  border: 1px dashed var(--line);
+  border-radius: 1.5rem;
+  background: rgba(255, 253, 248, 0.55);
+  color: var(--muted);
+  padding: 2rem;
+  line-height: 1.75;
+}
+
+@media (min-width: 820px) {
+  .login-shell {
+    grid-template-columns: minmax(0, 1.35fr) minmax(20rem, 0.65fr);
+  }
+}
+
 @media (min-width: 760px) {
   .snapshot-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -174,6 +281,11 @@ h2 {
   }
 
   .preview {
+    background: rgba(23, 41, 35, 0.88);
+  }
+
+  .login-panel,
+  .empty-state {
     background: rgba(23, 41, 35, 0.88);
   }
 

@@ -7,5 +7,6 @@ coverage/
 !.env.example
 .superpowers/
 *.log
+*.tsbuildinfo
 .DS_Store
 

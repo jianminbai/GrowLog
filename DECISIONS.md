@@ -27,3 +27,11 @@ P0 shows measurements and descriptive trends only. Percentiles, Z-scores, age re
 ## ADR-007 — Native inline execution on branch `work`
 
 The cloud checkout is clean and already uses the non-main `work` branch. Development stays in this checkout so the requested durable project files remain at the repository root. A nested worktree would make the environment snapshot and recovery path less direct.
+
+## ADR-008 — Preserve Prisma artifact verification
+
+The environment currently blocks `binaries.prisma.sh`. Do not set `PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING` or vendor an engine assembled through an internal WASM adapter. Save the required domain in cloud configuration and wait for that rule to be published. Static schema validation may use Prisma's npm-published WASM from the exact engine commit, but it does not replace migration and client verification.
+
+## ADR-009 — Authentication core is persistence-agnostic
+
+Authentication rules depend on a small `SessionRepository` contract. Production uses a lazy Prisma adapter, while unit and route tests use an in-memory implementation. This lets security behavior remain tested without hiding the outstanding real-PostgreSQL integration requirement.
