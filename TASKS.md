@@ -4,7 +4,7 @@ Status keys: `[ ]` pending, `[~]` in progress, `[x]` verified.
 
 ## P0 foundation
 
-- [~] M0 — Establish architecture, task ledger, executable Next.js/TypeScript baseline, lint, typecheck, tests, and production build.
+- [x] M0 — Establish architecture, task ledger, executable Next.js/TypeScript baseline, lint, typecheck, tests, and production build.
   - Acceptance: project state files exist; commands are documented; `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build` pass.
 - [ ] M1 — PostgreSQL and Prisma persistence foundation.
   - Acceptance: normalized schema covers the P0 entities, household isolation, timestamps, sources, soft deletion, audit events, indexes, and a reproducible migration; database integration test passes.
