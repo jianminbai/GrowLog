@@ -138,4 +138,37 @@ describe("authentication route handlers", () => {
     expect(dependencies.records[0]?.revokedAt).toBeInstanceOf(Date);
     expect(loggedOut.headers.getSetCookie().join("\n")).toContain("Max-Age=0");
   });
+
+  it("uses the externally visible host when validating a same-origin mutation", async () => {
+    const handlers = createAuthHandlers(dependencies);
+    const loginResponse = await handlers.login(
+      new Request("http://localhost:3000/api/auth/login", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          email: "parent@example.com",
+          password: "correct password"
+        })
+      })
+    );
+    const cookieHeader = cookiesFrom(loginResponse);
+    const csrf = cookieHeader
+      .split("; ")
+      .find((cookie) => cookie.startsWith(`${CSRF_COOKIE_NAME}=`))!
+      .split("=")[1]!;
+
+    const response = await handlers.logout(
+      new Request("http://localhost:3000/api/auth/logout", {
+        method: "POST",
+        headers: {
+          cookie: cookieHeader,
+          host: "127.0.0.1:3010",
+          origin: "http://127.0.0.1:3010",
+          "x-csrf-token": csrf
+        }
+      })
+    );
+
+    expect(response.status).toBe(200);
+  });
 });

@@ -77,7 +77,19 @@ function expiredCookie(name: string, httpOnly: boolean): string {
 
 function hasValidOrigin(request: Request): boolean {
   const origin = request.headers.get("origin");
-  return origin === null || origin === new URL(request.url).origin;
+  if (origin === null) return true;
+
+  const requestUrl = new URL(request.url);
+  const forwardedHost = request.headers.get("x-forwarded-host")?.split(",", 1)[0]?.trim();
+  const forwardedProtocol = request.headers.get("x-forwarded-proto")?.split(",", 1)[0]?.trim();
+  const host = forwardedHost || request.headers.get("host") || requestUrl.host;
+  const protocol = forwardedProtocol || requestUrl.protocol.slice(0, -1);
+
+  try {
+    return new URL(origin).origin === new URL(`${protocol}://${host}`).origin;
+  } catch {
+    return false;
+  }
 }
 
 export function createAuthHandlers(dependencies: AuthHandlerDependencies) {

@@ -1,17 +1,8 @@
-import type { SessionRecord, SessionRepository } from "./auth-service";
+import type { PrismaClient } from "@prisma/client";
 
-type StoredSession = SessionRecord & { id: string };
+import type { SessionRepository } from "./auth-service";
 
-export type SessionPrismaClient = {
-  adminSession: {
-    create(args: { data: SessionRecord }): Promise<StoredSession>;
-    findUnique(args: { where: { tokenDigest: string } }): Promise<StoredSession | null>;
-    updateMany(args: {
-      where: { tokenDigest: string; revokedAt: null };
-      data: { revokedAt: Date };
-    }): Promise<{ count: number }>;
-  };
-};
+export type SessionPrismaClient = Pick<PrismaClient, "adminSession">;
 
 export function createSessionRepository(client: SessionPrismaClient): SessionRepository {
   return {

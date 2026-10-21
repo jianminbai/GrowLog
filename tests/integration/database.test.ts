@@ -5,6 +5,8 @@ import {
   createChildWithAudit,
   findChildForHousehold
 } from "@/modules/children/child-repository";
+import { issueSession, resolveSession, revokeSession } from "@/modules/auth/auth-service";
+import { createSessionRepository } from "@/modules/auth/session-repository";
 
 const databaseUrl = process.env.DATABASE_URL;
 const databaseSuite = databaseUrl?.includes("growlog_test") ? describe : describe.skip;
@@ -15,6 +17,7 @@ databaseSuite("household-scoped child persistence", () => {
     prisma = new PrismaClient({ datasourceUrl: databaseUrl });
   });
   beforeEach(async () => {
+    await prisma.adminSession.deleteMany();
     await prisma.auditLog.deleteMany();
     await prisma.child.deleteMany();
     await prisma.household.deleteMany();
@@ -74,5 +77,46 @@ databaseSuite("household-scoped child persistence", () => {
       id: child.id,
       name: "Lin"
     });
+  });
+});
+
+databaseSuite("Prisma-backed administrator sessions", () => {
+  beforeAll(() => {
+    prisma = new PrismaClient({ datasourceUrl: databaseUrl });
+  });
+
+  beforeEach(async () => {
+    await prisma.adminSession.deleteMany();
+    await prisma.auditLog.deleteMany();
+    await prisma.child.deleteMany();
+    await prisma.household.deleteMany();
+  });
+
+  afterAll(async () => {
+    await prisma.$disconnect();
+  });
+
+  it("persists only digests and supports lookup and revocation", async () => {
+    const household = await prisma.household.create({ data: { name: "Session family" } });
+    const repository = createSessionRepository(prisma);
+    const now = new Date("2026-10-21T02:00:00.000Z");
+    const randomValues = [Buffer.alloc(32, 7), Buffer.alloc(32, 8)];
+
+    const issued = await issueSession(household.id, repository, {
+      now,
+      randomBytes: () => randomValues.shift() ?? Buffer.alloc(32, 9)
+    });
+    const stored = await prisma.adminSession.findFirstOrThrow();
+
+    expect(stored.tokenDigest).not.toBe(issued.token);
+    expect(stored.csrfTokenDigest).not.toBe(issued.csrfToken);
+    await expect(resolveSession(issued.token, repository, now)).resolves.toMatchObject({
+      householdId: household.id,
+      tokenDigest: stored.tokenDigest
+    });
+
+    await revokeSession(issued.token, repository, now);
+    await expect(prisma.adminSession.findUniqueOrThrow({ where: { id: stored.id } })).resolves
+      .toMatchObject({ revokedAt: now });
   });
 });

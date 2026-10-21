@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 
 import { SESSION_COOKIE_NAME } from "@/modules/auth/auth-handlers";
 import { InvalidSessionError, resolveSession } from "@/modules/auth/auth-service";
-import { createSessionRepository, type SessionPrismaClient } from "@/modules/auth/session-repository";
+import { createSessionRepository } from "@/modules/auth/session-repository";
 import { getPrisma } from "@/lib/db";
 
 export default async function ProtectedLayout({ children }: { children: ReactNode }) {
@@ -12,10 +12,7 @@ export default async function ProtectedLayout({ children }: { children: ReactNod
   const token = cookieStore.get(SESSION_COOKIE_NAME)?.value ?? "";
 
   try {
-    await resolveSession(
-      token,
-      createSessionRepository(getPrisma() as SessionPrismaClient)
-    );
+    await resolveSession(token, createSessionRepository(getPrisma()));
   } catch (error) {
     if (error instanceof InvalidSessionError) redirect("/login");
     throw error;

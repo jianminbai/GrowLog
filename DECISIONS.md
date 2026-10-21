@@ -35,3 +35,7 @@ The environment currently blocks `binaries.prisma.sh`. Do not set `PRISMA_ENGINE
 ## ADR-009 — Authentication core is persistence-agnostic
 
 Authentication rules depend on a small `SessionRepository` contract. Production uses a lazy Prisma adapter, while unit and route tests use an in-memory implementation. This lets security behavior remain tested without hiding the outstanding real-PostgreSQL integration requirement.
+
+## ADR-010 — Mutation origin follows the externally visible request authority
+
+Validate browser `Origin` against `X-Forwarded-Host`/`X-Forwarded-Proto` when supplied by the deployment proxy, then `Host`, with the request URL as fallback. This preserves same-origin protection when Next.js receives an internal URL behind Caddy or another trusted proxy; the per-session CSRF digest remains required independently.

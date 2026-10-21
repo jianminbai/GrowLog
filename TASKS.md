@@ -8,7 +8,7 @@ Status keys: `[ ]` pending, `[~]` in progress, `[x]` verified.
   - Acceptance: project state files exist; commands are documented; `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build` pass.
 - [x] M1 — PostgreSQL and Prisma persistence foundation.
   - Acceptance: normalized schema covers the P0 entities, household isolation, timestamps, sources, soft deletion, audit events, indexes, and a reproducible migration; database integration test passes.
-- [~] M2 — Single-administrator authentication and access protection.
+- [x] M2 — Single-administrator authentication and access protection.
   - Acceptance: no public signup; password verification uses a slow hash; secure HttpOnly session cookie; logout and expiry work; protected pages and APIs reject anonymous requests; CSRF protection is applied to mutations.
 
 ## P0 records
