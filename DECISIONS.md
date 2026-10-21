@@ -55,3 +55,7 @@ Emotion summaries count submitted observations by mood and tag in household-loca
 ## ADR-014 — Dashboard absence remains unknown
 
 The Today dashboard reports completion from records assigned to the household-local date. Missing records and unknown beverage quantities remain visibly unknown instead of becoming invented zeros. Trend notices describe submitted 7-day data and state their limits; quick actions reuse the domain forms rather than duplicating mutation logic.
+
+## ADR-015 — Unified history delegates mutations to domain pages
+
+The household timeline normalizes record summaries and links each entry to its domain page, where existing validation, CSRF checks, edit, soft-delete, and restore behavior remain authoritative. Audit rendering exposes actor, action, entity, timestamp, and changed field names; it discards all other metadata values before presentation.

@@ -12,6 +12,7 @@ export default async function ProtectedLayout({ children }: { children: ReactNod
         <Link className="app-brand" href="/today">GrowLog</Link>
         <div>
           <Link href="/today">今天</Link>
+          <Link href="/history">历史</Link>
           <Link href="/children">儿童档案</Link>
         </div>
       </nav>
