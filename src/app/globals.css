@@ -387,6 +387,9 @@ h2 {
   margin: 1rem 0 0;
 }
 
+.secondary-link { margin-left: 0.5rem; }
+.sleep-summary { margin-top: 2rem; max-width: 38rem; }
+
 .growth-chart,
 .record-card,
 .record-history,

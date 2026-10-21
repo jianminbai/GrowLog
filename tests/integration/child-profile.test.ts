@@ -19,6 +19,7 @@ databaseSuite("complete child profile persistence", () => {
   beforeEach(async () => {
     await prisma.adminSession.deleteMany();
     await prisma.auditLog.deleteMany();
+    await prisma.sleepSession.deleteMany();
     await prisma.growthMeasurement.deleteMany();
     await prisma.child.deleteMany();
     await prisma.household.deleteMany();

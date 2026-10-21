@@ -16,10 +16,11 @@
 - M2 administrator authentication: Argon2id verification, digest-only database sessions, secure cookies, expiry/revocation, protected pages, same-origin and CSRF mutation checks, and logout are verified.
 - M3 child profiles: validated create/list/view/edit APIs and mobile pages are household scoped; optional birth/parent measurements persist; create/update mutations append redacted audit metadata.
 - M4 growth history: household-scoped create/list/edit/soft-delete/restore APIs, redacted audit events, cautious BMI/change calculations, and a mobile history/trend page are verified.
+- M5 sleep history: night/nap intervals, cross-midnight validation, net duration, household-timezone daily attribution, 7/30-day summaries, full lifecycle APIs, audit events, and mobile UI are verified.
 
 ## Current task
 
-- M5: implement night/nap sleep intervals, crossing-midnight duration rules, CRUD/history, and 7/30-day summaries.
+- M6: implement meals, food items, milk/water records, nullable quantities, CRUD/history, and daily totals.
 
 ## Test record
 
@@ -42,6 +43,9 @@
 - M4 domain RED→GREEN: 8 validation/BMI/change cases pass; repository RED→GREEN: 2 PostgreSQL ownership/lifecycle/audit cases pass; handler RED→GREEN: 3 auth/validation/serialization cases pass (2026-10-21).
 - M4 final gate: test database reset passed; lint and generated-client typecheck pass; 43 tests across 11 files pass; production build emits all growth API and page routes (2026-10-21).
 - M4 production HTTP smoke: growth create 201; list/update/delete/restore and history page 200; restored data remains available (2026-10-21).
+- M5 RED→GREEN: 4 interval/summary domain cases, 1 PostgreSQL lifecycle case, and 1 handler summary case pass (2026-10-21).
+- M5 final gate: lint/typecheck and production build pass; database reset succeeds; 49 tests across 14 files pass (2026-10-21).
+- M5 production smoke: sleep create 201 with 450 net minutes; list/update/delete/restore and mobile page return 200 (2026-10-21).
 
 ## Work implemented
 
@@ -56,6 +60,7 @@
 - Child profile forms normalize calendar dates and nullable numeric fields, while API responses serialize Prisma decimals explicitly.
 - Vitest files run sequentially because database integration files share one disposable PostgreSQL schema and each owns cleanup.
 - Growth outputs serialize explicit units, calculate BMI only from height plus weight in the same record, and compare each metric only with its previous available value; no percentile or diagnostic output is produced.
+- Sleep sessions are attributed to the household-local date containing `endedAt`; net minutes subtract explicit awake time, while absent awake time means none recorded rather than an invented value.
 
 ## Blockers
 
@@ -63,5 +68,5 @@
 
 ## Next step
 
-- Implement M5 sleep interval validation and daily/7/30-day aggregation with failing tests.
-- Add household-scoped persistence, authenticated CRUD/history routes, then the mobile sleep entry and summary UI.
+- Implement M6 meal/item and beverage validation with offered/consumed/estimated distinctions and nullable amounts.
+- Add household-scoped lifecycle APIs, daily totals, and mobile entry/history UI.
