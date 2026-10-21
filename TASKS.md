@@ -19,9 +19,9 @@ Status keys: `[ ]` pending, `[~]` in progress, `[x]` verified.
   - Acceptance: create/list/edit/soft-delete/restore height and weight records with date, source, method, location, device, precision, and notes; BMI and change over time are computed only when inputs permit; chart displays history; no fabricated percentiles.
 - [x] M5 — Sleep records.
   - Acceptance: night and nap intervals support crossing midnight; waking duration cannot exceed the interval; daily totals and 7/30-day summaries are tested; CRUD and history work.
-- [~] M6 — Meals, foods, milk, and water.
+- [x] M6 — Meals, foods, milk, and water.
   - Acceptance: meal slots and items distinguish offered, consumed, and estimated amounts; beverage entries preserve units; missing quantity remains unknown; CRUD and daily totals work.
-- [ ] M7 — Physical and outdoor activity.
+- [~] M7 — Physical and outdoor activity.
   - Acceptance: type, duration, intensity, context, and outdoor minutes validate; outdoor time remains distinct from moderate/vigorous exercise; CRUD and weekly summaries work.
 - [ ] M8 — Emotion records.
   - Acceptance: quick overall mood plus optional tags, context, interaction, duration, and notes; CRUD and trend counts work; UI and copy avoid diagnostic claims.

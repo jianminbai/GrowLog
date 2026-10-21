@@ -17,10 +17,11 @@
 - M3 child profiles: validated create/list/view/edit APIs and mobile pages are household scoped; optional birth/parent measurements persist; create/update mutations append redacted audit metadata.
 - M4 growth history: household-scoped create/list/edit/soft-delete/restore APIs, redacted audit events, cautious BMI/change calculations, and a mobile history/trend page are verified.
 - M5 sleep history: night/nap intervals, cross-midnight validation, net duration, household-timezone daily attribution, 7/30-day summaries, full lifecycle APIs, audit events, and mobile UI are verified.
+- M6 nutrition: meal items preserve offered/consumed/estimated amounts, beverages preserve unknown volume, lifecycle APIs and audit trails are household scoped, and mobile daily totals/history are implemented.
 
 ## Current task
 
-- M6: implement meals, food items, milk/water records, nullable quantities, CRUD/history, and daily totals.
+- M7: implement physical/outdoor activity CRUD, distinct outdoor minutes, and weekly summaries.
 
 ## Test record
 
@@ -46,6 +47,7 @@
 - M5 RED→GREEN: 4 interval/summary domain cases, 1 PostgreSQL lifecycle case, and 1 handler summary case pass (2026-10-21).
 - M5 final gate: lint/typecheck and production build pass; database reset succeeds; 49 tests across 14 files pass (2026-10-21).
 - M5 production smoke: sleep create 201 with 450 net minutes; list/update/delete/restore and mobile page return 200 (2026-10-21).
+- M6 final gate: nutrition domain/handler/database suites pass; full database reset succeeds; 55 tests across 17 files pass; lint/typecheck and production build pass (2026-10-21).
 
 ## Work implemented
 
@@ -68,5 +70,4 @@
 
 ## Next step
 
-- Implement M6 meal/item and beverage validation with offered/consumed/estimated distinctions and nullable amounts.
-- Add household-scoped lifecycle APIs, daily totals, and mobile entry/history UI.
+- Implement M7 activity validation and weekly aggregation with failing tests, then scoped lifecycle APIs and mobile UI.
