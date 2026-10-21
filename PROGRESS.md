@@ -23,10 +23,11 @@
 - M9 Today dashboard: each household child receives timezone-aware completed/missing states, latest growth and sleep, daily nutrition/activity/mood values, cautious 7-day notices, and direct mobile quick-entry links.
 - M10 history/audit: a protected household timeline unifies every P0 record type, optionally shows deleted records, links back to lifecycle controls, and renders actor/action/entity/time with changed field names only. The lifecycle review also added the missing nutrition edit forms.
 - M11 export: authenticated versioned JSON and eight per-domain UTF-8 CSV downloads are household isolated, use explicit unit/timestamp columns, redact audits, omit sessions, escape spreadsheet text, and include soft-deleted rows only by request.
+- M12 PWA: installable standalone manifest, 192/512 icons, update-aware service-worker registration, public offline fallback, and static-shell caching are implemented; API and authenticated navigation responses never enter Cache Storage and API headers enforce private no-store.
 
 ## Current task
 
-- M12: add an installable PWA manifest, icons, app-shell service worker, safe offline fallback, and update registration.
+- M13: implement production Docker/Compose/Caddy deployment, database-aware health checks, and verified backup/restore scripts.
 
 ## Test record
 
@@ -63,6 +64,8 @@
 - M10 final gate: database reset, lint/typecheck, 75 tests across 26 files, and production build pass; authenticated `/history` smoke returns 200 with the scoped child and changed field while anonymous access redirects to login (2026-10-21).
 - M11 export test verifies JSON versioning, household isolation, deleted opt-in, explicit unit headers, and CSV comma/quote/newline escaping (2026-10-21).
 - M11 final gate: database reset, lint/typecheck, 76 tests across 27 files, and production build pass; anonymous export returns 401, authenticated JSON/CSV return 200 attachments with `private, no-store`, expected content types, version 1, and UTF-8 child data (2026-10-21).
+- M12 manifest/cache-policy tests pass; full reset and 78 tests across 28 files, lint/typecheck, and production build pass (2026-10-21).
+- M12 production smoke: manifest, service worker, offline fallback, and 192/512 PNG icons return 200 with correct types; API health responses include `Cache-Control: private, no-store, max-age=0` (2026-10-21).
 
 ## Work implemented
 
@@ -83,6 +86,7 @@
 - The Today dashboard distinguishes unknown quantities from recorded zero, attributes records by household-local date, and labels trend notices as summaries of submitted data. Quick actions lead directly to the short forms already used by each domain page.
 - Unified history reads every domain by authenticated household, normalizes occurrence time without copying sensitive values into audit output, and sends users to the existing domain form for edits or restoration. Nutrition edit forms now expose the already-tested PATCH APIs.
 - Export loads data directly by authenticated household, never exports `AdminSession`, converts decimals and timestamps explicitly, and reduces audit metadata to changed field names. CSV cells are quoted and spreadsheet-formula prefixes are neutralized.
+- The service worker caches only the offline fallback, manifest, icons, and immutable Next static assets. Navigations use the network with an offline fallback but are not stored; `/api/` requests bypass service-worker caching entirely.
 
 ## Blockers
 
@@ -90,4 +94,4 @@
 
 ## Next step
 
-- Implement M12 manifest/icons/service worker tests, then install metadata, registration, offline shell, and explicit API no-cache behavior.
+- Implement and smoke-test M13 production images, Compose/Caddy routing, database-aware health checks, and PostgreSQL backup/restore procedures.

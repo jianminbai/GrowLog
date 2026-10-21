@@ -34,9 +34,9 @@ Status keys: `[ ]` pending, `[~]` in progress, `[x]` verified.
   - Acceptance: every P0 record can be edited and soft deleted; authorized restore works; audit events show actor, action, entity, time, and redacted change metadata.
 - [x] M11 — JSON/CSV export.
   - Acceptance: authenticated household export includes versioned JSON and per-domain CSV with explicit units and timestamps; deleted records are opt-in; tests verify isolation and escaping.
-- [~] M12 — PWA support.
+- [x] M12 — PWA support.
   - Acceptance: installable manifest, icons, service worker/app shell, offline fallback, and update behavior pass manifest and build checks; sensitive API responses are never cached.
-- [ ] M13 — Docker Compose, Caddy, health checks, backup and restore.
+- [~] M13 — Docker Compose, Caddy, health checks, backup and restore.
   - Acceptance: Compose starts app/PostgreSQL/Caddy with persistent volumes; health endpoint verifies app and database; backup script creates a timestamped PostgreSQL dump; restore targets a named database and includes a verification procedure.
 - [ ] M14 — End-to-end verification and security review.
   - Acceptance: core login, create/query/edit/delete/restore flows pass; API validation/error format is consistent; dependency/build/test checks pass; deployment and backup restore smoke tests are recorded.

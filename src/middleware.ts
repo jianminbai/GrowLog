@@ -10,6 +10,6 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/today/:path*", "/history/:path*", "/growth/:path*", "/children/:path*"]
+  matcher: ["/today/:path*", "/history/:path*", "/settings/:path*", "/growth/:path*", "/children/:path*"]
 };
 

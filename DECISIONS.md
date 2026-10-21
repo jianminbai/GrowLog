@@ -63,3 +63,7 @@ The household timeline normalizes record summaries and links each entry to its d
 ## ADR-016 — Exports are versioned, scoped, and credential-free
 
 Household JSON declares `exportVersion: 1`; CSV is split by domain with units in column names. Both load by authenticated household, omit admin sessions and credential material, redact audit values, and exclude soft-deleted rows unless requested. CSV quoting follows common spreadsheet rules and text that could be interpreted as a formula is prefixed safely.
+
+## ADR-017 — PWA cache holds no household data
+
+The service worker caches only public shell assets and immutable Next static files. Authenticated navigations always go to the network and fall back to a public offline page without being written to Cache Storage. API requests bypass service-worker caching, and server headers mark all API responses private and no-store.

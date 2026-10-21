@@ -12,12 +12,12 @@ let prisma: PrismaClient;
 suite("nutrition persistence", () => {
   beforeAll(() => { prisma = new PrismaClient({ datasourceUrl: databaseUrl }); });
   beforeEach(async () => {
-    await prisma.auditLog.deleteMany(); await prisma.mealItem.deleteMany(); await prisma.meal.deleteMany();
+    await prisma.adminSession.deleteMany(); await prisma.auditLog.deleteMany(); await prisma.mealItem.deleteMany(); await prisma.meal.deleteMany();
     await prisma.beverageIntake.deleteMany(); await prisma.sleepSession.deleteMany();
     await prisma.growthMeasurement.deleteMany(); await prisma.child.deleteMany(); await prisma.household.deleteMany();
   });
   afterAll(async () => {
-    await prisma.auditLog.deleteMany(); await prisma.mealItem.deleteMany(); await prisma.meal.deleteMany();
+    await prisma.adminSession.deleteMany(); await prisma.auditLog.deleteMany(); await prisma.mealItem.deleteMany(); await prisma.meal.deleteMany();
     await prisma.beverageIntake.deleteMany(); await prisma.child.deleteMany(); await prisma.household.deleteMany();
     await prisma.$disconnect();
   });
