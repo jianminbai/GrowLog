@@ -67,3 +67,15 @@ Household JSON declares `exportVersion: 1`; CSV is split by domain with units in
 ## ADR-017 — PWA cache holds no household data
 
 The service worker caches only public shell assets and immutable Next static files. Authenticated navigations always go to the network and fall back to a public offline page without being written to Cache Storage. API requests bypass service-worker caching, and server headers mark all API responses private and no-store.
+
+## ADR-018 — Production runtime uses Node 24 and prebuilt Prisma assets
+
+The production image uses the active Node 24 line required by the current test toolchain. Prisma Client and engine artifacts are generated in the builder and copied with the verified dependency tree into the runtime image, so container startup applies migrations without reaching an external package or engine registry.
+
+## ADR-019 — Health means application and database readiness
+
+`/api/health` performs a minimal PostgreSQL query before reporting readiness. Database failures return a generic 503 problem without connection details. Compose waits for this application health check before starting the public proxy, preventing a process-only status from advertising an unusable deployment.
+
+## ADR-020 — Restore is isolated and explicit by default
+
+Backups use PostgreSQL's custom format plus a SHA-256 companion file. Restore requires a named target database different from the configured primary database unless the operator sets an explicit destructive override. Verification compares migration and domain-row counts before traffic is redirected.

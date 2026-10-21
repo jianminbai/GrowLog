@@ -1,0 +1,13 @@
+.git
+.next
+node_modules
+Dockerfile*
+docs
+*.md
+coverage
+backups
+.env
+.env.*
+!.env.example
+npm-debug.log*
+.superpowers

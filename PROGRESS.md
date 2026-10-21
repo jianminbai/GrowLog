@@ -24,10 +24,11 @@
 - M10 history/audit: a protected household timeline unifies every P0 record type, optionally shows deleted records, links back to lifecycle controls, and renders actor/action/entity/time with changed field names only. The lifecycle review also added the missing nutrition edit forms.
 - M11 export: authenticated versioned JSON and eight per-domain UTF-8 CSV downloads are household isolated, use explicit unit/timestamp columns, redact audits, omit sessions, escape spreadsheet text, and include soft-deleted rows only by request.
 - M12 PWA: installable standalone manifest, 192/512 icons, update-aware service-worker registration, public offline fallback, and static-shell caching are implemented; API and authenticated navigation responses never enter Cache Storage and API headers enforce private no-store.
+- M13 deployment and recovery: Node 24 production image stages, PostgreSQL 16, Caddy, persistent volumes, dependency-aware health checks, idempotent household bootstrap, checksummed backups, guarded named-database restores, and an operator runbook are implemented and smoke-tested.
 
 ## Current task
 
-- M13: implement production Docker/Compose/Caddy deployment, database-aware health checks, and verified backup/restore scripts.
+- M14: complete end-to-end lifecycle verification, API contract review, dependency security review, and final MVP gates.
 
 ## Test record
 
@@ -66,6 +67,10 @@
 - M11 final gate: database reset, lint/typecheck, 76 tests across 27 files, and production build pass; anonymous export returns 401, authenticated JSON/CSV return 200 attachments with `private, no-store`, expected content types, version 1, and UTF-8 child data (2026-10-21).
 - M12 manifest/cache-policy tests pass; full reset and 78 tests across 28 files, lint/typecheck, and production build pass (2026-10-21).
 - M12 production smoke: manifest, service worker, offline fallback, and 192/512 PNG icons return 200 with correct types; API health responses include `Cache-Control: private, no-store, max-age=0` (2026-10-21).
+- M13 health RED→GREEN: database connectivity failure returns a generic 503 problem and a successful query returns 200 with `database: ok`; 2 handler cases pass (2026-10-21).
+- M13 final code gate: test database reset, lint, typecheck, 80 tests across 29 files, production build, shell syntax, Compose resolution, and the exact Dockerfile BuildKit check pass (2026-10-21).
+- M13 deployment smoke: the Node 24 production stages built into `growlog-app:local`; Compose started PostgreSQL, the application, and Caddy; both database and application reached healthy state; proxied `/api/health` returned 200 with database status and security/no-store headers (2026-10-21).
+- M13 recovery smoke: checksummed custom-format dumps restored into a separate named database; source/target migration, household, and child counts matched; primary-database overwrite was refused unless explicitly enabled (2026-10-21).
 
 ## Work implemented
 
@@ -87,11 +92,13 @@
 - Unified history reads every domain by authenticated household, normalizes occurrence time without copying sensitive values into audit output, and sends users to the existing domain form for edits or restoration. Nutrition edit forms now expose the already-tested PATCH APIs.
 - Export loads data directly by authenticated household, never exports `AdminSession`, converts decimals and timestamps explicitly, and reduces audit metadata to changed field names. CSV cells are quoted and spreadsheet-formula prefixes are neutralized.
 - The service worker caches only the offline fallback, manifest, icons, and immutable Next static assets. Navigations use the network with an offline fallback but are not stored; `/api/` requests bypass service-worker caching entirely.
+- The deployment image installs dependencies with a BuildKit cache and optional CA secret, generates Prisma assets in the builder, then copies the verified dependency tree into the runtime image so startup never downloads engines. Compose keeps PostgreSQL and Caddy state in named volumes and routes only through the internal service names.
+- Backup and restore scripts operate inside the Compose PostgreSQL container, write a SHA-256 companion file, require a separate target database by default, and compare migration counts as part of the documented recovery procedure.
 
 ## Blockers
 
-- None. The published cloud egress rule now permits Prisma's signed engine download without bypassing integrity checks.
+- None.
 
 ## Next step
 
-- Implement and smoke-test M13 production images, Compose/Caddy routing, database-aware health checks, and PostgreSQL backup/restore procedures.
+- Run the M14 authenticated lifecycle smoke suite, document the dependency/security review, execute every final gate, and close the MVP ledger.

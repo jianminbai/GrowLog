@@ -1,7 +1,4 @@
-import { NextResponse } from "next/server";
+import { getPrisma } from "@/lib/db";
+import { createHealthHandler } from "./health-handler";
 
-import { ok } from "@/lib/result";
-
-export function GET() {
-  return NextResponse.json(ok({ status: "ok" as const }));
-}
+export const GET = createHealthHandler(() => getPrisma().$queryRaw`SELECT 1`);
