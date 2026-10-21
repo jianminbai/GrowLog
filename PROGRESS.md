@@ -26,6 +26,7 @@
 - M12 PWA: installable standalone manifest, 192/512 icons, update-aware service-worker registration, public offline fallback, and static-shell caching are implemented; API and authenticated navigation responses never enter Cache Storage and API headers enforce private no-store.
 - M13 deployment and recovery: Node 24 production image stages, PostgreSQL 16, Caddy, persistent volumes, dependency-aware health checks, idempotent household bootstrap, checksummed backups, guarded named-database restores, and an operator runbook are implemented and smoke-tested.
 - M14 end-to-end and security review: a reusable authenticated HTTP smoke script verifies the complete P0 lifecycle and API contract through Caddy; security controls and dependency advisories are documented with explicit follow-up work.
+- Repository documentation: the root README provides an accurate Chinese product overview, Docker/VPS quick start, development checks, backup/restore entry points, security boundaries, and links to durable project records.
 
 ## Current task
 
