@@ -21,9 +21,9 @@ Status keys: `[ ]` pending, `[~]` in progress, `[x]` verified.
   - Acceptance: night and nap intervals support crossing midnight; waking duration cannot exceed the interval; daily totals and 7/30-day summaries are tested; CRUD and history work.
 - [x] M6 — Meals, foods, milk, and water.
   - Acceptance: meal slots and items distinguish offered, consumed, and estimated amounts; beverage entries preserve units; missing quantity remains unknown; CRUD and daily totals work.
-- [~] M7 — Physical and outdoor activity.
+- [x] M7 — Physical and outdoor activity.
   - Acceptance: type, duration, intensity, context, and outdoor minutes validate; outdoor time remains distinct from moderate/vigorous exercise; CRUD and weekly summaries work.
-- [ ] M8 — Emotion records.
+- [~] M8 — Emotion records.
   - Acceptance: quick overall mood plus optional tags, context, interaction, duration, and notes; CRUD and trend counts work; UI and copy avoid diagnostic claims.
 
 ## P0 experience and operations

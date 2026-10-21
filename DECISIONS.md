@@ -43,3 +43,7 @@ Validate browser `Origin` against `X-Forwarded-Host`/`X-Forwarded-Proto` when su
 ## ADR-011 — Shared database integration tests run sequentially
 
 Integration test files share one disposable `growlog_test` schema and clean tables before each case. Vitest disables file-level parallelism so independent cleanup hooks cannot delete another test's parent rows mid-transaction. Unit cases remain isolated and the suite is small enough that deterministic execution is the better tradeoff.
+
+## ADR-012 — Outdoor time and exercise intensity remain independent
+
+Each activity stores total duration, optional outdoor minutes, and an explicit intensity. Weekly outdoor totals use only `outdoorMinutes`; moderate/vigorous totals use total duration only when intensity is marked `MODERATE` or `VIGOROUS`. This prevents a light-intensity outdoor session from being presented as effective moderate/vigorous exercise.

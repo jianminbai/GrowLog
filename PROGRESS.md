@@ -18,10 +18,11 @@
 - M4 growth history: household-scoped create/list/edit/soft-delete/restore APIs, redacted audit events, cautious BMI/change calculations, and a mobile history/trend page are verified.
 - M5 sleep history: night/nap intervals, cross-midnight validation, net duration, household-timezone daily attribution, 7/30-day summaries, full lifecycle APIs, audit events, and mobile UI are verified.
 - M6 nutrition: meal items preserve offered/consumed/estimated amounts, beverages preserve unknown volume, lifecycle APIs and audit trails are household scoped, and mobile daily totals/history are implemented.
+- M7 activity: activity type, duration, intensity, structure, source/context, participation, and outdoor minutes validate; lifecycle APIs and audit trails are household scoped; the mobile page shows independent weekly totals for all activity, outdoor time, and moderate/vigorous activity.
 
 ## Current task
 
-- M7: implement physical/outdoor activity CRUD, distinct outdoor minutes, and weekly summaries.
+- M8: implement non-diagnostic emotion records, lifecycle management, and trend counts.
 
 ## Test record
 
@@ -48,6 +49,8 @@
 - M5 final gate: lint/typecheck and production build pass; database reset succeeds; 49 tests across 14 files pass (2026-10-21).
 - M5 production smoke: sleep create 201 with 450 net minutes; list/update/delete/restore and mobile page return 200 (2026-10-21).
 - M6 final gate: nutrition domain/handler/database suites pass; full database reset succeeds; 55 tests across 17 files pass; lint/typecheck and production build pass (2026-10-21).
+- M7 RED→GREEN: 5 activity validation/summary cases, 2 authenticated handler cases, and 1 PostgreSQL ownership/lifecycle/audit case pass (2026-10-21).
+- M7 final gate: full database reset succeeds; lint and typecheck pass; 63 tests across 20 files pass; production build emits activity API/page routes; production HTTP smoke returns health 200 and anonymous activity API 401 (2026-10-21).
 
 ## Work implemented
 
@@ -63,6 +66,7 @@
 - Vitest files run sequentially because database integration files share one disposable PostgreSQL schema and each owns cleanup.
 - Growth outputs serialize explicit units, calculate BMI only from height plus weight in the same record, and compare each metric only with its previous available value; no percentile or diagnostic output is produced.
 - Sleep sessions are attributed to the household-local date containing `endedAt`; net minutes subtract explicit awake time, while absent awake time means none recorded rather than an invented value.
+- Activity summaries use the household-local occurrence date. Outdoor minutes are summed independently; only records explicitly marked moderate or vigorous contribute their full duration to the moderate/vigorous total.
 
 ## Blockers
 
@@ -70,4 +74,4 @@
 
 ## Next step
 
-- Implement M7 activity validation and weekly aggregation with failing tests, then scoped lifecycle APIs and mobile UI.
+- Implement M8 emotion validation and non-diagnostic trend counts with failing tests, then scoped lifecycle APIs and mobile UI.

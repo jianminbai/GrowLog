@@ -30,6 +30,7 @@ export default async function ChildPage({ params }: { params: Promise<{ childId:
       <Link className="primary-action inline-action" href={`/children/${child.id}/growth`}>查看身高体重记录</Link>
       <Link className="primary-action inline-action secondary-link" href={`/children/${child.id}/sleep`}>查看睡眠记录</Link>
       <Link className="primary-action inline-action secondary-link" href={`/children/${child.id}/nutrition`}>查看饮食记录</Link>
+      <Link className="primary-action inline-action secondary-link" href={`/children/${child.id}/activity`}>查看运动与户外记录</Link>
       <section className="profile-panel" aria-labelledby="edit-profile">
         <div className="section-heading">
           <div>
