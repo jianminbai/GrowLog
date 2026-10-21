@@ -14,6 +14,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "smoke:mvp": "node scripts/mvp-smoke.mjs",
     "prisma:generate": "prisma generate",
     "prisma:validate": "prisma validate",
     "db:test:prepare": "DATABASE_URL=postgresql://growlog_test:growlog_test@localhost:55432/growlog_test prisma migrate reset --force --skip-seed"

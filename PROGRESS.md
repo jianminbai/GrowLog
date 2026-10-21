@@ -25,10 +25,11 @@
 - M11 export: authenticated versioned JSON and eight per-domain UTF-8 CSV downloads are household isolated, use explicit unit/timestamp columns, redact audits, omit sessions, escape spreadsheet text, and include soft-deleted rows only by request.
 - M12 PWA: installable standalone manifest, 192/512 icons, update-aware service-worker registration, public offline fallback, and static-shell caching are implemented; API and authenticated navigation responses never enter Cache Storage and API headers enforce private no-store.
 - M13 deployment and recovery: Node 24 production image stages, PostgreSQL 16, Caddy, persistent volumes, dependency-aware health checks, idempotent household bootstrap, checksummed backups, guarded named-database restores, and an operator runbook are implemented and smoke-tested.
+- M14 end-to-end and security review: a reusable authenticated HTTP smoke script verifies the complete P0 lifecycle and API contract through Caddy; security controls and dependency advisories are documented with explicit follow-up work.
 
 ## Current task
 
-- M14: complete end-to-end lifecycle verification, API contract review, dependency security review, and final MVP gates.
+- All GrowLog MVP milestones M0–M14 are implemented and verified. Deferred P1/P2 work remains listed in `TASKS.md`.
 
 ## Test record
 
@@ -71,6 +72,10 @@
 - M13 final code gate: test database reset, lint, typecheck, 80 tests across 29 files, production build, shell syntax, Compose resolution, and the exact Dockerfile BuildKit check pass (2026-10-21).
 - M13 deployment smoke: the Node 24 production stages built into `growlog-app:local`; Compose started PostgreSQL, the application, and Caddy; both database and application reached healthy state; proxied `/api/health` returned 200 with database status and security/no-store headers (2026-10-21).
 - M13 recovery smoke: checksummed custom-format dumps restored into a separate named database; source/target migration, household, and child counts matched; primary-database overwrite was refused unless explicitly enabled (2026-10-21).
+- M14 authenticated HTTP smoke: 57 requests through Caddy verify anonymous and invalid-input errors, secure cookie attributes, session resolution, missing-CSRF and cross-origin rejection, child create/edit, all six record-domain create/query/edit/delete/deleted-query/restore flows, protected Today/History pages, JSON export, logout, and revoked-session rejection (2026-10-21).
+- M14 API contract review: success and error envelopes, field errors, private no-store headers, generic authentication/database failures, and household scoping are covered by the HTTP smoke plus handler and PostgreSQL integration tests (2026-10-21).
+- M14 dependency review: `npm audit --omit=dev --json` reports 0 critical, 1 moderate, and 5 high dependency nodes. Remediation requires breaking Prisma 7.10.1 and Next.js 16.4.2 upgrades; current exposure is restricted to trusted CLI/build inputs and the migration is tracked as P1 in `docs/SECURITY_REVIEW.md` (2026-10-21).
+- M14 final gate: clean test-database reset, lint with zero warnings, sequential typecheck, 80/80 tests across 29 files with PostgreSQL enabled, production build, healthy three-service Compose stack, and proxied database-aware health response all pass (2026-10-21).
 
 ## Work implemented
 
@@ -94,6 +99,7 @@
 - The service worker caches only the offline fallback, manifest, icons, and immutable Next static assets. Navigations use the network with an offline fallback but are not stored; `/api/` requests bypass service-worker caching entirely.
 - The deployment image installs dependencies with a BuildKit cache and optional CA secret, generates Prisma assets in the builder, then copies the verified dependency tree into the runtime image so startup never downloads engines. Compose keeps PostgreSQL and Caddy state in named volumes and routes only through the internal service names.
 - Backup and restore scripts operate inside the Compose PostgreSQL container, write a SHA-256 companion file, require a separate target database by default, and compare migration counts as part of the documented recovery procedure.
+- `scripts/mvp-smoke.mjs` is an environment-driven release check that exercises the deployed application through its public proxy without embedding credentials. It also asserts security cookie flags, CSRF/origin behavior, API envelope shape, and no-store policy.
 
 ## Blockers
 
@@ -101,4 +107,4 @@
 
 ## Next step
 
-- Run the M14 authenticated lifecycle smoke suite, document the dependency/security review, execute every final gate, and close the MVP ledger.
+- Begin only the explicitly deferred P1/P2 roadmap work; the next maintenance priority is the isolated Prisma 7 and Next.js 16 upgrade recorded in `TASKS.md` and `docs/SECURITY_REVIEW.md`.

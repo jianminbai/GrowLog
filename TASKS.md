@@ -38,10 +38,11 @@ Status keys: `[ ]` pending, `[~]` in progress, `[x]` verified.
   - Acceptance: installable manifest, icons, service worker/app shell, offline fallback, and update behavior pass manifest and build checks; sensitive API responses are never cached.
 - [x] M13 — Docker Compose, Caddy, health checks, backup and restore.
   - Acceptance: Compose starts app/PostgreSQL/Caddy with persistent volumes; health endpoint verifies app and database; backup script creates a timestamped PostgreSQL dump; restore targets a named database and includes a verification procedure.
-- [~] M14 — End-to-end verification and security review.
+- [x] M14 — End-to-end verification and security review.
   - Acceptance: core login, create/query/edit/delete/restore flows pass; API validation/error format is consistent; dependency/build/test checks pass; deployment and backup restore smoke tests are recorded.
 
 ## Deferred after MVP
 
+- [ ] P1 — Upgrade to Prisma 7 and Next.js 16, rerun database/deployment migrations, and close the reviewed transitive dependency advisories.
 - [ ] P1 — Verified WHO/CDC reference curves, reports, health events, data-quality analysis, and kindergarten image extraction with human confirmation.
 - [ ] P2 — Multiple children, family collaboration, milestones, reminders, richer longitudinal analysis, and visit reports.

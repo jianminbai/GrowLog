@@ -79,3 +79,7 @@ The production image uses the active Node 24 line required by the current test t
 ## ADR-020 — Restore is isolated and explicit by default
 
 Backups use PostgreSQL's custom format plus a SHA-256 companion file. Restore requires a named target database different from the configured primary database unless the operator sets an explicit destructive override. Verification compares migration and domain-row counts before traffic is redirected.
+
+## ADR-021 — Framework-major security remediation is an isolated P1 migration
+
+The production dependency audit has no critical findings but reports transitive Prisma CLI and bundled Next.js PostCSS advisories. Their inputs are limited to checked-in schema, configuration, CSS, and source maps; request and uploaded user data do not reach the affected operations. Automated remediation requires Prisma 7 and Next.js 16 major upgrades, so the MVP records this bounded exposure and tracks both migrations as an isolated P1 change with full database, build, HTTP, and recovery re-verification.
