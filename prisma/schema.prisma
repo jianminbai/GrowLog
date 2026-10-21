@@ -74,44 +74,44 @@ enum AuditAction {
 }
 
 model Household {
-  id           String                @id @default(cuid())
-  name         String
-  timeZone     String                @default("Asia/Shanghai")
-  createdAt    DateTime              @default(now())
-  updatedAt    DateTime              @updatedAt
-  children     Child[]
-  sessions     AdminSession[]
-  auditLogs    AuditLog[]
-  growth       GrowthMeasurement[]
-  sleep        SleepSession[]
-  meals        Meal[]
-  mealItems    MealItem[]
-  beverages    BeverageIntake[]
-  activities   PhysicalActivity[]
-  emotions     EmotionRecord[]
+  id         String              @id @default(cuid())
+  name       String
+  timeZone   String              @default("Asia/Shanghai")
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+  children   Child[]
+  sessions   AdminSession[]
+  auditLogs  AuditLog[]
+  growth     GrowthMeasurement[]
+  sleep      SleepSession[]
+  meals      Meal[]
+  mealItems  MealItem[]
+  beverages  BeverageIntake[]
+  activities PhysicalActivity[]
+  emotions   EmotionRecord[]
 }
 
 model Child {
-  id                  String                @id @default(cuid())
-  householdId         String
-  household           Household             @relation(fields: [householdId], references: [id], onDelete: Restrict)
-  name                String
-  birthDate           DateTime              @db.Date
-  sex                 Sex                   @default(UNSPECIFIED)
-  birthHeightCm       Decimal?              @db.Decimal(5, 2)
-  birthWeightKg       Decimal?              @db.Decimal(5, 3)
-  motherHeightCm      Decimal?              @db.Decimal(5, 2)
-  fatherHeightCm      Decimal?              @db.Decimal(5, 2)
-  notes               String?
-  createdAt           DateTime              @default(now())
-  updatedAt           DateTime              @updatedAt
-  deletedAt           DateTime?
+  id                 String              @id @default(cuid())
+  householdId        String
+  household          Household           @relation(fields: [householdId], references: [id], onDelete: Restrict)
+  name               String
+  birthDate          DateTime            @db.Date
+  sex                Sex                 @default(UNSPECIFIED)
+  birthHeightCm      Decimal?            @db.Decimal(5, 2)
+  birthWeightKg      Decimal?            @db.Decimal(5, 3)
+  motherHeightCm     Decimal?            @db.Decimal(5, 2)
+  fatherHeightCm     Decimal?            @db.Decimal(5, 2)
+  notes              String?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  deletedAt          DateTime?
   growthMeasurements GrowthMeasurement[]
-  sleepSessions       SleepSession[]
-  meals               Meal[]
-  beverages           BeverageIntake[]
-  activities          PhysicalActivity[]
-  emotions            EmotionRecord[]
+  sleepSessions      SleepSession[]
+  meals              Meal[]
+  beverages          BeverageIntake[]
+  activities         PhysicalActivity[]
+  emotions           EmotionRecord[]
 
   @@index([householdId, deletedAt])
   @@index([householdId, birthDate])
@@ -224,23 +224,23 @@ model BeverageIntake {
 }
 
 model PhysicalActivity {
-  id             String            @id @default(cuid())
-  householdId    String
-  household      Household         @relation(fields: [householdId], references: [id], onDelete: Restrict)
-  childId        String
-  child          Child             @relation(fields: [childId], references: [id], onDelete: Restrict)
-  activityType   String
+  id              String            @id @default(cuid())
+  householdId     String
+  household       Household         @relation(fields: [householdId], references: [id], onDelete: Restrict)
+  childId         String
+  child           Child             @relation(fields: [childId], references: [id], onDelete: Restrict)
+  activityType    String
   durationMinutes Int
-  outdoorMinutes Int?
-  intensity      ActivityIntensity
-  structure      ActivityStructure
-  occurredAt     DateTime
-  engagement     String?
-  notes          String?
-  source         DataSource        @default(MANUAL)
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
-  deletedAt      DateTime?
+  outdoorMinutes  Int?
+  intensity       ActivityIntensity
+  structure       ActivityStructure
+  occurredAt      DateTime
+  engagement      String?
+  notes           String?
+  source          DataSource        @default(MANUAL)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  deletedAt       DateTime?
 
   @@index([householdId, childId, occurredAt])
   @@index([householdId, deletedAt])
@@ -254,16 +254,16 @@ model EmotionRecord {
   child             Child      @relation(fields: [childId], references: [id], onDelete: Restrict)
   mood              Mood
   tags              String[]
-  context            String?
-  durationMinutes    Int?
-  peerInteraction    String?
-  parentInteraction  String?
-  notes              String?
-  occurredAt         DateTime
-  source             DataSource @default(MANUAL)
-  createdAt          DateTime   @default(now())
-  updatedAt          DateTime   @updatedAt
-  deletedAt          DateTime?
+  context           String?
+  durationMinutes   Int?
+  peerInteraction   String?
+  parentInteraction String?
+  notes             String?
+  occurredAt        DateTime
+  source            DataSource @default(MANUAL)
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  deletedAt         DateTime?
 
   @@index([householdId, childId, occurredAt])
   @@index([householdId, deletedAt])
@@ -285,16 +285,15 @@ model AuditLog {
 }
 
 model AdminSession {
-  id              String     @id @default(cuid())
+  id              String    @id @default(cuid())
   householdId     String
-  household       Household  @relation(fields: [householdId], references: [id], onDelete: Restrict)
-  tokenDigest     String     @unique
+  household       Household @relation(fields: [householdId], references: [id], onDelete: Restrict)
+  tokenDigest     String    @unique
   csrfTokenDigest String
   expiresAt       DateTime
   revokedAt       DateTime?
-  createdAt       DateTime   @default(now())
-  lastSeenAt      DateTime   @default(now())
+  createdAt       DateTime  @default(now())
+  lastSeenAt      DateTime  @default(now())
 
   @@index([householdId, expiresAt])
 }
-
