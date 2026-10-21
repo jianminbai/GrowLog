@@ -28,9 +28,9 @@ Status keys: `[ ]` pending, `[~]` in progress, `[x]` verified.
 
 ## P0 experience and operations
 
-- [~] M9 — Mobile Dashboard and quick entry.
+- [x] M9 — Mobile Dashboard and quick entry.
   - Acceptance: within one view a parent can see today’s completed/missing categories, latest growth, recent sleep, today’s milk/water, activity, mood, and cautious trend notices; common entries take no more than a short mobile form.
-- [ ] M10 — Historical editing, deletion, restoration, and audit view.
+- [~] M10 — Historical editing, deletion, restoration, and audit view.
   - Acceptance: every P0 record can be edited and soft deleted; authorized restore works; audit events show actor, action, entity, time, and redacted change metadata.
 - [ ] M11 — JSON/CSV export.
   - Acceptance: authenticated household export includes versioned JSON and per-domain CSV with explicit units and timestamps; deleted records are opt-in; tests verify isolation and escaping.

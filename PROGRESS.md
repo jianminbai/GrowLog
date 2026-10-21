@@ -20,10 +20,11 @@
 - M6 nutrition: meal items preserve offered/consumed/estimated amounts, beverages preserve unknown volume, lifecycle APIs and audit trails are household scoped, and mobile daily totals/history are implemented.
 - M7 activity: activity type, duration, intensity, structure, source/context, participation, and outdoor minutes validate; lifecycle APIs and audit trails are household scoped; the mobile page shows independent weekly totals for all activity, outdoor time, and moderate/vigorous activity.
 - M8 emotion observations: bounded moods, normalized tags, context, optional duration, peer/parent interactions, notes, and source validate; household-scoped lifecycle APIs, audit events, descriptive 7/30-day counts, and a non-diagnostic mobile UI are verified.
+- M9 Today dashboard: each household child receives timezone-aware completed/missing states, latest growth and sleep, daily nutrition/activity/mood values, cautious 7-day notices, and direct mobile quick-entry links.
 
 ## Current task
 
-- M9: implement the mobile Today dashboard and quick-entry navigation across all P0 record categories.
+- M10: add a unified household history and redacted audit view, while verifying lifecycle coverage across all P0 records.
 
 ## Test record
 
@@ -54,6 +55,8 @@
 - M7 final gate: full database reset succeeds; lint and typecheck pass; 63 tests across 20 files pass; production build emits activity API/page routes; production HTTP smoke returns health 200 and anonymous activity API 401 (2026-10-21).
 - M8 RED→GREEN: 5 emotion validation/summary cases, 2 authenticated handler cases, and 1 PostgreSQL ownership/lifecycle/audit case pass (2026-10-21).
 - M8 final gate: full database reset succeeds; lint and typecheck pass; 71 tests across 23 files pass; production build emits emotion API/page routes; production HTTP smoke returns health 200 and anonymous emotion API 401 (2026-10-21).
+- M9 dashboard RED→GREEN: 2 household-timezone aggregation cases pass for completion state, null preservation, latest records, daily totals, and cautious notices (2026-10-21).
+- M9 final gate: lint/typecheck pass; 73 tests across 24 files pass; production build emits the dynamic Today page; production HTTP smoke redirects anonymous `/today` to login and renders a household-scoped child dashboard with status 200 for a valid session (2026-10-21).
 
 ## Work implemented
 
@@ -71,6 +74,7 @@
 - Sleep sessions are attributed to the household-local date containing `endedAt`; net minutes subtract explicit awake time, while absent awake time means none recorded rather than an invented value.
 - Activity summaries use the household-local occurrence date. Outdoor minutes are summed independently; only records explicitly marked moderate or vigorous contribute their full duration to the moderate/vigorous total.
 - Emotion summaries count recorded observations by household-local date, mood, and tag over 7/30-day windows. They intentionally expose no aggregate score, diagnosis, or inferred condition.
+- The Today dashboard distinguishes unknown quantities from recorded zero, attributes records by household-local date, and labels trend notices as summaries of submitted data. Quick actions lead directly to the short forms already used by each domain page.
 
 ## Blockers
 
@@ -78,4 +82,4 @@
 
 ## Next step
 
-- Implement M9 dashboard aggregation tests, then replace the placeholder Today page with mobile summary cards and direct quick-entry links.
+- Implement M10 household-scoped history/audit queries and a protected mobile history page; verify that every P0 domain exposes edit, soft-delete, and restore controls.

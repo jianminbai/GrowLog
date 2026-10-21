@@ -244,6 +244,105 @@ h2 {
   gap: 1rem;
 }
 
+.today-header p {
+  max-width: 42rem;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.dashboard-empty,
+.dashboard-children {
+  margin-top: 2rem;
+}
+
+.dashboard-children {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.dashboard-card {
+  border: 1px solid var(--line);
+  border-radius: 1.75rem;
+  background: rgba(255, 253, 248, 0.84);
+  padding: clamp(1rem, 4vw, 2rem);
+  box-shadow: 0 20px 55px rgba(30, 69, 57, 0.08);
+}
+
+.dashboard-title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.dashboard-title h2 { margin-bottom: 1rem; }
+.dashboard-title a { color: var(--ink); font-size: 0.85rem; font-weight: 750; text-decoration: none; }
+
+.completion-grid,
+.dashboard-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.completion-item {
+  display: grid;
+  gap: 0.35rem;
+  border-radius: 1rem;
+  color: var(--ink);
+  padding: 0.9rem;
+  text-decoration: none;
+}
+
+.completion-item.done { background: #dceee3; }
+.completion-item.missing { background: #f4e8da; }
+.completion-item span { color: rgba(23, 52, 45, 0.66); font-size: 0.72rem; font-weight: 750; }
+
+.dashboard-metrics { margin-top: 1.25rem; }
+
+.dashboard-metrics div {
+  display: grid;
+  gap: 0.3rem;
+  border-bottom: 1px solid var(--line);
+  padding: 0.8rem 0;
+}
+
+.dashboard-metrics span,
+.dashboard-metrics small { color: var(--muted); }
+.dashboard-metrics span { font-size: 0.78rem; font-weight: 750; }
+.dashboard-metrics strong { font-size: 0.98rem; line-height: 1.45; }
+.dashboard-metrics small { font-size: 0.74rem; }
+
+.quick-actions {
+  display: flex;
+  gap: 0.55rem;
+  margin-top: 1.25rem;
+  overflow-x: auto;
+  padding-bottom: 0.35rem;
+}
+
+.quick-actions a {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  flex: 0 0 auto;
+  font-size: 0.8rem;
+  font-weight: 750;
+  padding: 0.7rem 0.9rem;
+  text-decoration: none;
+}
+
+.trend-notices {
+  border-radius: 1rem;
+  background: rgba(223, 232, 239, 0.62);
+  margin-top: 1rem;
+  padding: 0.9rem 1rem;
+}
+
+.trend-notices ul { margin: 0.5rem 0 0; padding-left: 1.1rem; }
+.trend-notices li { color: var(--muted); font-size: 0.78rem; line-height: 1.6; }
+
 .empty-state {
   border: 1px dashed var(--line);
   border-radius: 1.5rem;
@@ -564,7 +663,8 @@ h2 {
   .profile-card,
   .growth-chart,
   .record-card,
-  .empty-state {
+  .empty-state,
+  .dashboard-card {
     background: rgba(23, 41, 35, 0.88);
   }
 

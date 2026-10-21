@@ -51,3 +51,7 @@ Each activity stores total duration, optional outdoor minutes, and an explicit i
 ## ADR-013 — Emotion trends are descriptive counts
 
 Emotion summaries count submitted observations by mood and tag in household-local 7/30-day windows. They do not calculate a wellness score, infer an unrecorded state, or label a psychological or neurodevelopmental condition. The UI states that frequency depends on what the caregiver recorded.
+
+## ADR-014 — Dashboard absence remains unknown
+
+The Today dashboard reports completion from records assigned to the household-local date. Missing records and unknown beverage quantities remain visibly unknown instead of becoming invented zeros. Trend notices describe submitted 7-day data and state their limits; quick actions reuse the domain forms rather than duplicating mutation logic.
