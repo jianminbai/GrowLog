@@ -47,3 +47,7 @@ Integration test files share one disposable `growlog_test` schema and clean tabl
 ## ADR-012 — Outdoor time and exercise intensity remain independent
 
 Each activity stores total duration, optional outdoor minutes, and an explicit intensity. Weekly outdoor totals use only `outdoorMinutes`; moderate/vigorous totals use total duration only when intensity is marked `MODERATE` or `VIGOROUS`. This prevents a light-intensity outdoor session from being presented as effective moderate/vigorous exercise.
+
+## ADR-013 — Emotion trends are descriptive counts
+
+Emotion summaries count submitted observations by mood and tag in household-local 7/30-day windows. They do not calculate a wellness score, infer an unrecorded state, or label a psychological or neurodevelopmental condition. The UI states that frequency depends on what the caregiver recorded.
