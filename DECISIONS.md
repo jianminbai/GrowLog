@@ -59,3 +59,7 @@ The Today dashboard reports completion from records assigned to the household-lo
 ## ADR-015 — Unified history delegates mutations to domain pages
 
 The household timeline normalizes record summaries and links each entry to its domain page, where existing validation, CSRF checks, edit, soft-delete, and restore behavior remain authoritative. Audit rendering exposes actor, action, entity, timestamp, and changed field names; it discards all other metadata values before presentation.
+
+## ADR-016 — Exports are versioned, scoped, and credential-free
+
+Household JSON declares `exportVersion: 1`; CSV is split by domain with units in column names. Both load by authenticated household, omit admin sessions and credential material, redact audit values, and exclude soft-deleted rows unless requested. CSV quoting follows common spreadsheet rules and text that could be interpreted as a formula is prefixed safely.

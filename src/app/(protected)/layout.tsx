@@ -14,6 +14,7 @@ export default async function ProtectedLayout({ children }: { children: ReactNod
           <Link href="/today">今天</Link>
           <Link href="/history">历史</Link>
           <Link href="/children">儿童档案</Link>
+          <Link href="/settings">设置</Link>
         </div>
       </nav>
       {children}

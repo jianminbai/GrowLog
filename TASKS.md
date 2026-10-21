@@ -32,9 +32,9 @@ Status keys: `[ ]` pending, `[~]` in progress, `[x]` verified.
   - Acceptance: within one view a parent can see today’s completed/missing categories, latest growth, recent sleep, today’s milk/water, activity, mood, and cautious trend notices; common entries take no more than a short mobile form.
 - [x] M10 — Historical editing, deletion, restoration, and audit view.
   - Acceptance: every P0 record can be edited and soft deleted; authorized restore works; audit events show actor, action, entity, time, and redacted change metadata.
-- [~] M11 — JSON/CSV export.
+- [x] M11 — JSON/CSV export.
   - Acceptance: authenticated household export includes versioned JSON and per-domain CSV with explicit units and timestamps; deleted records are opt-in; tests verify isolation and escaping.
-- [ ] M12 — PWA support.
+- [~] M12 — PWA support.
   - Acceptance: installable manifest, icons, service worker/app shell, offline fallback, and update behavior pass manifest and build checks; sensitive API responses are never cached.
 - [ ] M13 — Docker Compose, Caddy, health checks, backup and restore.
   - Acceptance: Compose starts app/PostgreSQL/Caddy with persistent volumes; health endpoint verifies app and database; backup script creates a timestamped PostgreSQL dump; restore targets a named database and includes a verification procedure.

@@ -22,10 +22,11 @@
 - M8 emotion observations: bounded moods, normalized tags, context, optional duration, peer/parent interactions, notes, and source validate; household-scoped lifecycle APIs, audit events, descriptive 7/30-day counts, and a non-diagnostic mobile UI are verified.
 - M9 Today dashboard: each household child receives timezone-aware completed/missing states, latest growth and sleep, daily nutrition/activity/mood values, cautious 7-day notices, and direct mobile quick-entry links.
 - M10 history/audit: a protected household timeline unifies every P0 record type, optionally shows deleted records, links back to lifecycle controls, and renders actor/action/entity/time with changed field names only. The lifecycle review also added the missing nutrition edit forms.
+- M11 export: authenticated versioned JSON and eight per-domain UTF-8 CSV downloads are household isolated, use explicit unit/timestamp columns, redact audits, omit sessions, escape spreadsheet text, and include soft-deleted rows only by request.
 
 ## Current task
 
-- M11: implement versioned household JSON and escaped per-domain CSV exports with authenticated download routes.
+- M12: add an installable PWA manifest, icons, app-shell service worker, safe offline fallback, and update registration.
 
 ## Test record
 
@@ -60,6 +61,8 @@
 - M9 final gate: lint/typecheck pass; 73 tests across 24 files pass; production build emits the dynamic Today page; production HTTP smoke redirects anonymous `/today` to login and renders a household-scoped child dashboard with status 200 for a valid session (2026-10-21).
 - M10 RED→GREEN: PostgreSQL history test verifies household isolation, deleted filtering, reverse ordering, and redacted audit output; a UI test verifies active meal and beverage edit controls (2026-10-21).
 - M10 final gate: database reset, lint/typecheck, 75 tests across 26 files, and production build pass; authenticated `/history` smoke returns 200 with the scoped child and changed field while anonymous access redirects to login (2026-10-21).
+- M11 export test verifies JSON versioning, household isolation, deleted opt-in, explicit unit headers, and CSV comma/quote/newline escaping (2026-10-21).
+- M11 final gate: database reset, lint/typecheck, 76 tests across 27 files, and production build pass; anonymous export returns 401, authenticated JSON/CSV return 200 attachments with `private, no-store`, expected content types, version 1, and UTF-8 child data (2026-10-21).
 
 ## Work implemented
 
@@ -79,6 +82,7 @@
 - Emotion summaries count recorded observations by household-local date, mood, and tag over 7/30-day windows. They intentionally expose no aggregate score, diagnosis, or inferred condition.
 - The Today dashboard distinguishes unknown quantities from recorded zero, attributes records by household-local date, and labels trend notices as summaries of submitted data. Quick actions lead directly to the short forms already used by each domain page.
 - Unified history reads every domain by authenticated household, normalizes occurrence time without copying sensitive values into audit output, and sends users to the existing domain form for edits or restoration. Nutrition edit forms now expose the already-tested PATCH APIs.
+- Export loads data directly by authenticated household, never exports `AdminSession`, converts decimals and timestamps explicitly, and reduces audit metadata to changed field names. CSV cells are quoted and spreadsheet-formula prefixes are neutralized.
 
 ## Blockers
 
@@ -86,4 +90,4 @@
 
 ## Next step
 
-- Implement M11 export serializers with isolation and CSV escaping tests, then authenticated JSON/CSV download routes and settings UI.
+- Implement M12 manifest/icons/service worker tests, then install metadata, registration, offline shell, and explicit API no-cache behavior.

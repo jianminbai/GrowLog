@@ -389,6 +389,19 @@ h2 {
 .history-time em { color: var(--green); font-size: 0.75rem; font-style: normal; font-weight: 750; }
 .audit-entry > div:last-child { text-align: right; }
 
+.export-panel p { color: var(--muted); line-height: 1.7; }
+.secondary-download { color: var(--green); align-self: center; font-size: 0.85rem; font-weight: 750; }
+.export-links { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.export-links a {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 750;
+  padding: 0.7rem 0.9rem;
+  text-decoration: none;
+}
+
 .empty-state {
   border: 1px dashed var(--line);
   border-radius: 1.5rem;
