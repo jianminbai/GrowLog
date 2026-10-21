@@ -15,10 +15,11 @@
 - M1 PostgreSQL foundation: Prisma Client 6.19.2 generated, the initial migration was created and applied to PostgreSQL 16, schema validation passed, and household isolation plus transactional audit creation passed against the real database.
 - M2 administrator authentication: Argon2id verification, digest-only database sessions, secure cookies, expiry/revocation, protected pages, same-origin and CSRF mutation checks, and logout are verified.
 - M3 child profiles: validated create/list/view/edit APIs and mobile pages are household scoped; optional birth/parent measurements persist; create/update mutations append redacted audit metadata.
+- M4 growth history: household-scoped create/list/edit/soft-delete/restore APIs, redacted audit events, cautious BMI/change calculations, and a mobile history/trend page are verified.
 
 ## Current task
 
-- M4: implement growth measurement create/list/edit/soft-delete/restore, safe BMI/change calculations, and a historical trend view.
+- M5: implement night/nap sleep intervals, crossing-midnight duration rules, CRUD/history, and 7/30-day summaries.
 
 ## Test record
 
@@ -38,6 +39,9 @@
 - `npm run db:test:prepare`: initial migration reapplied and Prisma Client regenerated successfully (2026-10-21).
 - M3 final gate: lint and generated-client typecheck pass; 30 tests across 8 files pass; production build emits child APIs and pages (2026-10-21).
 - M3 production HTTP smoke: child create 201; list/update/detail and `/children` pages 200; logout 200; revoked session 401 (2026-10-21).
+- M4 domain RED→GREEN: 8 validation/BMI/change cases pass; repository RED→GREEN: 2 PostgreSQL ownership/lifecycle/audit cases pass; handler RED→GREEN: 3 auth/validation/serialization cases pass (2026-10-21).
+- M4 final gate: test database reset passed; lint and generated-client typecheck pass; 43 tests across 11 files pass; production build emits all growth API and page routes (2026-10-21).
+- M4 production HTTP smoke: growth create 201; list/update/delete/restore and history page 200; restored data remains available (2026-10-21).
 
 ## Work implemented
 
@@ -51,6 +55,7 @@
 - Same-origin validation uses the externally visible forwarded/Host authority, preventing false CSRF rejection when Next.js reconstructs an internal request URL.
 - Child profile forms normalize calendar dates and nullable numeric fields, while API responses serialize Prisma decimals explicitly.
 - Vitest files run sequentially because database integration files share one disposable PostgreSQL schema and each owns cleanup.
+- Growth outputs serialize explicit units, calculate BMI only from height plus weight in the same record, and compare each metric only with its previous available value; no percentile or diagnostic output is produced.
 
 ## Blockers
 
@@ -58,5 +63,5 @@
 
 ## Next step
 
-- Implement M4 growth domain validation and derived calculations with failing tests, then add scoped repository and authenticated CRUD/history endpoints.
-- Add the mobile growth entry/history UI only after repository and route behavior pass against PostgreSQL.
+- Implement M5 sleep interval validation and daily/7/30-day aggregation with failing tests.
+- Add household-scoped persistence, authenticated CRUD/history routes, then the mobile sleep entry and summary UI.

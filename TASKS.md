@@ -15,9 +15,9 @@ Status keys: `[ ]` pending, `[~]` in progress, `[x]` verified.
 
 - [x] M3 — Child profile create, view, and edit.
   - Acceptance: name, birth date, sex, optional birth measurements and parent heights validate; all access is household scoped; audit history is produced.
-- [~] M4 — Growth measurements and trends.
+- [x] M4 — Growth measurements and trends.
   - Acceptance: create/list/edit/soft-delete/restore height and weight records with date, source, method, location, device, precision, and notes; BMI and change over time are computed only when inputs permit; chart displays history; no fabricated percentiles.
-- [ ] M5 — Sleep records.
+- [~] M5 — Sleep records.
   - Acceptance: night and nap intervals support crossing midnight; waking duration cannot exceed the interval; daily totals and 7/30-day summaries are tested; CRUD and history work.
 - [ ] M6 — Meals, foods, milk, and water.
   - Acceptance: meal slots and items distinguish offered, consumed, and estimated amounts; beverage entries preserve units; missing quantity remains unknown; CRUD and daily totals work.

@@ -27,6 +27,7 @@ export default async function ChildPage({ params }: { params: Promise<{ childId:
           <p>出生于 {child.birthDate}。在这里修正基础资料，修改会写入审计记录。</p>
         </div>
       </header>
+      <Link className="primary-action inline-action" href={`/children/${child.id}/growth`}>查看身高体重记录</Link>
       <section className="profile-panel" aria-labelledby="edit-profile">
         <div className="section-heading">
           <div>

@@ -19,6 +19,7 @@ databaseSuite("household-scoped child persistence", () => {
   beforeEach(async () => {
     await prisma.adminSession.deleteMany();
     await prisma.auditLog.deleteMany();
+    await prisma.growthMeasurement.deleteMany();
     await prisma.child.deleteMany();
     await prisma.household.deleteMany();
   });
@@ -88,6 +89,7 @@ databaseSuite("Prisma-backed administrator sessions", () => {
   beforeEach(async () => {
     await prisma.adminSession.deleteMany();
     await prisma.auditLog.deleteMany();
+    await prisma.growthMeasurement.deleteMany();
     await prisma.child.deleteMany();
     await prisma.household.deleteMany();
   });
