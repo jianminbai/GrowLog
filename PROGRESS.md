@@ -14,10 +14,11 @@
 - Task 1 GREEN: 2/2 result-envelope tests passed; lint, strict typecheck, and the Next.js production build exited 0.
 - M1 PostgreSQL foundation: Prisma Client 6.19.2 generated, the initial migration was created and applied to PostgreSQL 16, schema validation passed, and household isolation plus transactional audit creation passed against the real database.
 - M2 administrator authentication: Argon2id verification, digest-only database sessions, secure cookies, expiry/revocation, protected pages, same-origin and CSRF mutation checks, and logout are verified.
+- M3 child profiles: validated create/list/view/edit APIs and mobile pages are household scoped; optional birth/parent measurements persist; create/update mutations append redacted audit metadata.
 
 ## Current task
 
-- M3: implement household-scoped child profile create, view, and edit with validation, audit history, authenticated APIs, and a mobile UI.
+- M4: implement growth measurement create/list/edit/soft-delete/restore, safe BMI/change calculations, and a historical trend view.
 
 ## Test record
 
@@ -32,6 +33,11 @@
 - `DATABASE_URL=... npm test`: 17 passed, 0 failed across 5 files (2026-10-21).
 - `DATABASE_URL=... npm run build`: passed; protected and authentication routes emitted (2026-10-21).
 - Production HTTP smoke: health 200, login 200, session 200, logout 200, and revoked session 401 against PostgreSQL (2026-10-21).
+- M3 validation RED→GREEN: 7 profile schema cases pass; handler RED→GREEN: 4 authentication/CSRF/validation/isolation cases pass (2026-10-21).
+- M3 database integration: 2 profile tests pass for optional measurements, household list/update isolation, and redacted audit field names (2026-10-21).
+- `npm run db:test:prepare`: initial migration reapplied and Prisma Client regenerated successfully (2026-10-21).
+- M3 final gate: lint and generated-client typecheck pass; 30 tests across 8 files pass; production build emits child APIs and pages (2026-10-21).
+- M3 production HTTP smoke: child create 201; list/update/detail and `/children` pages 200; logout 200; revoked session 401 (2026-10-21).
 
 ## Work implemented
 
@@ -43,6 +49,8 @@
 - Authentication RED→GREEN: service test failed on missing module then 6/6 passed; route test failed on missing handler then 4/4 passed; login UI test failed on missing component then passed.
 - Prisma-backed sessions now persist only credential digests and support resolution and revocation in the test database.
 - Same-origin validation uses the externally visible forwarded/Host authority, preventing false CSRF rejection when Next.js reconstructs an internal request URL.
+- Child profile forms normalize calendar dates and nullable numeric fields, while API responses serialize Prisma decimals explicitly.
+- Vitest files run sequentially because database integration files share one disposable PostgreSQL schema and each owns cleanup.
 
 ## Blockers
 
@@ -50,4 +58,5 @@
 
 ## Next step
 
-- Implement M3 child profile validation and service behavior with failing tests first, then add authenticated API routes and mobile forms.
+- Implement M4 growth domain validation and derived calculations with failing tests, then add scoped repository and authenticated CRUD/history endpoints.
+- Add the mobile growth entry/history UI only after repository and route behavior pass against PostgreSQL.

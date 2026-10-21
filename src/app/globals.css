@@ -253,6 +253,135 @@ h2 {
   line-height: 1.75;
 }
 
+.app-nav {
+  width: min(100% - 2rem, 70rem);
+  margin: 0 auto;
+  padding: 1rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.app-nav div {
+  display: flex;
+  gap: 1rem;
+}
+
+.app-nav a,
+.back-link {
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.app-brand {
+  font-family: Georgia, serif;
+  font-size: 1.25rem !important;
+}
+
+.profile-shell {
+  padding-top: clamp(2rem, 6vw, 4rem);
+}
+
+.profile-header h1 {
+  font-size: clamp(2.8rem, 9vw, 5rem);
+}
+
+.profile-header p {
+  max-width: 42rem;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.profile-header.compact h1 {
+  margin-bottom: 0.75rem;
+}
+
+.profile-list,
+.profile-panel {
+  margin-top: 2rem;
+}
+
+.profile-cards {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.profile-card {
+  display: grid;
+  gap: 0.35rem;
+  border: 1px solid var(--line);
+  border-radius: 1.2rem;
+  background: rgba(255, 253, 248, 0.72);
+  color: var(--ink);
+  padding: 1rem 1.15rem;
+  text-decoration: none;
+}
+
+.profile-card span {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.profile-panel {
+  border: 1px solid var(--line);
+  border-radius: 1.75rem;
+  background: rgba(255, 253, 248, 0.86);
+  padding: clamp(1.2rem, 4vw, 2rem);
+}
+
+.profile-form,
+.form-grid,
+.profile-form label {
+  display: grid;
+  gap: 1rem;
+}
+
+.form-grid {
+  grid-template-columns: 1fr;
+}
+
+.profile-form label {
+  gap: 0.45rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.profile-form input,
+.profile-form select,
+.profile-form textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 0.85rem;
+  background: var(--paper);
+  color: var(--ink);
+  padding: 0.8rem 0.9rem;
+  font: inherit;
+}
+
+.profile-form textarea {
+  resize: vertical;
+}
+
+.profile-submit {
+  justify-self: start;
+  border: 0;
+  cursor: pointer;
+}
+
+.profile-submit:disabled {
+  cursor: wait;
+  opacity: 0.68;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 2rem;
+}
+
 @media (min-width: 820px) {
   .login-shell {
     grid-template-columns: minmax(0, 1.35fr) minmax(20rem, 0.65fr);
@@ -262,6 +391,11 @@ h2 {
 @media (min-width: 760px) {
   .snapshot-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .form-grid,
+  .profile-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -285,6 +419,8 @@ h2 {
   }
 
   .login-panel,
+  .profile-panel,
+  .profile-card,
   .empty-state {
     background: rgba(23, 41, 35, 0.88);
   }

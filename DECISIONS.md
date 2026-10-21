@@ -39,3 +39,7 @@ Authentication rules depend on a small `SessionRepository` contract. Production 
 ## ADR-010 — Mutation origin follows the externally visible request authority
 
 Validate browser `Origin` against `X-Forwarded-Host`/`X-Forwarded-Proto` when supplied by the deployment proxy, then `Host`, with the request URL as fallback. This preserves same-origin protection when Next.js receives an internal URL behind Caddy or another trusted proxy; the per-session CSRF digest remains required independently.
+
+## ADR-011 — Shared database integration tests run sequentially
+
+Integration test files share one disposable `growlog_test` schema and clean tables before each case. Vitest disables file-level parallelism so independent cleanup hooks cannot delete another test's parent rows mid-transaction. Unit cases remain isolated and the suite is small enough that deterministic execution is the better tradeoff.

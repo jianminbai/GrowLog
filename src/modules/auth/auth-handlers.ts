@@ -3,6 +3,7 @@ import { z } from "zod";
 import { ok, problem, type Failure } from "@/lib/result";
 
 import { CSRF_COOKIE_NAME, SESSION_COOKIE_NAME } from "./auth-constants";
+import { hasValidRequestOrigin, readRequestCookies } from "./request-auth";
 import {
   InvalidCredentialsError,
   InvalidSessionError,
@@ -36,18 +37,6 @@ function jsonProblem(failure: Failure): Response {
   return json({ error: failure.error }, failure.status);
 }
 
-function readCookies(request: Request): Map<string, string> {
-  const values = new Map<string, string>();
-  for (const part of (request.headers.get("cookie") ?? "").split(";")) {
-    const separator = part.indexOf("=");
-    if (separator < 1) continue;
-    const name = part.slice(0, separator).trim();
-    const value = part.slice(separator + 1).trim();
-    values.set(name, value);
-  }
-  return values;
-}
-
 function sessionCookie(name: string, value: string, expiresAt: Date, httpOnly: boolean): string {
   return [
     `${name}=${value}`,
@@ -73,23 +62,6 @@ function expiredCookie(name: string, httpOnly: boolean): string {
   ]
     .filter(Boolean)
     .join("; ");
-}
-
-function hasValidOrigin(request: Request): boolean {
-  const origin = request.headers.get("origin");
-  if (origin === null) return true;
-
-  const requestUrl = new URL(request.url);
-  const forwardedHost = request.headers.get("x-forwarded-host")?.split(",", 1)[0]?.trim();
-  const forwardedProtocol = request.headers.get("x-forwarded-proto")?.split(",", 1)[0]?.trim();
-  const host = forwardedHost || request.headers.get("host") || requestUrl.host;
-  const protocol = forwardedProtocol || requestUrl.protocol.slice(0, -1);
-
-  try {
-    return new URL(origin).origin === new URL(`${protocol}://${host}`).origin;
-  } catch {
-    return false;
-  }
 }
 
 export function createAuthHandlers(dependencies: AuthHandlerDependencies) {
@@ -136,7 +108,7 @@ export function createAuthHandlers(dependencies: AuthHandlerDependencies) {
     },
 
     async session(request: Request): Promise<Response> {
-      const token = readCookies(request).get(SESSION_COOKIE_NAME) ?? "";
+      const token = readRequestCookies(request).get(SESSION_COOKIE_NAME) ?? "";
       try {
         const session = await resolveSession(token, dependencies.sessions);
         return json(ok({ authenticated: true, householdId: session.householdId }));
@@ -149,11 +121,11 @@ export function createAuthHandlers(dependencies: AuthHandlerDependencies) {
     },
 
     async logout(request: Request): Promise<Response> {
-      const cookies = readCookies(request);
+      const cookies = readRequestCookies(request);
       const token = cookies.get(SESSION_COOKIE_NAME) ?? "";
       const submittedCsrf = request.headers.get("x-csrf-token") ?? "";
 
-      if (!hasValidOrigin(request)) {
+      if (!hasValidRequestOrigin(request)) {
         return jsonProblem(problem("FORBIDDEN", "Request origin is not allowed.", 403));
       }
 
