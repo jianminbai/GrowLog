@@ -47,6 +47,9 @@ Status keys: `[ ]` pending, `[~]` in progress, `[x]` verified.
 - [x] M17 — Compact date-grouped history and low-frequency data management.
   - Acceptance: active history retains all summary fields in compact cards grouped by household-local day; a deliberate right swipe or keyboard action reveals the edit link; daily domain pages exclude deleted records; settings links to an authenticated household-scoped page that restores deleted records with CSRF protection and shows redacted audit events; focused and full release checks pass.
 
+- [x] M18 — Read-only child reports and settings-based record management.
+  - Acceptance: empty profiles offer Add child; populated profiles never show creation forms; all five child domains show time-based charts and complete read-only tables; growth height/weight have separate labeled axes with actual time spacing; missing values remain unknown; settings hosts child creation, basic profile editing and all existing record editors; Today and History entry links continue to work; authentication, household isolation, full checks and mobile browser verification pass.
+
 ## Deferred after MVP
 
 - [ ] P1 — Upgrade to Prisma 7 and Next.js 16, rerun database/deployment migrations, and close the reviewed transitive dependency advisories.

@@ -53,7 +53,7 @@ export default async function TodayPage() {
 
     {dashboards.length === 0 ? <section className="empty-state dashboard-empty">
       <p>先建立儿童档案，GrowLog 就会在这里整理今天已记录和待记录的项目。</p>
-      <Link className="primary-action inline-action" href="/children">建立儿童档案</Link>
+      <Link className="primary-action inline-action" href="/settings/children/new">建立儿童档案</Link>
     </section> : <section className="dashboard-children" aria-label="今日成长概览">
       {dashboards.map(({ child, snapshot }) => <article className="dashboard-card" key={child.id}>
         <div className="dashboard-title"><h2>{child.name}</h2><Link href={`/children/${child.id}`}>查看档案 →</Link></div>
@@ -62,12 +62,12 @@ export default async function TodayPage() {
           {([
             ["sleep", "睡眠", "sleep"], ["nutrition", "饮食 / 奶水", "nutrition"],
             ["activity", "运动 / 户外", "activity"], ["emotion", "情绪", "emotion"]
-          ] as const).map(([key, label, route]) => <Link className={`completion-item ${snapshot.completion[key] ? "done" : "missing"}`} href={`/children/${child.id}/${route}`} key={key}><span>{snapshot.completion[key] ? "已记录" : "待记录"}</span><strong>{label}</strong></Link>)}
+          ] as const).map(([key, label, route]) => <Link className={`completion-item ${snapshot.completion[key] ? "done" : "missing"}`} href={`/settings/children/${child.id}/records/${route}`} key={key}><span>{snapshot.completion[key] ? "已记录" : "待记录"}</span><strong>{label}</strong></Link>)}
         </div>
 
         <h3 className="dashboard-section-title">快捷记录</h3>
         <div className="quick-actions" aria-label={`${child.name} 的快捷记录`}>
-          <Link href={`/children/${child.id}/nutrition`}>＋ 饮食奶水</Link><Link href={`/children/${child.id}/sleep`}>＋ 睡眠</Link><Link href={`/children/${child.id}/activity`}>＋ 运动</Link><Link href={`/children/${child.id}/emotion`}>＋ 情绪</Link><Link href={`/children/${child.id}/growth`}>＋ 身高体重</Link>
+          <Link href={`/settings/children/${child.id}/records/nutrition`}>＋ 饮食奶水</Link><Link href={`/settings/children/${child.id}/records/sleep`}>＋ 睡眠</Link><Link href={`/settings/children/${child.id}/records/activity`}>＋ 运动</Link><Link href={`/settings/children/${child.id}/records/emotion`}>＋ 情绪</Link><Link href={`/settings/children/${child.id}/records/growth`}>＋ 身高体重</Link>
         </div>
 
         <h3 className="dashboard-section-title">最近数据</h3>

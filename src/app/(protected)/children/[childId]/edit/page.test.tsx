@@ -32,7 +32,7 @@ vi.mock("@/modules/children/child-handlers", () => ({
   })
 }));
 
-import EditChildPage from "./page";
+import EditChildPage from "../../../settings/children/[childId]/edit/page";
 
 describe("child profile edit page", () => {
   it("keeps the existing form on a dedicated low-frequency route", async () => {
@@ -40,9 +40,9 @@ describe("child profile edit page", () => {
 
     expect(screen.getByRole("heading", { name: "编辑基础资料" })).toBeInTheDocument();
     expect(screen.getByLabelText("姓名")).toHaveValue("小满");
-    expect(screen.getByRole("link", { name: "← 返回小满档案" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "← 返回儿童与记录管理" })).toHaveAttribute(
       "href",
-      "/children/child-1"
+      "/settings/children"
     );
   });
 });

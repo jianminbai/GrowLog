@@ -5,7 +5,7 @@ import { requireServerSession } from "@/modules/auth/server-session";
 import { serializeChild } from "@/modules/children/child-handlers";
 import { listChildrenForHousehold } from "@/modules/children/child-repository";
 
-import { ChildProfileForm } from "./child-profile-form";
+
 
 export const dynamic = "force-dynamic";
 
@@ -30,19 +30,17 @@ export default async function ChildrenPage() {
               <Link className="profile-card" href={`/children/${child.id}`} key={child.id}>
                 <strong>{child.name}</strong>
                 <span>出生于 {child.birthDate}</span>
-                <span>查看与编辑 →</span>
+                <span>查看成长趋势 →</span>
               </Link>
             ))}
           </div>
         </section>
       ) : null}
 
-      <section className="profile-panel" aria-labelledby="new-profile">
-        <div className="section-heading">
-          <h2 id="new-profile">建立儿童档案</h2>
-        </div>
-        <ChildProfileForm />
-      </section>
+      {children.length === 0 ? <section className="empty-state profile-panel">
+        <p>还没有孩子的档案。添加孩子后，即可查看成长趋势与历史数据。</p>
+        <Link className="primary-action" href="/settings/children/new">添加孩子</Link>
+      </section> : null}
     </main>
   );
 }

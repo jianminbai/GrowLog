@@ -31,7 +31,7 @@
 
 ## Current task
 
-- All GrowLog MVP milestones M0–M17 are implemented and verified. Deferred P1/P2 work remains listed in `TASKS.md`.
+- All GrowLog MVP milestones M0–M18 are implemented and verified. Deferred P1/P2 work remains listed in `TASKS.md`.
 
 ## Test record
 
@@ -88,6 +88,10 @@
 - M17 RED→GREEN: history-page tests require household-local date groups and a deliberate right-swipe edit reveal; settings and data-management tests require a low-frequency entry, deleted-only recovery, redacted audits, and a CSRF-protected restore request; CSS and placement contracts keep cards compact and deleted data out of daily domain pages (2026-10-22).
 - M17 review fixes: link-originated pointer and keyboard events no longer close or suppress the revealed edit link, canceled gestures restore the prior card state, and cross-year date headings include the year; 5 focused regression tests pass (2026-10-22).
 - M17 final gate: clean test-database reset, lint with zero warnings, typecheck, 129/129 tests across 45 files with PostgreSQL enabled, and the production build including `/settings/data-management` all pass (2026-10-22).
+- M18 RED→GREEN: child-list, child-detail, time-series, daily-total, report, settings-navigation, and legacy-edit tests first failed against the prior embedded forms, then 24/24 focused assertions passed after the view/management split (2026-10-22).
+- M18 review fixes: all meal/beverage/activity enum values have readable labels, yogurt drinks receive their own chart, unknown daily quantities stay unknown, inherited editor-route keys return 404, and every report remains household scoped (2026-10-22).
+- M18 final gate: clean test-database reset, lint with zero warnings, typecheck, 151/151 tests across 50 files with PostgreSQL enabled, and the production build including all report and settings-management routes pass (2026-10-22).
+- M18 browser verification: authenticated seeded pages at 320, 390, and 768 px produced 34 successful page checks; five reports contained chart/table output without forms, five settings editors retained forms, Today and swipe-revealed History links reached those editors, and no page-level horizontal overflow was detected (2026-10-22).
 
 ## Work implemented
 
@@ -113,7 +117,7 @@
 - Backup and restore scripts operate inside the Compose PostgreSQL container, write a SHA-256 companion file, require a separate target database by default, and compare migration counts as part of the documented recovery procedure.
 - `scripts/mvp-smoke.mjs` is an environment-driven release check that exercises the deployed application through its public proxy without embedding credentials. It also asserts security cookie flags, CSRF/origin behavior, API envelope shape, and no-store policy.
 - Mobile presentation logic stays in small client components for pathname state, logout, and existing forms; server components, API routes, Prisma schema, audit behavior, household isolation, and service-worker cache policy remain unchanged. Nutrition requests retain their validated schema while the creation/edit UI now exposes previously omitted optional payload fields.
-- The child profile detail is view-first: health-domain links and a compact profile summary stay on the default route, while the existing authenticated edit form lives on a dedicated low-frequency route and returns to the detail after success.
+- The child area is view-first: the list offers creation only when empty, child detail contains five report categories, and each category displays time-based charts plus complete read-only tables. Child creation, profile editing, and all record editors live under Settings; Today, History, and the legacy profile-edit route point to those management routes.
 - The active history timeline is grouped by household-local day and uses compact cards that retain category, child, title, detail, and time; right swipe or keyboard intent reveals the edit link. Deleted records and redacted audits live under Settings → Data management, where restore actions reuse the existing household-scoped APIs and CSRF contract.
 
 ## Blockers

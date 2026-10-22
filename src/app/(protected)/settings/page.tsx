@@ -11,7 +11,12 @@ const labels = {
 
 export default function SettingsPage() {
   return <main className="profile-shell">
-    <header className="profile-header compact"><h1>设置</h1><p>下载当前家庭的可移植数据，或安全退出本设备。导出不包含登录会话、密码哈希或 CSRF 凭据。</p></header>
+    <header className="profile-header compact"><h1>设置</h1><p>管理儿童资料和成长记录，下载家庭数据，或安全退出本设备。导出不包含登录会话、密码哈希或 CSRF 凭据。</p></header>
+    <section className="profile-panel export-panel">
+      <h2>儿童与成长记录</h2>
+      <p>添加孩子、编辑基础资料，以及录入或修改身高体重、睡眠、饮食、运动和情绪记录。</p>
+      <div className="settings-management-links"><Link href="/settings/children/new">添加孩子</Link><Link href="/settings/children">基础资料与记录管理</Link></div>
+    </section>
     <section className="profile-panel export-panel">
       <h2>数据管理</h2>
       <p>在低频管理页面恢复已删除记录，或查看脱敏后的操作审计。</p>

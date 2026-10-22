@@ -53,35 +53,35 @@ export async function listHistoryEntries(
       id: record.id, kind: "GROWTH" as const, childId: record.childId, childName: record.child.name,
       occurredAt: record.measuredAt, title: "身高体重",
       detail: [number(record.heightCm) === null ? null : `${number(record.heightCm)} cm`, number(record.weightKg) === null ? null : `${number(record.weightKg)} kg`].filter(Boolean).join(" · ") || "测量值未填写",
-      href: `/children/${record.childId}/growth`, deletedAt: record.deletedAt
+      href: `/settings/children/${record.childId}/records/growth`, deletedAt: record.deletedAt
     })),
     ...sleep.map((record) => ({
       id: record.id, kind: "SLEEP" as const, childId: record.childId, childName: record.child.name,
       occurredAt: record.endedAt, title: record.kind === "NIGHT" ? "夜间睡眠" : "小睡",
       detail: `${calculateSleepMinutes(record.startedAt, record.endedAt, record.awakeMinutes)} 分钟`,
-      href: `/children/${record.childId}/sleep`, deletedAt: record.deletedAt
+      href: `/settings/children/${record.childId}/records/sleep`, deletedAt: record.deletedAt
     })),
     ...meals.map((record) => ({
       id: record.id, kind: "MEAL" as const, childId: record.childId, childName: record.child.name,
       occurredAt: record.occurredAt, title: "饮食记录", detail: `${record.items.length} 项食物`,
-      href: `/children/${record.childId}/nutrition`, deletedAt: record.deletedAt
+      href: `/settings/children/${record.childId}/records/nutrition`, deletedAt: record.deletedAt
     })),
     ...beverages.map((record) => ({
       id: record.id, kind: "BEVERAGE" as const, childId: record.childId, childName: record.child.name,
       occurredAt: record.occurredAt, title: record.type === "MILK" ? "奶量" : record.type === "WATER" ? "饮水" : "饮品",
       detail: record.volumeMl === null ? "容量未记录" : `${record.volumeMl} ml`,
-      href: `/children/${record.childId}/nutrition`, deletedAt: record.deletedAt
+      href: `/settings/children/${record.childId}/records/nutrition`, deletedAt: record.deletedAt
     })),
     ...activities.map((record) => ({
       id: record.id, kind: "ACTIVITY" as const, childId: record.childId, childName: record.child.name,
       occurredAt: record.occurredAt, title: record.activityType,
       detail: `${record.durationMinutes} 分钟 · 户外 ${record.outdoorMinutes ?? 0} 分钟`,
-      href: `/children/${record.childId}/activity`, deletedAt: record.deletedAt
+      href: `/settings/children/${record.childId}/records/activity`, deletedAt: record.deletedAt
     })),
     ...emotions.map((record) => ({
       id: record.id, kind: "EMOTION" as const, childId: record.childId, childName: record.child.name,
       occurredAt: record.occurredAt, title: "情绪观察", detail: record.tags.join(" · ") || record.mood,
-      href: `/children/${record.childId}/emotion`, deletedAt: record.deletedAt
+      href: `/settings/children/${record.childId}/records/emotion`, deletedAt: record.deletedAt
     }))
   ];
   return entries.sort((left, right) => right.occurredAt.getTime() - left.occurredAt.getTime());

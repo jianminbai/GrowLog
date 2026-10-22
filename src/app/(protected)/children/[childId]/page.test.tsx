@@ -39,14 +39,9 @@ describe("child profile detail", () => {
   it("shows a compact summary and keeps the edit form off the default page", async () => {
     render(await ChildPage({ params: Promise.resolve({ childId: "child-1" }) }));
 
-    expect(screen.getByRole("heading", { name: "基础资料" })).toBeInTheDocument();
-    expect(screen.getByText("女")).toBeInTheDocument();
-    expect(screen.getByText("3.2 kg")).toBeInTheDocument();
+    expect(screen.getByRole("navigation", { name: "小朋友的记录分类" })).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "基础资料" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "编辑基础资料" })).not.toBeInTheDocument();
     expect(screen.queryByLabelText("姓名")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "保存修改" })).not.toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "编辑基础资料" })).toHaveAttribute(
-      "href",
-      "/children/child-1/edit"
-    );
   });
 });
