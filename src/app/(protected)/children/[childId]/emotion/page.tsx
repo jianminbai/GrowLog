@@ -20,14 +20,12 @@ export default async function EmotionPage({ params }: { params: Promise<{ childI
   const child = await findChildForHousehold(prisma, auth.householdId, childId);
   if (!child) notFound();
   const [stored, timeZone] = await Promise.all([
-    listEmotionsForChild(prisma, auth.householdId, childId, true),
+    listEmotionsForChild(prisma, auth.householdId, childId),
     getEmotionHouseholdTimeZone(prisma, auth.householdId)
   ]);
   const records = stored.map(serializeEmotion);
-  const active = records.filter((record) => !record.deletedAt);
-  const deleted = records.filter((record) => record.deletedAt);
   const summary = summarizeEmotions(
-    stored.filter((record) => !record.deletedAt), timeZone, dateInTimeZone(new Date(), timeZone)
+    stored, timeZone, dateInTimeZone(new Date(), timeZone)
   );
   const frequent = Object.entries(summary.last30Days.byMood)
     .sort((left, right) => right[1] - left[1])
@@ -45,9 +43,8 @@ export default async function EmotionPage({ params }: { params: Promise<{ childI
     {frequent ? <p className="care-note">近 30 天记录频次：{frequent}。次数仅反映已填写的观察。</p> : null}
     <section className="profile-panel"><h2>快速记录</h2><EmotionForm childId={childId} /></section>
     <section className="record-history"><h2>历史记录</h2>
-      {active.length === 0 ? <div className="empty-state">尚无情绪记录。</div> : active.slice().reverse().map((record) =>
+      {records.length === 0 ? <div className="empty-state">尚无情绪记录。</div> : records.slice().reverse().map((record) =>
         <details className="record-card" key={record.id}><summary><strong>{moodLabels[record.mood]}</strong><span>{record.tags.join(" · ") || "无标签"} · {new Date(record.occurredAt).toLocaleDateString("zh-CN")}</span></summary><EmotionForm childId={childId} record={record} /></details>)}
     </section>
-    {deleted.length ? <section className="deleted-history"><h2>已删除记录</h2>{deleted.map((record) => <EmotionForm childId={childId} record={record} key={record.id} />)}</section> : null}
   </main>;
 }

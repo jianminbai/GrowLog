@@ -13,6 +13,11 @@ export default function SettingsPage() {
   return <main className="profile-shell">
     <header className="profile-header compact"><h1>设置</h1><p>下载当前家庭的可移植数据，或安全退出本设备。导出不包含登录会话、密码哈希或 CSRF 凭据。</p></header>
     <section className="profile-panel export-panel">
+      <h2>数据管理</h2>
+      <p>在低频管理页面恢复已删除记录，或查看脱敏后的操作审计。</p>
+      <Link className="secondary-download" href="/settings/data-management">打开数据管理</Link>
+    </section>
+    <section className="profile-panel export-panel">
       <h2>完整 JSON</h2>
       <p>版本化 JSON 保留领域结构、明确单位字段和 ISO 时间戳，适合备份或迁移。</p>
       <div className="record-actions"><a className="primary-action" href="/api/export/json">下载当前数据</a><a className="secondary-download" href="/api/export/json?includeDeleted=true">包含已删除记录</a></div>

@@ -27,6 +27,16 @@ svg { max-width: 100%; }
 
 code { overflow-wrap: anywhere; }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -431,10 +441,67 @@ h2 {
 
 .unified-history,
 .audit-section { margin-top: 2rem; }
-.history-list,
+.history-list { display: grid; gap: 0.45rem; }
 .audit-list { display: grid; gap: 0.7rem; }
 
-.history-entry,
+.history-day + .history-day { margin-top: 1.4rem; }
+.history-day h3 {
+  margin: 0 0 0.5rem;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.swipe-history-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.85rem;
+  touch-action: pan-y;
+}
+
+.swipe-history-item:focus-visible {
+  outline: 3px solid #e69b66;
+  outline-offset: 2px;
+}
+
+.swipe-edit-slot {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 6rem;
+  display: grid;
+  place-items: center;
+  background: var(--green);
+}
+
+.swipe-edit-slot a {
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
+  color: var(--paper);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.history-entry {
+  position: relative;
+  z-index: 1;
+  min-height: var(--tap-min);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem;
+  border: 1px solid var(--line);
+  border-radius: 0.85rem;
+  background: rgba(255, 253, 248, 0.78);
+  color: var(--ink);
+  padding: 0.55rem 0.75rem;
+  transition: transform 160ms ease-out;
+}
+
 .audit-entry {
   display: flex;
   align-items: flex-start;
@@ -446,11 +513,9 @@ h2 {
   background: rgba(255, 253, 248, 0.78);
   color: var(--ink);
   padding: 0.9rem 1rem;
-  text-decoration: none;
 }
 
-.history-entry.deleted { border-style: dashed; opacity: 0.78; }
-.history-entry > div,
+.history-copy,
 .audit-entry > div { display: grid; gap: 0.25rem; }
 .history-entry span,
 .history-entry small,
@@ -458,8 +523,7 @@ h2 {
 .audit-entry span,
 .audit-entry small,
 .audit-entry time { color: var(--muted); font-size: 0.76rem; }
-.history-time { text-align: left; }
-.history-time em { color: var(--green); font-size: 0.75rem; font-style: normal; font-weight: 750; }
+.history-time { text-align: right; }
 .audit-entry > div:last-child { text-align: left; }
 
 .history-toolbar a {
@@ -475,6 +539,37 @@ h2 {
 .history-toolbar a.filter-active {
   background: rgba(31, 107, 86, 0.1);
 }
+
+.deleted-management-list {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.deleted-management-entry {
+  min-width: 0;
+  display: grid;
+  gap: 0.75rem;
+  border: 1px dashed var(--line);
+  border-radius: 0.9rem;
+  background: rgba(255, 253, 248, 0.6);
+  padding: 0.75rem;
+}
+
+.deleted-management-entry > div:first-child,
+.restore-control {
+  min-width: 0;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.deleted-management-entry span,
+.deleted-management-entry small {
+  color: var(--muted);
+  font-size: 0.76rem;
+  overflow-wrap: anywhere;
+}
+
+.restore-control .form-message { margin-top: 0.25rem; }
 
 .export-panel p { color: var(--muted); line-height: 1.7; }
 .account-panel p { color: var(--muted); line-height: 1.7; }
@@ -1121,6 +1216,11 @@ h2 {
 
   .record-card summary { flex-direction: row; }
 
+  .deleted-management-entry {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+
   .history-time,
   .audit-entry > div:last-child { text-align: right; }
 
@@ -1177,6 +1277,7 @@ h2 {
   .dashboard-card,
   .history-entry,
   .audit-entry,
+  .deleted-management-entry,
   .domain-links a,
   .optional-fields {
     background: rgba(23, 41, 35, 0.88);

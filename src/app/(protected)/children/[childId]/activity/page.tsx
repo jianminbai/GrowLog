@@ -20,14 +20,12 @@ export default async function ActivityPage({ params }: { params: Promise<{ child
   const child = await findChildForHousehold(prisma, auth.householdId, childId);
   if (!child) notFound();
   const [stored, timeZone] = await Promise.all([
-    listActivitiesForChild(prisma, auth.householdId, childId, true),
+    listActivitiesForChild(prisma, auth.householdId, childId),
     getActivityHouseholdTimeZone(prisma, auth.householdId)
   ]);
   const records = stored.map(serializeActivity);
-  const active = records.filter((record) => !record.deletedAt);
-  const deleted = records.filter((record) => record.deletedAt);
   const summary = summarizeActivity(
-    stored.filter((record) => !record.deletedAt), timeZone, dateInTimeZone(new Date(), timeZone)
+    stored, timeZone, dateInTimeZone(new Date(), timeZone)
   );
 
   return <main className="profile-shell">
@@ -41,9 +39,8 @@ export default async function ActivityPage({ params }: { params: Promise<{ child
     </section>
     <section className="profile-panel"><h2>添加活动</h2><ActivityForm childId={childId} /></section>
     <section className="record-history"><h2>历史记录</h2>
-      {active.length === 0 ? <div className="empty-state">尚无活动记录。</div> : active.slice().reverse().map((record) =>
+      {records.length === 0 ? <div className="empty-state">尚无活动记录。</div> : records.slice().reverse().map((record) =>
         <details className="record-card" key={record.id}><summary><strong>{record.activityType}</strong><span>{record.durationMinutes} 分钟 · 户外 {record.outdoorMinutes ?? 0} 分钟 · {new Date(record.occurredAt).toLocaleDateString("zh-CN")}</span></summary><ActivityForm childId={childId} record={record} /></details>)}
     </section>
-    {deleted.length ? <section className="deleted-history"><h2>已删除记录</h2>{deleted.map((record) => <ActivityForm childId={childId} record={record} key={record.id} />)}</section> : null}
   </main>;
 }

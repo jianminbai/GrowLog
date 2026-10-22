@@ -19,10 +19,8 @@ export default async function GrowthPage({ params }: { params: Promise<{ childId
   const child = await findChildForHousehold(prisma, session.householdId, childId);
   if (!child) notFound();
   const measurements = serializeGrowthHistory(
-    await listGrowthForChild(prisma, session.householdId, childId, true)
+    await listGrowthForChild(prisma, session.householdId, childId)
   );
-  const active = measurements.filter((record) => !record.deletedAt);
-  const deleted = measurements.filter((record) => record.deletedAt);
 
   return (
     <main className="profile-shell">
@@ -31,11 +29,11 @@ export default async function GrowthPage({ params }: { params: Promise<{ childId
         <h1>身高与体重</h1>
         <p>记录原始测量值与测量条件。BMI 和变化量只在所需数据齐全时显示，不提供百分位或医学判断。</p>
       </header>
-      <GrowthChart measurements={active} />
+      <GrowthChart measurements={measurements} />
       <section className="profile-panel"><h2>添加测量</h2><GrowthForm childId={childId} /></section>
       <section className="record-history">
         <h2>历史记录</h2>
-        {active.length === 0 ? <div className="empty-state">尚无测量记录。</div> : active.slice().reverse().map((record) => (
+        {measurements.length === 0 ? <div className="empty-state">尚无测量记录。</div> : measurements.slice().reverse().map((record) => (
           <details className="record-card" key={record.id}>
             <summary><strong>{new Date(record.measuredAt).toLocaleDateString("zh-CN")}</strong><span>{record.heightCm === null ? "身高未记录" : `${record.heightCm} cm`} · {record.weightKg === null ? "体重未记录" : `${record.weightKg} kg`}</span></summary>
             <div className="record-metrics">
@@ -47,7 +45,6 @@ export default async function GrowthPage({ params }: { params: Promise<{ childId
           </details>
         ))}
       </section>
-      {deleted.length > 0 ? <section className="deleted-history"><h2>已删除记录</h2>{deleted.map((record) => <GrowthForm childId={childId} measurement={record} key={record.id} />)}</section> : null}
     </main>
   );
 }

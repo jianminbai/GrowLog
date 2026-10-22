@@ -31,7 +31,7 @@
 
 ## Current task
 
-- All GrowLog MVP milestones M0–M16 are implemented and verified. Deferred P1/P2 work remains listed in `TASKS.md`.
+- GrowLog MVP milestones M0–M16 are verified. M17 is implemented and undergoing its final release checks; deferred P1/P2 work remains listed in `TASKS.md`.
 
 ## Test record
 
@@ -85,6 +85,7 @@
 - M16 RED→GREEN: detail-page tests require a read-only summary without profile inputs, the dedicated edit-page test requires the existing populated form, and the form test requires successful edits to return to the detail page (2026-10-22).
 - M16 review fixes: successful profile saves keep the submit control disabled during navigation to prevent duplicate writes, and multi-line notes preserve their authored line breaks in the read-only summary; 8 focused tests pass (2026-10-22).
 - M16 final gate: clean test-database reset, lint with zero warnings, typecheck, 117/117 tests across 39 files with PostgreSQL enabled, and the production build including `/children/[childId]/edit` all pass (2026-10-22).
+- M17 RED→GREEN: history-page tests require household-local date groups and a deliberate right-swipe edit reveal; settings and data-management tests require a low-frequency entry, deleted-only recovery, redacted audits, and a CSRF-protected restore request; CSS and placement contracts keep cards compact and deleted data out of daily domain pages (2026-10-22).
 
 ## Work implemented
 
@@ -111,6 +112,7 @@
 - `scripts/mvp-smoke.mjs` is an environment-driven release check that exercises the deployed application through its public proxy without embedding credentials. It also asserts security cookie flags, CSRF/origin behavior, API envelope shape, and no-store policy.
 - Mobile presentation logic stays in small client components for pathname state, logout, and existing forms; server components, API routes, Prisma schema, audit behavior, household isolation, and service-worker cache policy remain unchanged. Nutrition requests retain their validated schema while the creation/edit UI now exposes previously omitted optional payload fields.
 - The child profile detail is view-first: health-domain links and a compact profile summary stay on the default route, while the existing authenticated edit form lives on a dedicated low-frequency route and returns to the detail after success.
+- The active history timeline is grouped by household-local day and uses compact cards that retain category, child, title, detail, and time; right swipe or keyboard intent reveals the edit link. Deleted records and redacted audits live under Settings → Data management, where restore actions reuse the existing household-scoped APIs and CSRF contract.
 
 ## Blockers
 

@@ -44,6 +44,8 @@ Status keys: `[ ]` pending, `[~]` in progress, `[x]` verified.
   - Acceptance: protected pages have no unintended horizontal overflow from 320–430px; four-item mobile navigation switches to desktop navigation at 760px and exposes the current page; inputs use at least 16px text, touch targets at least 44px, and primary controls at least 48px; all six record forms progressively disclose optional values and reopen them for populated edits; delete requires confirmation while restore remains direct; settings provides CSRF-safe logout; Dashboard and child-detail actions support one-handed use; pending/success/error states use consistent accessible semantics; light/dark themes retain clear contrast; existing business, isolation, export, PWA, security, test, typecheck, lint, and production-build contracts remain verified.
 - [x] M16 — View-first child profile detail.
   - Acceptance: the default child profile page shows a compact read-only summary and health-record entry points without rendering the edit form; a dedicated authenticated edit route reuses existing validation and audit behavior; successful edits return to the profile detail; focused and full release checks pass.
+- [~] M17 — Compact date-grouped history and low-frequency data management.
+  - Acceptance: active history retains all summary fields in compact cards grouped by household-local day; a deliberate right swipe or keyboard action reveals the edit link; daily domain pages exclude deleted records; settings links to an authenticated household-scoped page that restores deleted records with CSRF protection and shows redacted audit events; focused and full release checks pass.
 
 ## Deferred after MVP
 

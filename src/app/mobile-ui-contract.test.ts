@@ -61,6 +61,17 @@ describe("mobile UI CSS contract", () => {
     expect(css).toMatch(/\.restore-action\s*\{[^}]*min-height:\s*var\(--tap-min\)/);
   });
 
+  it("keeps history rows compact while reserving a touch-safe swipe action", () => {
+    expect(css).toMatch(/\.swipe-history-item\s*\{[^}]*overflow:\s*hidden[^}]*touch-action:\s*pan-y/);
+    expect(css).toMatch(/\.history-entry\s*\{[^}]*gap:\s*0\.35rem[^}]*padding:\s*0\.55rem 0\.75rem/);
+    expect(css).toMatch(/\.swipe-edit-slot a\s*\{[^}]*min-width:\s*var\(--tap-min\)[^}]*min-height:\s*var\(--tap-min\)/);
+  });
+
+  it("keeps deleted-record recovery readable and touch safe on phones", () => {
+    expect(css).toMatch(/\.deleted-management-entry\s*\{[^}]*display:\s*grid[^}]*padding:\s*0\.75rem/);
+    expect(css).toMatch(/\.restore-control\s*\{[^}]*display:\s*grid/);
+  });
+
   it("disables nonessential motion when the user requests it", () => {
     expect(css).toMatch(/@media\s*\(prefers-reduced-motion:\s*reduce\)/);
   });

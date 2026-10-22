@@ -22,17 +22,17 @@ export default async function NutritionPage({ params }: { params: Promise<{ chil
   if (!child) notFound();
 
   const [storedMeals, storedDrinks, timeZone] = await Promise.all([
-    listMealsForChild(prisma, auth.householdId, childId, true),
-    listBeveragesForChild(prisma, auth.householdId, childId, true),
+    listMealsForChild(prisma, auth.householdId, childId),
+    listBeveragesForChild(prisma, auth.householdId, childId),
     getHouseholdTimeZone(prisma, auth.householdId)
   ]);
   const date = dateInTimeZone(new Date(), timeZone);
   const summary = summarizeNutrition(
-    storedMeals.filter((meal) => !meal.deletedAt).map((meal) => ({
+    storedMeals.map((meal) => ({
       occurredAt: meal.occurredAt,
       itemCount: meal.items.filter((item) => !item.deletedAt).length
     })),
-    storedDrinks.filter((drink) => !drink.deletedAt).map((drink) => ({
+    storedDrinks.map((drink) => ({
       occurredAt: drink.occurredAt,
       type: drink.type,
       volumeMl: drink.volumeMl
