@@ -13,6 +13,8 @@
   --status-done-ink: #173e31;
   --status-missing-bg: #fff1e7;
   --status-missing-ink: #78391f;
+  --notice-bg: #e4efeb;
+  --notice-ink: #315148;
   color-scheme: light;
 }
 
@@ -403,13 +405,14 @@ h2 {
 
 .trend-notices {
   border-radius: 1rem;
-  background: rgba(223, 232, 239, 0.62);
+  background: var(--notice-bg);
+  color: var(--notice-ink);
   margin-top: 1rem;
   padding: 0.9rem 1rem;
 }
 
 .trend-notices ul { margin: 0.5rem 0 0; padding-left: 1.1rem; }
-.trend-notices li { color: var(--muted); font-size: 0.78rem; line-height: 1.6; }
+.trend-notices li { color: inherit; font-size: 0.8rem; line-height: 1.6; }
 
 .history-toolbar {
   display: flex;
@@ -489,7 +492,16 @@ h2 {
   font-weight: 750;
 }
 .logout-button:disabled { cursor: wait; opacity: 0.68; }
-.secondary-download { color: var(--green); align-self: center; font-size: 0.85rem; font-weight: 750; }
+.secondary-download {
+  width: 100%;
+  min-height: var(--tap-min);
+  color: var(--green);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 750;
+}
 .export-links { display: grid; gap: 0.6rem; }
 .export-links a {
   min-height: var(--tap-min);
@@ -936,6 +948,19 @@ h2 {
   font-weight: 700;
 }
 
+.restore-action {
+  width: 100%;
+  min-height: var(--tap-min);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--green);
+  cursor: pointer;
+  padding: 0.8rem 1rem;
+  font: inherit;
+  font-weight: 700;
+}
+
 .deleted-record {
   display: flex;
   flex-wrap: wrap;
@@ -1024,6 +1049,8 @@ h2 {
   .profile-submit,
   .danger-action,
   .deleted-record button,
+  .restore-action,
+  .secondary-download,
   .logout-button {
     width: auto;
   }
@@ -1072,6 +1099,8 @@ h2 {
     --status-done-ink: #dff5e9;
     --status-missing-bg: #4a3027;
     --status-missing-ink: #ffe5d8;
+    --notice-bg: #243a33;
+    --notice-ink: #dcece4;
     color-scheme: dark;
   }
 

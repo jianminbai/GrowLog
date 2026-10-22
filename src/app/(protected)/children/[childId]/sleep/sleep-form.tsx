@@ -72,6 +72,6 @@ export function SleepForm({ childId, record }: { childId: string; record?: Sleep
       <label>观察备注<textarea name="observation" rows={3} defaultValue={record?.observation ?? ""} /></label>
     </OptionalFields>
     {message ? <p className="form-message" role={messageRole}>{message}</p> : null}
-    <div className="record-actions"><button className="primary-action profile-submit" disabled={pending}>{pending ? "处理中…" : record ? "保存修改" : "添加睡眠"}</button>{record ? <button className="danger-action" type="button" onClick={() => lifecycle("delete")}>删除记录</button> : null}</div>
+    <div className="record-actions"><button className="primary-action profile-submit" disabled={pending}>{pending ? "处理中…" : record ? "保存修改" : "添加睡眠"}</button>{record ? <button className="danger-action" type="button" disabled={pending} onClick={() => lifecycle("delete")}>删除记录</button> : null}</div>
   </form>;
 }

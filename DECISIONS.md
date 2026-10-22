@@ -86,4 +86,4 @@ The production dependency audit has no critical findings but reports transitive 
 
 ## ADR-022 — 移动端展示层保持业务边界不变
 
-移动端优化只在展示层增加路径状态导航、安全退出按钮、原生 `<details>` 渐进展开和共享响应式样式。健康数据继续由服务端组件读取，各领域表单继续使用原有 API、CSRF、校验和请求结构；Prisma schema、仓库层、审计、家庭隔离及 Service Worker 缓存边界不变。内联 SVG 和原生 HTML 控件避免引入新的 UI、图标或动画依赖，使移动体验可以独立演进而不改变已经验证的业务规则。
+移动端优化只在展示层增加路径状态导航、安全退出按钮、原生 `<details>` 渐进展开和共享响应式样式。健康数据继续由服务端组件读取，各领域表单继续使用原有 API、CSRF 和校验规则；营养表单在保持既有 schema 的同时补齐先前 UI 未提交的可选字段。Prisma schema、仓库层、审计、家庭隔离及 Service Worker 缓存边界不变。内联 SVG 和原生 HTML 控件避免引入新的 UI、图标或动画依赖，使移动体验可以独立演进而不改变已经验证的业务规则。

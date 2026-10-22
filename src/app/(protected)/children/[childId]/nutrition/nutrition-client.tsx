@@ -170,13 +170,13 @@ export function NutritionClient({
           <label>时间<input name="occurredAt" type="datetime-local" required defaultValue={local()} /></label>
           <label>食物<input name="name" required /></label>
           <label>实际摄入量<input name="amount" type="number" min="0" step="0.01" /></label>
+          <label>单位（填写数量时必填）<input name="unit" maxLength={24} placeholder="g / ml / 份" /></label>
         </div>
         <OptionalFields>
           <div className="form-grid">
             <label>分类<input name="category" maxLength={80} /></label>
             <label>提供量<input name="offeredAmount" type="number" min="0" step="0.01" /></label>
             <label>估算量<input name="estimatedAmount" type="number" min="0" step="0.01" /></label>
-            <label>单位<input name="unit" maxLength={24} placeholder="g / ml / 份" /></label>
             <label className="checkbox-field"><input name="isNewFood" type="checkbox" />新食物</label>
             <label>反应记录<input name="reactionNote" maxLength={500} /></label>
             <label>进食表现<input name="appetite" maxLength={80} /></label>
@@ -209,13 +209,14 @@ export function NutritionClient({
       <article className="record-card" key={meal.id}>
         <strong>{meal.type} · {new Date(meal.occurredAt).toLocaleString("zh-CN")}</strong>
         <p>{meal.items.map((item) => `${item.name}${item.consumedAmount === null ? "（数量未知）" : ` ${item.consumedAmount}${item.amountUnit ?? ""}`}`).join("、")}</p>
-        {meal.deletedAt ? <button type="button" disabled={pending} onClick={() => send(`/api/children/${childId}/nutrition/meals/${meal.id}/restore`, "POST")}>恢复</button> : <>
+        {meal.deletedAt ? <button className="restore-action" type="button" disabled={pending} onClick={() => send(`/api/children/${childId}/nutrition/meals/${meal.id}/restore`, "POST")}>恢复</button> : <>
           <details className="edit-record"><summary>编辑餐食</summary><form className="growth-form" onSubmit={(event) => updateMeal(event, meal)}><div className="form-grid">
             <label>餐次<select name="type" defaultValue={meal.type}>{mealTypes.map(([value, label]) => <option value={value} key={value}>{label}</option>)}</select></label>
             <label>时间<input name="occurredAt" type="datetime-local" required defaultValue={local(new Date(meal.occurredAt))} /></label>
             {meal.items.map((item, index) => <div className="form-grid" key={item.id}>
               <label>食物<input name={`name-${index}`} required defaultValue={item.name} /></label>
               <label>实际摄入量<input name={`consumed-${index}`} type="number" min="0" step="0.01" defaultValue={item.consumedAmount ?? ""} /></label>
+              <label>单位（填写数量时必填）<input name={`unit-${index}`} defaultValue={item.amountUnit ?? ""} /></label>
             </div>)}
           </div><OptionalFields defaultOpen={mealHasOptionalContent(meal)}>
             <div className="form-grid">
@@ -225,7 +226,6 @@ export function NutritionClient({
                 <label>分类<input name={`category-${index}`} defaultValue={item.category ?? ""} /></label>
                 <label>提供量<input name={`offered-${index}`} type="number" min="0" step="0.01" defaultValue={item.offeredAmount ?? ""} /></label>
                 <label>估算量<input name={`estimated-${index}`} type="number" min="0" step="0.01" defaultValue={item.estimatedAmount ?? ""} /></label>
-                <label>单位<input name={`unit-${index}`} defaultValue={item.amountUnit ?? ""} /></label>
                 <label className="checkbox-field"><input name={`new-${index}`} type="checkbox" defaultChecked={item.isNewFood} />新食物</label>
                 <label>反应记录<input name={`reaction-${index}`} defaultValue={item.reactionNote ?? ""} /></label>
               </div>)}
@@ -240,7 +240,7 @@ export function NutritionClient({
       <article className="record-card" key={beverage.id}>
         <strong>{beverage.type} · {beverage.volumeMl === null ? "数量未知" : `${beverage.volumeMl} ml`}</strong>
         <span>{new Date(beverage.occurredAt).toLocaleString("zh-CN")}</span>
-        {beverage.deletedAt ? <button type="button" disabled={pending} onClick={() => send(`/api/children/${childId}/nutrition/beverages/${beverage.id}/restore`, "POST")}>恢复</button> : <>
+        {beverage.deletedAt ? <button className="restore-action" type="button" disabled={pending} onClick={() => send(`/api/children/${childId}/nutrition/beverages/${beverage.id}/restore`, "POST")}>恢复</button> : <>
           <details className="edit-record"><summary>编辑饮品</summary><form className="growth-form" onSubmit={(event) => updateBeverage(event, beverage)}><div className="form-grid">
             <label>类型<select name="type" defaultValue={beverage.type}>{beverageTypes.map(([value, label]) => <option value={value} key={value}>{label}</option>)}</select></label>
             <label>时间<input name="occurredAt" type="datetime-local" required defaultValue={local(new Date(beverage.occurredAt))} /></label>

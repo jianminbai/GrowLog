@@ -87,7 +87,7 @@ describe("mobile record form field priority", () => {
     expectInside(mealDetails, within(mealSection).getByLabelText("餐次"), false);
     expectInside(mealDetails, within(mealSection).getByLabelText("食物"), false);
     expectInside(mealDetails, within(mealSection).getByLabelText("实际摄入量"), false);
-    expectInside(mealDetails, within(mealSection).getByLabelText("单位"));
+    expectInside(mealDetails, within(mealSection).getByLabelText("单位（填写数量时必填）"), false);
     expectInside(drinkDetails, within(drinkSection).getByLabelText("体积（ml，可不填）"), false);
     expectInside(drinkDetails, within(drinkSection).getByLabelText("备注"));
   });
@@ -170,6 +170,21 @@ describe("record form action safeguards", () => {
       "/api/children/child-1/growth/growth-1",
       expect.objectContaining({ method: "DELETE" })
     ));
+  });
+
+  it("disables sleep deletion while its request is pending", async () => {
+    vi.stubGlobal("confirm", vi.fn().mockReturnValue(true));
+    vi.stubGlobal("fetch", vi.fn().mockReturnValue(new Promise(() => undefined)));
+    render(<SleepForm childId="child-1" record={{
+      id: "sleep-1", kind: "NIGHT", startedAt: "2026-10-20T12:00:00.000Z",
+      endedAt: "2026-10-20T22:00:00.000Z", awakeMinutes: null, wakeCount: null,
+      observation: null, source: "HOME", deletedAt: null, sleepMinutes: 600
+    }} />);
+
+    const deleteButton = screen.getByRole("button", { name: "删除记录" });
+    fireEvent.click(deleteButton);
+
+    await waitFor(() => expect(deleteButton).toBeDisabled());
   });
 
   it("announces a failed save as an alert", async () => {
