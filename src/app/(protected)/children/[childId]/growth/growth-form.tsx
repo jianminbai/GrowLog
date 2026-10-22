@@ -7,6 +7,7 @@ import { CSRF_COOKIE_NAME } from "@/modules/auth/auth-constants";
 import type { GrowthMeasurementDto } from "@/modules/growth/growth-handlers";
 
 import { OptionalFields } from "../../../_components/optional-fields";
+import { confirmRecordDeletion } from "../../../_components/confirm-delete";
 
 function csrfToken(): string {
   const value = document.cookie
@@ -35,6 +36,7 @@ export function GrowthForm({ childId, measurement }: { childId: string; measurem
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
+  const [messageRole, setMessageRole] = useState<"status" | "alert">("status");
   const editing = Boolean(measurement);
   const showOptionalFields = Boolean(
     measurement?.headCircumferenceCm ?? measurement?.place ?? measurement?.method
@@ -45,7 +47,8 @@ export function GrowthForm({ childId, measurement }: { childId: string; measurem
     event.preventDefault();
     setPending(true);
     setMessage("");
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
     const measuredAt = String(form.get("measuredAt") ?? "");
     const payload = {
       measuredAt: new Date(measuredAt).toISOString(),
@@ -70,13 +73,16 @@ export function GrowthForm({ childId, measurement }: { childId: string; measurem
       });
       const body = await response.json();
       if (!response.ok) {
+        setMessageRole("alert");
         setMessage(body?.error?.message ?? "测量记录保存失败。");
         return;
       }
+      setMessageRole("status");
       setMessage(editing ? "记录已更新。" : "记录已添加。");
-      if (!editing) event.currentTarget.reset();
+      if (!editing) formElement.reset();
       router.refresh();
     } catch {
+      setMessageRole("alert");
       setMessage("暂时无法保存，请稍后重试。");
     } finally {
       setPending(false);
@@ -84,6 +90,7 @@ export function GrowthForm({ childId, measurement }: { childId: string; measurem
   }
 
   async function changeDeletedState(action: "delete" | "restore") {
+    if (action === "delete" && !confirmRecordDeletion("生长记录")) return;
     setPending(true);
     setMessage("");
     const endpoint = `/api/children/${childId}/growth/${measurement!.id}${action === "restore" ? "/restore" : ""}`;
@@ -94,11 +101,13 @@ export function GrowthForm({ childId, measurement }: { childId: string; measurem
       });
       if (!response.ok) {
         const body = await response.json();
+        setMessageRole("alert");
         setMessage(body?.error?.message ?? "操作失败。");
         return;
       }
       router.refresh();
     } catch {
+      setMessageRole("alert");
       setMessage("暂时无法完成操作，请稍后重试。");
     } finally {
       setPending(false);
@@ -110,7 +119,7 @@ export function GrowthForm({ childId, measurement }: { childId: string; measurem
       <div className="deleted-record">
         <span>{new Date(measurement.measuredAt).toLocaleString("zh-CN")}</span>
         <button type="button" disabled={pending} onClick={() => changeDeletedState("restore")}>恢复记录</button>
-        {message ? <p className="form-message">{message}</p> : null}
+        {message ? <p className="form-message" role={messageRole}>{message}</p> : null}
       </div>
     );
   }
@@ -135,7 +144,7 @@ export function GrowthForm({ childId, measurement }: { childId: string; measurem
         </div>
         <label>备注<textarea name="notes" rows={3} maxLength={2000} defaultValue={measurement?.notes ?? ""} /></label>
       </OptionalFields>
-      {message ? <p className="form-message" role="status">{message}</p> : null}
+      {message ? <p className="form-message" role={messageRole}>{message}</p> : null}
       <div className="record-actions">
         <button className="primary-action profile-submit" type="submit" disabled={pending}>{pending ? "处理中…" : editing ? "保存修改" : "添加测量"}</button>
         {editing ? <button className="danger-action" type="button" disabled={pending} onClick={() => changeDeletedState("delete")}>删除记录</button> : null}

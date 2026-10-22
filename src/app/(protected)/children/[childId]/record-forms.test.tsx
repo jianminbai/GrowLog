@@ -2,7 +2,7 @@
 
 import "@testing-library/jest-dom/vitest";
 
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -14,7 +14,11 @@ import { SleepForm } from "./sleep/sleep-form";
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.unstubAllGlobals();
+  vi.clearAllMocks();
+});
 
 function optionalDetails(container: HTMLElement) {
   const details = container.querySelector("details.optional-fields");
@@ -132,5 +136,57 @@ describe("mobile record form field priority", () => {
     expect(editOptionals).toHaveLength(2);
     expect(editOptionals[0]).toHaveAttribute("open");
     expect(editOptionals[1]).toHaveAttribute("open");
+  });
+});
+
+const growthRecord = {
+  id: "growth-1", childId: "child-1", measuredAt: "2026-10-20T08:00:00.000Z",
+  heightCm: 96.2, weightKg: 14.8, headCircumferenceCm: null, bmi: 16,
+  heightChangeCm: null, weightChangeKg: null, source: "HOME" as const, place: null,
+  method: null, device: null, precisionNote: null, notes: null, deletedAt: null,
+  createdAt: "2026-10-20T08:00:00.000Z", updatedAt: "2026-10-20T08:00:00.000Z"
+};
+
+describe("record form action safeguards", () => {
+  it("does not request deletion when confirmation is cancelled", () => {
+    vi.stubGlobal("confirm", vi.fn().mockReturnValue(false));
+    vi.stubGlobal("fetch", vi.fn());
+    render(<GrowthForm childId="child-1" measurement={growthRecord} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "删除记录" }));
+
+    expect(confirm).toHaveBeenCalledOnce();
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it("uses the existing DELETE endpoint after confirmation", async () => {
+    vi.stubGlobal("confirm", vi.fn().mockReturnValue(true));
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 204 })));
+    render(<GrowthForm childId="child-1" measurement={growthRecord} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "删除记录" }));
+
+    await waitFor(() => expect(fetch).toHaveBeenCalledWith(
+      "/api/children/child-1/growth/growth-1",
+      expect.objectContaining({ method: "DELETE" })
+    ));
+  });
+
+  it("announces a failed save as an alert", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(Response.json({ error: { message: "请检查输入。" } }, { status: 400 })));
+    const { container } = render(<GrowthForm childId="child-1" />);
+
+    fireEvent.submit(container.querySelector("form")!);
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("请检查输入。");
+  });
+
+  it("announces a successful save as status", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(Response.json({ data: {} }, { status: 201 })));
+    const { container } = render(<GrowthForm childId="child-1" />);
+
+    fireEvent.submit(container.querySelector("form")!);
+
+    expect(await screen.findByRole("status")).toHaveTextContent("记录已添加。");
   });
 });

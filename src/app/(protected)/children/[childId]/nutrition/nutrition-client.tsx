@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { CSRF_COOKIE_NAME } from "@/modules/auth/auth-constants";
 
+import { confirmRecordDeletion } from "../../../_components/confirm-delete";
 import { OptionalFields } from "../../../_components/optional-fields";
 
 type MealItemDto = {
@@ -69,15 +70,28 @@ export function NutritionClient({
 }) {
   const router = useRouter();
   const [message, setMessage] = useState("");
+  const [messageRole, setMessageRole] = useState<"status" | "alert">("status");
+  const [pending, setPending] = useState(false);
 
   async function send(path: string, method: string, payload?: unknown) {
-    const response = await fetch(path, {
-      method,
-      headers: { "content-type": "application/json", "x-csrf-token": csrf() },
-      ...(payload ? { body: JSON.stringify(payload) } : {})
-    });
-    if (!response.ok) setMessage((await response.json())?.error?.message ?? "操作失败。");
-    else { setMessage("已保存。"); router.refresh(); }
+    setPending(true);
+    setMessage("");
+    try {
+      const response = await fetch(path, {
+        method,
+        headers: { "content-type": "application/json", "x-csrf-token": csrf() },
+        ...(payload ? { body: JSON.stringify(payload) } : {})
+      });
+      if (!response.ok) { setMessageRole("alert"); setMessage((await response.json())?.error?.message ?? "操作失败。"); }
+      else { setMessageRole("status"); setMessage("已保存。"); router.refresh(); }
+    } catch {
+      setMessageRole("alert"); setMessage("暂时无法保存，请稍后重试。");
+    } finally { setPending(false); }
+  }
+
+  async function remove(path: string, label: string) {
+    if (!confirmRecordDeletion(label)) return;
+    await send(path, "DELETE");
   }
 
   async function createMeal(event: FormEvent<HTMLFormElement>) {
@@ -170,7 +184,7 @@ export function NutritionClient({
           </div>
           <label>备注<textarea name="notes" rows={3} maxLength={2000} /></label>
         </OptionalFields>
-        <button className="primary-action profile-submit">添加餐食</button>
+        <button className="primary-action profile-submit" disabled={pending}>{pending ? "正在保存…" : "添加餐食"}</button>
       </form>
     </section>
 
@@ -186,16 +200,16 @@ export function NutritionClient({
           <div className="form-grid"><label>来源<select name="source" defaultValue="HOME"><option value="HOME">家庭</option><option value="KINDERGARTEN">幼儿园</option><option value="MANUAL">手工</option><option value="HOSPITAL">医院</option><option value="IMPORT">导入</option></select></label></div>
           <label>备注<textarea name="notes" rows={3} maxLength={2000} /></label>
         </OptionalFields>
-        <button className="primary-action profile-submit">添加饮品</button>
+        <button className="primary-action profile-submit" disabled={pending}>{pending ? "正在保存…" : "添加饮品"}</button>
       </form>
     </section>
-    {message ? <p className="form-message">{message}</p> : null}
+    {message ? <p className="form-message" role={messageRole}>{message}</p> : null}
 
     <section className="record-history"><h2>餐食历史</h2>{meals.slice().reverse().map((meal) =>
       <article className="record-card" key={meal.id}>
         <strong>{meal.type} · {new Date(meal.occurredAt).toLocaleString("zh-CN")}</strong>
         <p>{meal.items.map((item) => `${item.name}${item.consumedAmount === null ? "（数量未知）" : ` ${item.consumedAmount}${item.amountUnit ?? ""}`}`).join("、")}</p>
-        {meal.deletedAt ? <button onClick={() => send(`/api/children/${childId}/nutrition/meals/${meal.id}/restore`, "POST")}>恢复</button> : <>
+        {meal.deletedAt ? <button type="button" disabled={pending} onClick={() => send(`/api/children/${childId}/nutrition/meals/${meal.id}/restore`, "POST")}>恢复</button> : <>
           <details className="edit-record"><summary>编辑餐食</summary><form className="growth-form" onSubmit={(event) => updateMeal(event, meal)}><div className="form-grid">
             <label>餐次<select name="type" defaultValue={meal.type}>{mealTypes.map(([value, label]) => <option value={value} key={value}>{label}</option>)}</select></label>
             <label>时间<input name="occurredAt" type="datetime-local" required defaultValue={local(new Date(meal.occurredAt))} /></label>
@@ -217,8 +231,8 @@ export function NutritionClient({
               </div>)}
             </div>
             <label>备注<textarea name="notes" defaultValue={meal.notes ?? ""} /></label>
-          </OptionalFields><button className="primary-action profile-submit">保存餐食修改</button></form></details>
-          <button className="danger-action" onClick={() => send(`/api/children/${childId}/nutrition/meals/${meal.id}`, "DELETE")}>删除</button>
+          </OptionalFields><button className="primary-action profile-submit" disabled={pending}>{pending ? "正在保存…" : "保存餐食修改"}</button></form></details>
+          <button className="danger-action" type="button" disabled={pending} onClick={() => remove(`/api/children/${childId}/nutrition/meals/${meal.id}`, "餐食记录")}>删除</button>
         </>}
       </article>)}</section>
 
@@ -226,7 +240,7 @@ export function NutritionClient({
       <article className="record-card" key={beverage.id}>
         <strong>{beverage.type} · {beverage.volumeMl === null ? "数量未知" : `${beverage.volumeMl} ml`}</strong>
         <span>{new Date(beverage.occurredAt).toLocaleString("zh-CN")}</span>
-        {beverage.deletedAt ? <button onClick={() => send(`/api/children/${childId}/nutrition/beverages/${beverage.id}/restore`, "POST")}>恢复</button> : <>
+        {beverage.deletedAt ? <button type="button" disabled={pending} onClick={() => send(`/api/children/${childId}/nutrition/beverages/${beverage.id}/restore`, "POST")}>恢复</button> : <>
           <details className="edit-record"><summary>编辑饮品</summary><form className="growth-form" onSubmit={(event) => updateBeverage(event, beverage)}><div className="form-grid">
             <label>类型<select name="type" defaultValue={beverage.type}>{beverageTypes.map(([value, label]) => <option value={value} key={value}>{label}</option>)}</select></label>
             <label>时间<input name="occurredAt" type="datetime-local" required defaultValue={local(new Date(beverage.occurredAt))} /></label>
@@ -234,8 +248,8 @@ export function NutritionClient({
           </div><OptionalFields defaultOpen={Boolean(beverage.notes || beverage.source !== "HOME")}>
             <div className="form-grid"><label>来源<select name="source" defaultValue={beverage.source}><option value="HOME">家庭</option><option value="KINDERGARTEN">幼儿园</option><option value="MANUAL">手工</option><option value="HOSPITAL">医院</option><option value="IMPORT">导入</option></select></label></div>
             <label>备注<textarea name="notes" defaultValue={beverage.notes ?? ""} /></label>
-          </OptionalFields><button className="primary-action profile-submit">保存饮品修改</button></form></details>
-          <button className="danger-action" onClick={() => send(`/api/children/${childId}/nutrition/beverages/${beverage.id}`, "DELETE")}>删除</button>
+          </OptionalFields><button className="primary-action profile-submit" disabled={pending}>{pending ? "正在保存…" : "保存饮品修改"}</button></form></details>
+          <button className="danger-action" type="button" disabled={pending} onClick={() => remove(`/api/children/${childId}/nutrition/beverages/${beverage.id}`, "饮品记录")}>删除</button>
         </>}
       </article>)}</section>
   </>;
