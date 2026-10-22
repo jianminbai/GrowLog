@@ -31,7 +31,7 @@
 
 ## Current task
 
-- All GrowLog MVP milestones M0–M15 are implemented and verified. Deferred P1/P2 work remains listed in `TASKS.md`.
+- All GrowLog MVP milestones M0–M16 are implemented and verified. Deferred P1/P2 work remains listed in `TASKS.md`.
 
 ## Test record
 
@@ -82,6 +82,8 @@
 - M15 viewport verification: authenticated pages at 320×568, 375×667, 390×844, 430×932, and 768×1024 have no page-level horizontal overflow; mobile/desktop navigation switches at 760px and current-page state is correct on Today, History, Children, child detail, and Settings (2026-10-22).
 - M15 whole-branch review fixes: meal amount and unit are visible together, notice colors are contrast-tested in both themes, secondary/restore controls meet the 44px target, and sleep deletion cannot be repeated while pending (2026-10-22).
 - M15 final gate: clean test-database reset, lint with zero warnings, typecheck, 114/114 tests across 37 files with PostgreSQL enabled, and the production build all pass (2026-10-22).
+- M16 RED→GREEN: detail-page tests require a read-only summary without profile inputs, the dedicated edit-page test requires the existing populated form, and the form test requires successful edits to return to the detail page (2026-10-22).
+- M16 final gate: clean test-database reset, lint with zero warnings, typecheck, 117/117 tests across 39 files with PostgreSQL enabled, and the production build including `/children/[childId]/edit` all pass (2026-10-22).
 
 ## Work implemented
 
@@ -107,6 +109,7 @@
 - Backup and restore scripts operate inside the Compose PostgreSQL container, write a SHA-256 companion file, require a separate target database by default, and compare migration counts as part of the documented recovery procedure.
 - `scripts/mvp-smoke.mjs` is an environment-driven release check that exercises the deployed application through its public proxy without embedding credentials. It also asserts security cookie flags, CSRF/origin behavior, API envelope shape, and no-store policy.
 - Mobile presentation logic stays in small client components for pathname state, logout, and existing forms; server components, API routes, Prisma schema, audit behavior, household isolation, and service-worker cache policy remain unchanged. Nutrition requests retain their validated schema while the creation/edit UI now exposes previously omitted optional payload fields.
+- The child profile detail is view-first: health-domain links and a compact profile summary stay on the default route, while the existing authenticated edit form lives on a dedicated low-frequency route and returns to the detail after success.
 
 ## Blockers
 
@@ -114,4 +117,4 @@
 
 ## Next step
 
-- Begin only explicitly deferred P1/P2 work; the next maintenance priority is the isolated Prisma 7 and Next.js 16 upgrade recorded in `TASKS.md` and `docs/SECURITY_REVIEW.md`.
+- Begin only explicitly deferred P1/P2 work; the next maintenance priority remains the isolated Prisma 7 and Next.js 16 upgrade.

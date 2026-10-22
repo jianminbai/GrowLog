@@ -58,6 +58,7 @@ export function ChildProfileForm({ child }: { child?: ChildProfileDto }) {
       if (editing) {
         setMessageRole("status");
         setMessage("档案已更新。");
+        router.replace(`/children/${child!.id}`);
         router.refresh();
       } else {
         router.push(`/children/${body.data.child.id}`);
