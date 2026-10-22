@@ -31,7 +31,7 @@
 
 ## Current task
 
-- GrowLog MVP milestones M0–M16 are verified. M17 is implemented and undergoing its final release checks; deferred P1/P2 work remains listed in `TASKS.md`.
+- All GrowLog MVP milestones M0–M17 are implemented and verified. Deferred P1/P2 work remains listed in `TASKS.md`.
 
 ## Test record
 
@@ -86,6 +86,8 @@
 - M16 review fixes: successful profile saves keep the submit control disabled during navigation to prevent duplicate writes, and multi-line notes preserve their authored line breaks in the read-only summary; 8 focused tests pass (2026-10-22).
 - M16 final gate: clean test-database reset, lint with zero warnings, typecheck, 117/117 tests across 39 files with PostgreSQL enabled, and the production build including `/children/[childId]/edit` all pass (2026-10-22).
 - M17 RED→GREEN: history-page tests require household-local date groups and a deliberate right-swipe edit reveal; settings and data-management tests require a low-frequency entry, deleted-only recovery, redacted audits, and a CSRF-protected restore request; CSS and placement contracts keep cards compact and deleted data out of daily domain pages (2026-10-22).
+- M17 review fixes: link-originated pointer and keyboard events no longer close or suppress the revealed edit link, canceled gestures restore the prior card state, and cross-year date headings include the year; 5 focused regression tests pass (2026-10-22).
+- M17 final gate: clean test-database reset, lint with zero warnings, typecheck, 129/129 tests across 45 files with PostgreSQL enabled, and the production build including `/settings/data-management` all pass (2026-10-22).
 
 ## Work implemented
 

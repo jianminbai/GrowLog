@@ -83,4 +83,27 @@ describe("history page", () => {
       "/children/child-1/growth"
     );
   });
+
+  it("keeps the revealed edit link actionable by touch and keyboard", async () => {
+    render(await HistoryPage());
+    const card = screen.getByRole("group", { name: "身高体重" });
+    fireEvent.keyDown(card, { key: "Enter" });
+    const link = within(card).getByRole("link", { name: "前往编辑" });
+
+    fireEvent.pointerDown(link, { clientX: 84, clientY: 30, pointerId: 1 });
+    fireEvent.pointerUp(link, { clientX: 84, clientY: 30, pointerId: 1 });
+    expect(link).toBeInTheDocument();
+    expect(fireEvent.keyDown(link, { key: "Enter" })).toBe(true);
+  });
+
+  it("does not reveal editing after the browser cancels a gesture", async () => {
+    render(await HistoryPage());
+    const card = screen.getByRole("group", { name: "身高体重" });
+
+    fireEvent.pointerDown(card, { clientX: 12, clientY: 30, pointerId: 1 });
+    fireEvent.pointerMove(card, { clientX: 84, clientY: 34, pointerId: 1 });
+    fireEvent.pointerCancel(card, { pointerId: 1 });
+
+    expect(within(card).queryByRole("link", { name: "前往编辑" })).not.toBeInTheDocument();
+  });
 });

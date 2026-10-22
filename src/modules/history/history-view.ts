@@ -20,7 +20,13 @@ function previousDateKey(value: string): string {
 function dateLabel(value: Date, key: string, today: string, timeZone: string): string {
   if (key === today) return "今天";
   if (key === previousDateKey(today)) return "昨天";
-  return value.toLocaleDateString("zh-CN", { timeZone, month: "long", day: "numeric", weekday: "short" });
+  return value.toLocaleDateString("zh-CN", {
+    timeZone,
+    year: key.slice(0, 4) === today.slice(0, 4) ? undefined : "numeric",
+    month: "long",
+    day: "numeric",
+    weekday: "short"
+  });
 }
 
 export function groupHistoryEntries(entries: HistoryEntry[], timeZone: string, now = new Date()) {

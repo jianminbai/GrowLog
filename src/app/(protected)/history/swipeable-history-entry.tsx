@@ -22,10 +22,13 @@ export function SwipeableHistoryEntry({
   const [offset, setOffset] = useState(0);
   const start = useRef<{ x: number; y: number } | null>(null);
   const distance = useRef(0);
+  const startedOpen = useRef(false);
 
   function pointerDown(event: PointerEvent<HTMLDivElement>) {
+    if ((event.target as HTMLElement).closest("a")) return;
     start.current = { x: event.clientX, y: event.clientY };
     distance.current = 0;
+    startedOpen.current = open;
   }
 
   function pointerMove(event: PointerEvent<HTMLDivElement>) {
@@ -47,6 +50,7 @@ export function SwipeableHistoryEntry({
   }
 
   function keyDown(event: KeyboardEvent<HTMLDivElement>) {
+    if ((event.target as HTMLElement).closest("a")) return;
     if (event.key === "Enter" || event.key === " " || event.key === "ArrowRight") {
       event.preventDefault();
       setOpen(true);
@@ -55,6 +59,13 @@ export function SwipeableHistoryEntry({
       setOpen(false);
       setOffset(0);
     }
+  }
+
+  function pointerCancel() {
+    setOpen(startedOpen.current);
+    setOffset(startedOpen.current ? revealDistance : 0);
+    start.current = null;
+    distance.current = 0;
   }
 
   return <div
@@ -66,7 +77,7 @@ export function SwipeableHistoryEntry({
     onPointerDown={pointerDown}
     onPointerMove={pointerMove}
     onPointerUp={pointerEnd}
-    onPointerCancel={pointerEnd}
+    onPointerCancel={pointerCancel}
   >
     <div className="swipe-edit-slot">
       {open ? <Link href={href}>前往编辑</Link> : null}
