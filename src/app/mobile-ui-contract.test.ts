@@ -36,6 +36,7 @@ describe("mobile UI CSS contract", () => {
     expect(css).not.toMatch(/min\(100%\s*-/);
     expect(css).toContain("min(calc(100% - 2rem), 70rem)");
     expect(css).toMatch(/\.dashboard-children\s*>\s*\*\s*\{\s*min-width:\s*0/);
+    expect(css).toMatch(/\.profile-summary-notes dd\s*\{[^}]*white-space:\s*pre-wrap/);
   });
 
   it("gives completion states their own dark-mode-safe foreground", () => {

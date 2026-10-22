@@ -42,6 +42,7 @@ export function ChildProfileForm({ child }: { child?: ChildProfileDto }) {
       fatherHeightCm: optionalNumber(form, "fatherHeightCm"),
       notes: String(form.get("notes") ?? "") || null
     };
+    let navigationStarted = false;
 
     try {
       const response = await fetch(editing ? `/api/children/${child!.id}` : "/api/children", {
@@ -58,16 +59,20 @@ export function ChildProfileForm({ child }: { child?: ChildProfileDto }) {
       if (editing) {
         setMessageRole("status");
         setMessage("档案已更新。");
+        navigationStarted = true;
         router.replace(`/children/${child!.id}`);
         router.refresh();
       } else {
+        navigationStarted = true;
         router.push(`/children/${body.data.child.id}`);
       }
     } catch {
       setMessageRole("alert");
       setMessage("暂时无法保存，请稍后重试。");
     } finally {
-      setPending(false);
+      if (!navigationStarted) {
+        setPending(false);
+      }
     }
   }
 

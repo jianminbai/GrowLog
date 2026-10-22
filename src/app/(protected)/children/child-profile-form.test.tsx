@@ -41,8 +41,10 @@ describe("ChildProfileForm", () => {
       notes: null, createdAt: "2026-10-20T08:00:00.000Z", updatedAt: "2026-10-20T08:00:00.000Z"
     }} />);
 
-    fireEvent.submit(screen.getByRole("button", { name: "保存修改" }).closest("form")!);
+    const submitButton = screen.getByRole("button", { name: "保存修改" });
+    fireEvent.submit(submitButton.closest("form")!);
 
     await waitFor(() => expect(router.replace).toHaveBeenCalledWith("/children/child-1"));
+    expect(submitButton).toBeDisabled();
   });
 });

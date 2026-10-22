@@ -682,6 +682,10 @@ h2 {
   grid-column: 1 / -1;
 }
 
+.profile-summary-notes dd {
+  white-space: pre-wrap;
+}
+
 .profile-cards {
   display: grid;
   gap: 0.8rem;

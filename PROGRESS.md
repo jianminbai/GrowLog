@@ -83,6 +83,7 @@
 - M15 whole-branch review fixes: meal amount and unit are visible together, notice colors are contrast-tested in both themes, secondary/restore controls meet the 44px target, and sleep deletion cannot be repeated while pending (2026-10-22).
 - M15 final gate: clean test-database reset, lint with zero warnings, typecheck, 114/114 tests across 37 files with PostgreSQL enabled, and the production build all pass (2026-10-22).
 - M16 RED→GREEN: detail-page tests require a read-only summary without profile inputs, the dedicated edit-page test requires the existing populated form, and the form test requires successful edits to return to the detail page (2026-10-22).
+- M16 review fixes: successful profile saves keep the submit control disabled during navigation to prevent duplicate writes, and multi-line notes preserve their authored line breaks in the read-only summary; 8 focused tests pass (2026-10-22).
 - M16 final gate: clean test-database reset, lint with zero warnings, typecheck, 117/117 tests across 39 files with PostgreSQL enabled, and the production build including `/children/[childId]/edit` all pass (2026-10-22).
 
 ## Work implemented
