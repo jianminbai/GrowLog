@@ -439,6 +439,56 @@ h2 {
   font-size: 1.25rem !important;
 }
 
+.protected-app-shell {
+  padding-bottom: calc(5.25rem + env(safe-area-inset-bottom));
+}
+
+.desktop-app-nav {
+  display: none;
+}
+
+.mobile-app-nav {
+  position: fixed;
+  z-index: 50;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-top: 1px solid var(--line);
+  background: rgba(255, 253, 248, 0.96);
+  padding: 0.4rem 0.5rem calc(0.4rem + env(safe-area-inset-bottom));
+  box-shadow: 0 -8px 30px rgba(23, 52, 45, 0.08);
+}
+
+.mobile-app-nav a {
+  min-height: 3.2rem;
+  border-radius: 0.9rem;
+  color: var(--muted);
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 0.15rem;
+  font-size: 0.75rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.mobile-app-nav a.is-current {
+  background: #f8e3d3;
+  color: #9a4427;
+}
+
+.mobile-app-nav svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
 .profile-shell {
   padding-top: clamp(2rem, 6vw, 4rem);
 }
@@ -688,6 +738,46 @@ h2 {
 }
 
 @media (min-width: 760px) {
+  .protected-app-shell {
+    padding-bottom: 0;
+  }
+
+  .desktop-app-nav {
+    width: min(100% - 3rem, 70rem);
+    margin: 0 auto;
+    padding: 1rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .app-nav-links {
+    display: flex;
+    gap: 0.35rem;
+  }
+
+  .desktop-app-nav a {
+    min-height: 2.75rem;
+    border-radius: 999px;
+    color: var(--ink);
+    display: inline-flex;
+    align-items: center;
+    padding: 0 0.85rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .desktop-app-nav .app-nav-links a.is-current {
+    background: rgba(31, 107, 86, 0.1);
+    color: var(--green);
+  }
+
+  .mobile-app-nav {
+    display: none;
+  }
+
   .snapshot-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
@@ -731,5 +821,7 @@ h2 {
 
   .primary-action { background: #dbece3; color: #17342d; }
   .snapshot-card { color: #17342d; }
+  .mobile-app-nav { background: rgba(23, 41, 35, 0.97); }
+  .mobile-app-nav a.is-current { background: #f8e3d3; color: #79341f; }
 }
 

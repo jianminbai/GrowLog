@@ -1,23 +1,16 @@
-import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { requireServerSession } from "@/modules/auth/server-session";
+
+import { AppNavigation } from "./_components/app-navigation";
 
 export default async function ProtectedLayout({ children }: { children: ReactNode }) {
   await requireServerSession();
 
   return (
     <>
-      <nav className="app-nav" aria-label="主要导航">
-        <Link className="app-brand" href="/today">GrowLog</Link>
-        <div>
-          <Link href="/today">今天</Link>
-          <Link href="/history">历史</Link>
-          <Link href="/children">儿童档案</Link>
-          <Link href="/settings">设置</Link>
-        </div>
-      </nav>
-      {children}
+      <AppNavigation />
+      <div className="protected-app-shell">{children}</div>
     </>
   );
 }
