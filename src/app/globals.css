@@ -390,6 +390,20 @@ h2 {
 .audit-entry > div:last-child { text-align: right; }
 
 .export-panel p { color: var(--muted); line-height: 1.7; }
+.account-panel p { color: var(--muted); line-height: 1.7; }
+.logout-control { display: grid; gap: 0.75rem; justify-items: start; }
+.logout-button {
+  min-height: 2.75rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  padding: 0.7rem 1rem;
+  font: inherit;
+  font-weight: 750;
+}
+.logout-button:disabled { cursor: wait; opacity: 0.68; }
 .secondary-download { color: var(--green); align-self: center; font-size: 0.85rem; font-weight: 750; }
 .export-links { display: flex; flex-wrap: wrap; gap: 0.6rem; }
 .export-links a {
