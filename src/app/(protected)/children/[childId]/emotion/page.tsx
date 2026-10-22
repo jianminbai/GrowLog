@@ -37,7 +37,7 @@ export default async function EmotionPage({ params }: { params: Promise<{ childI
 
   return <main className="profile-shell">
     <Link className="back-link" href={`/children/${childId}`}>← 返回 {child.name} 的档案</Link>
-    <header className="profile-header compact"><span className="eyebrow">Emotion observations</span><h1>情绪观察</h1><p>用简短的总体情绪、标签和情境回顾变化。这里展示描述性频次，不提供诊断或风险评分。</p></header>
+    <header className="profile-header compact"><h1>情绪观察</h1><p>用简短的总体情绪、标签和情境回顾变化。这里展示描述性频次，不提供诊断或风险评分。</p></header>
     <section className="snapshot-grid sleep-summary">
       <div className="snapshot-card rose"><span>近 7 天记录</span><strong>{summary.last7Days.total} 次</strong></div>
       <div className="snapshot-card mint"><span>近 30 天记录</span><strong>{summary.last30Days.total} 次</strong></div>

@@ -48,8 +48,7 @@ export default async function TodayPage() {
 
   return <main className="today-shell">
     <header className="today-header">
-      <div><span className="eyebrow">Today</span><h1>今天，慢慢记录。</h1><p>一页查看今日填写情况和最近记录。空白表示尚未填写，不代表发生了异常。</p></div>
-      <span className="date-chip">{date} · {timeZone}</span>
+      <div><h1>今天</h1><p className="today-date">{date} · {timeZone}</p><p>快速补齐今日记录。空白表示尚未填写，不代表发生了异常。</p></div>
     </header>
 
     {dashboards.length === 0 ? <section className="empty-state dashboard-empty">
@@ -57,7 +56,7 @@ export default async function TodayPage() {
       <Link className="primary-action inline-action" href="/children">建立儿童档案</Link>
     </section> : <section className="dashboard-children" aria-label="今日成长概览">
       {dashboards.map(({ child, snapshot }) => <article className="dashboard-card" key={child.id}>
-        <div className="dashboard-title"><div><span className="eyebrow">Daily snapshot</span><h2>{child.name}</h2></div><Link href={`/children/${child.id}`}>查看档案 →</Link></div>
+        <div className="dashboard-title"><h2>{child.name}</h2><Link href={`/children/${child.id}`}>查看档案 →</Link></div>
 
         <div className="completion-grid">
           {([
@@ -66,16 +65,18 @@ export default async function TodayPage() {
           ] as const).map(([key, label, route]) => <Link className={`completion-item ${snapshot.completion[key] ? "done" : "missing"}`} href={`/children/${child.id}/${route}`} key={key}><span>{snapshot.completion[key] ? "已记录" : "待记录"}</span><strong>{label}</strong></Link>)}
         </div>
 
+        <h3 className="dashboard-section-title">快捷记录</h3>
+        <div className="quick-actions" aria-label={`${child.name} 的快捷记录`}>
+          <Link href={`/children/${child.id}/nutrition`}>＋ 饮食奶水</Link><Link href={`/children/${child.id}/sleep`}>＋ 睡眠</Link><Link href={`/children/${child.id}/activity`}>＋ 运动</Link><Link href={`/children/${child.id}/emotion`}>＋ 情绪</Link><Link href={`/children/${child.id}/growth`}>＋ 身高体重</Link>
+        </div>
+
+        <h3 className="dashboard-section-title">最近数据</h3>
         <div className="dashboard-metrics">
           <div><span>最近身高体重</span><strong>{snapshot.latestGrowth ? `${valueOrUnknown(snapshot.latestGrowth.heightCm, "cm")} · ${valueOrUnknown(snapshot.latestGrowth.weightKg, "kg")}` : "尚无记录"}</strong><small>{snapshot.latestGrowth?.date ?? "添加首次测量"}</small></div>
           <div><span>最近睡眠</span><strong>{snapshot.recentSleep ? `${snapshot.recentSleep.minutes} 分钟` : "尚无记录"}</strong><small>{snapshot.recentSleep?.date ?? "记录夜间睡眠或小睡"}</small></div>
           <div><span>今日奶 / 水</span><strong>{valueOrUnknown(snapshot.today.milkMl, "ml")} · {valueOrUnknown(snapshot.today.waterMl, "ml")}</strong><small>{snapshot.today.unknownBeverages ? `${snapshot.today.unknownBeverages} 条饮品未填容量` : `${snapshot.today.meals} 餐 · ${snapshot.today.foodItems} 项食物`}</small></div>
           <div><span>今日活动</span><strong>{snapshot.today.activityMinutes} 分钟</strong><small>其中户外 {snapshot.today.outdoorMinutes} 分钟</small></div>
           <div><span>今日最近情绪</span><strong>{snapshot.today.mood ? moodLabels[snapshot.today.mood] : "尚无记录"}</strong><small>仅显示家长填写的观察</small></div>
-        </div>
-
-        <div className="quick-actions" aria-label={`${child.name} 的快捷记录`}>
-          <Link href={`/children/${child.id}/nutrition`}>＋ 饮食奶水</Link><Link href={`/children/${child.id}/sleep`}>＋ 睡眠</Link><Link href={`/children/${child.id}/activity`}>＋ 运动</Link><Link href={`/children/${child.id}/emotion`}>＋ 情绪</Link><Link href={`/children/${child.id}/growth`}>＋ 身高体重</Link>
         </div>
 
         {snapshot.notices.length ? <aside className="trend-notices" aria-label="描述性趋势"><strong>最近记录</strong><ul>{snapshot.notices.map((notice) => <li key={notice}>{notice}</li>)}</ul></aside> : null}

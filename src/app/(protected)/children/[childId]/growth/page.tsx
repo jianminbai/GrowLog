@@ -28,7 +28,6 @@ export default async function GrowthPage({ params }: { params: Promise<{ childId
     <main className="profile-shell">
       <Link className="back-link" href={`/children/${childId}`}>← 返回 {child.name} 的档案</Link>
       <header className="profile-header compact">
-        <span className="eyebrow">Growth history</span>
         <h1>身高与体重</h1>
         <p>记录原始测量值与测量条件。BMI 和变化量只在所需数据齐全时显示，不提供百分位或医学判断。</p>
       </header>

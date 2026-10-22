@@ -11,7 +11,7 @@ const labels = {
 
 export default function SettingsPage() {
   return <main className="profile-shell">
-    <header className="profile-header compact"><span className="eyebrow">Settings & export</span><h1>设置与数据导出</h1><p>下载当前家庭的可移植数据。导出不包含登录会话、密码哈希或 CSRF 凭据。</p></header>
+    <header className="profile-header compact"><h1>设置</h1><p>下载当前家庭的可移植数据，或安全退出本设备。导出不包含登录会话、密码哈希或 CSRF 凭据。</p></header>
     <section className="profile-panel export-panel">
       <h2>完整 JSON</h2>
       <p>版本化 JSON 保留领域结构、明确单位字段和 ISO 时间戳，适合备份或迁移。</p>

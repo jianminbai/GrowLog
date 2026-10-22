@@ -32,7 +32,7 @@ export default async function ActivityPage({ params }: { params: Promise<{ child
 
   return <main className="profile-shell">
     <Link className="back-link" href={`/children/${childId}`}>← 返回 {child.name} 的档案</Link>
-    <header className="profile-header compact"><span className="eyebrow">Activity history</span><h1>运动与户外</h1><p>分别记录活动总时长、户外时长和运动强度，查看最近 7 天的实际趋势。</p></header>
+    <header className="profile-header compact"><h1>运动与户外</h1><p>分别记录活动总时长、户外时长和运动强度，查看最近 7 天的实际趋势。</p></header>
     <section className="snapshot-grid sleep-summary">
       <div className="snapshot-card mint"><span>近 7 天总活动</span><strong>{summary.last7Days.totalMinutes} 分钟</strong></div>
       <div className="snapshot-card blue"><span>近 7 天户外</span><strong>{summary.last7Days.outdoorMinutes} 分钟</strong></div>

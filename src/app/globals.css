@@ -238,16 +238,20 @@ h2 {
 }
 
 .today-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
+  display: block;
 }
 
 .today-header p {
   max-width: 42rem;
   color: var(--muted);
   line-height: 1.7;
+}
+
+.today-header .today-date {
+  margin: -0.35rem 0 0.75rem;
+  color: var(--green);
+  font-size: 0.88rem;
+  font-weight: 750;
 }
 
 .dashboard-empty,
@@ -278,8 +282,7 @@ h2 {
 .dashboard-title h2 { margin-bottom: 1rem; }
 .dashboard-title a { color: var(--ink); font-size: 0.85rem; font-weight: 750; text-decoration: none; }
 
-.completion-grid,
-.dashboard-metrics {
+.completion-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.7rem;
@@ -298,7 +301,15 @@ h2 {
 .completion-item.missing { background: #f4e8da; }
 .completion-item span { color: rgba(23, 52, 45, 0.66); font-size: 0.72rem; font-weight: 750; }
 
-.dashboard-metrics { margin-top: 1.25rem; }
+.dashboard-section-title {
+  margin: 1.35rem 0 0.6rem;
+  font-size: 1rem;
+}
+
+.dashboard-metrics {
+  display: grid;
+  grid-template-columns: 1fr;
+}
 
 .dashboard-metrics div {
   display: grid;
@@ -319,6 +330,9 @@ h2 {
   margin-top: 1.25rem;
   overflow-x: auto;
   padding-bottom: 0.35rem;
+  padding-right: 2rem;
+  scroll-padding-inline: 0.25rem;
+  scroll-snap-type: x proximity;
 }
 
 .quick-actions a {
@@ -331,6 +345,7 @@ h2 {
   font-weight: 750;
   padding: 0.7rem 0.9rem;
   text-decoration: none;
+  scroll-snap-align: start;
 }
 
 .trend-notices {
@@ -388,6 +403,20 @@ h2 {
 .history-time { text-align: right; }
 .history-time em { color: var(--green); font-size: 0.75rem; font-style: normal; font-weight: 750; }
 .audit-entry > div:last-child { text-align: right; }
+
+.history-toolbar a {
+  min-height: 2.75rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 0.8rem;
+  text-decoration: none;
+}
+
+.history-toolbar a.filter-active {
+  background: rgba(31, 107, 86, 0.1);
+}
 
 .export-panel p { color: var(--muted); line-height: 1.7; }
 .account-panel p { color: var(--muted); line-height: 1.7; }
@@ -559,6 +588,66 @@ h2 {
 .profile-form label {
   display: grid;
   gap: 1rem;
+}
+
+.profile-fieldset {
+  min-width: 0;
+  border: 0;
+  display: grid;
+  gap: 0.8rem;
+  margin: 0;
+  padding: 0;
+}
+
+.profile-fieldset + .profile-fieldset {
+  border-top: 1px solid var(--line);
+  padding-top: 1rem;
+}
+
+.profile-fieldset legend {
+  color: var(--ink);
+  padding: 0;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.domain-links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.domain-links a {
+  min-height: 5rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: rgba(255, 253, 248, 0.76);
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem;
+  text-decoration: none;
+}
+
+.domain-links a > span:last-child {
+  min-width: 0;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.domain-links small { color: var(--muted); font-size: 0.74rem; }
+.domain-symbol {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.75rem;
+  background: #f8e3d3;
+  color: #9a4427;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  font-weight: 800;
 }
 
 .form-grid {

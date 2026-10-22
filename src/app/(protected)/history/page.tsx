@@ -30,10 +30,10 @@ export default async function HistoryPage({
   const timestamp = (value: Date) => value.toLocaleString("zh-CN", { timeZone, hour12: false });
 
   return <main className="profile-shell">
-    <header className="profile-header compact"><span className="eyebrow">History & audit</span><h1>历史与审计</h1><p>按时间查看所有记录，并进入原始表单进行修改、删除或恢复。审计区只显示发生变更的字段名，不展示敏感字段值。</p></header>
+    <header className="profile-header compact"><h1>历史与审计</h1><p>按时间查看所有记录，并进入原始表单进行修改、删除或恢复。审计区只显示发生变更的字段名，不展示敏感字段值。</p></header>
     <div className="history-toolbar">
       <strong>{entries.length} 条记录</strong>
-      <Link href={includeDeleted ? "/history" : "/history?deleted=1"}>{includeDeleted ? "隐藏已删除记录" : "查看已删除记录"}</Link>
+      <Link className={includeDeleted ? "filter-active" : undefined} href={includeDeleted ? "/history" : "/history?deleted=1"}>{includeDeleted ? "正在显示已删除 · 点击隐藏" : "查看已删除记录"}</Link>
     </div>
     <section className="unified-history" aria-labelledby="all-records">
       <h2 id="all-records">全部记录</h2>

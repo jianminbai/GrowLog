@@ -17,7 +17,6 @@ export default async function ChildrenPage() {
     <main className="profile-shell">
       <header className="profile-header">
         <div>
-          <span className="eyebrow">Child profiles</span>
           <h1>儿童档案</h1>
           <p>基础资料只需填写一次，之后每条成长记录都会归入相应档案。</p>
         </div>
@@ -40,10 +39,7 @@ export default async function ChildrenPage() {
 
       <section className="profile-panel" aria-labelledby="new-profile">
         <div className="section-heading">
-          <div>
-            <span>New profile</span>
-            <h2 id="new-profile">建立儿童档案</h2>
-          </div>
+          <h2 id="new-profile">建立儿童档案</h2>
         </div>
         <ChildProfileForm />
       </section>
