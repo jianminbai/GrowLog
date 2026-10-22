@@ -40,6 +40,8 @@ Status keys: `[ ]` pending, `[~]` in progress, `[x]` verified.
   - Acceptance: Compose starts app/PostgreSQL/Caddy with persistent volumes; health endpoint verifies app and database; backup script creates a timestamped PostgreSQL dump; restore targets a named database and includes a verification procedure.
 - [x] M14 — End-to-end verification and security review.
   - Acceptance: core login, create/query/edit/delete/restore flows pass; API validation/error format is consistent; dependency/build/test checks pass; deployment and backup restore smoke tests are recorded.
+- [x] M15 — Mobile-first application interface and interaction audit.
+  - Acceptance: protected pages have no unintended horizontal overflow from 320–430px; four-item mobile navigation switches to desktop navigation at 760px and exposes the current page; inputs use at least 16px text, touch targets at least 44px, and primary controls at least 48px; all six record forms progressively disclose optional values and reopen them for populated edits; delete requires confirmation while restore remains direct; settings provides CSRF-safe logout; Dashboard and child-detail actions support one-handed use; pending/success/error states use consistent accessible semantics; light/dark themes retain clear contrast; existing business, isolation, export, PWA, security, test, typecheck, lint, and production-build contracts remain verified.
 
 ## Deferred after MVP
 

@@ -26,11 +26,12 @@
 - M12 PWA: installable standalone manifest, 192/512 icons, update-aware service-worker registration, public offline fallback, and static-shell caching are implemented; API and authenticated navigation responses never enter Cache Storage and API headers enforce private no-store.
 - M13 deployment and recovery: Node 24 production image stages, PostgreSQL 16, Caddy, persistent volumes, dependency-aware health checks, idempotent household bootstrap, checksummed backups, guarded named-database restores, and an operator runbook are implemented and smoke-tested.
 - M14 end-to-end and security review: a reusable authenticated HTTP smoke script verifies the complete P0 lifecycle and API contract through Caddy; security controls and dependency advisories are documented with explicit follow-up work.
+- M15 mobile-first interface: the protected application now has four-item mobile navigation, a 760px desktop navigation breakpoint, one-handed Dashboard and child-domain entry points, progressively disclosed optional form fields, confirmed destructive actions, accessible status messages, safe account logout, and a responsive light/dark visual system.
 - Repository documentation: the root README provides an accurate Chinese product overview, Docker/VPS quick start, development checks, backup/restore entry points, security boundaries, and links to durable project records.
 
 ## Current task
 
-- All GrowLog MVP milestones M0–M14 are implemented and verified. Deferred P1/P2 work remains listed in `TASKS.md`.
+- All GrowLog MVP milestones M0–M15 are implemented and verified. Deferred P1/P2 work remains listed in `TASKS.md`.
 
 ## Test record
 
@@ -77,6 +78,9 @@
 - M14 API contract review: success and error envelopes, field errors, private no-store headers, generic authentication/database failures, and household scoping are covered by the HTTP smoke plus handler and PostgreSQL integration tests (2026-10-21).
 - M14 dependency review: `npm audit --omit=dev --json` reports 0 critical, 1 moderate, and 5 high dependency nodes. Remediation requires breaking Prisma 7.10.1 and Next.js 16.4.2 upgrades; current exposure is restricted to trusted CLI/build inputs and the migration is tracked as P1 in `docs/SECURITY_REVIEW.md` (2026-10-21).
 - M14 final gate: clean test-database reset, lint with zero warnings, sequential typecheck, 80/80 tests across 29 files with PostgreSQL enabled, production build, healthy three-service Compose stack, and proxied database-aware health response all pass (2026-10-21).
+- M15 focused verification: navigation, logout, progressive disclosure, form lifecycle, domain-link, profile grouping, dashboard, CSS-contract, and login tests pass; typecheck and production build pass (2026-10-22).
+- M15 viewport verification: authenticated pages at 320×568, 375×667, 390×844, 430×932, and 768×1024 have no page-level horizontal overflow; mobile/desktop navigation switches at 760px and current-page state is correct on Today, History, Children, child detail, and Settings (2026-10-22).
+- M15 final gate: clean test-database reset, lint with zero warnings, typecheck, 112/112 tests across 37 files with PostgreSQL enabled, and the production build all pass (2026-10-22).
 
 ## Work implemented
 
@@ -101,6 +105,7 @@
 - The deployment image installs dependencies with a BuildKit cache and optional CA secret, generates Prisma assets in the builder, then copies the verified dependency tree into the runtime image so startup never downloads engines. Compose keeps PostgreSQL and Caddy state in named volumes and routes only through the internal service names.
 - Backup and restore scripts operate inside the Compose PostgreSQL container, write a SHA-256 companion file, require a separate target database by default, and compare migration counts as part of the documented recovery procedure.
 - `scripts/mvp-smoke.mjs` is an environment-driven release check that exercises the deployed application through its public proxy without embedding credentials. It also asserts security cookie flags, CSRF/origin behavior, API envelope shape, and no-store policy.
+- Mobile presentation logic stays in small client components for pathname state, logout, and existing forms; server components, request payloads, API routes, Prisma schema, audit behavior, household isolation, and service-worker cache policy remain unchanged.
 
 ## Blockers
 
@@ -108,4 +113,4 @@
 
 ## Next step
 
-- Begin only the explicitly deferred P1/P2 roadmap work; the next maintenance priority is the isolated Prisma 7 and Next.js 16 upgrade recorded in `TASKS.md` and `docs/SECURITY_REVIEW.md`.
+- Begin only explicitly deferred P1/P2 work; the next maintenance priority is the isolated Prisma 7 and Next.js 16 upgrade recorded in `TASKS.md` and `docs/SECURITY_REVIEW.md`.

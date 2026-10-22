@@ -83,3 +83,7 @@ Backups use PostgreSQL's custom format plus a SHA-256 companion file. Restore re
 ## ADR-021 — Framework-major security remediation is an isolated P1 migration
 
 The production dependency audit has no critical findings but reports transitive Prisma CLI and bundled Next.js PostCSS advisories. Their inputs are limited to checked-in schema, configuration, CSS, and source maps; request and uploaded user data do not reach the affected operations. Automated remediation requires Prisma 7 and Next.js 16 major upgrades, so the MVP records this bounded exposure and tracks both migrations as an isolated P1 change with full database, build, HTTP, and recovery re-verification.
+
+## ADR-022 — 移动端展示层保持业务边界不变
+
+移动端优化只在展示层增加路径状态导航、安全退出按钮、原生 `<details>` 渐进展开和共享响应式样式。健康数据继续由服务端组件读取，各领域表单继续使用原有 API、CSRF、校验和请求结构；Prisma schema、仓库层、审计、家庭隔离及 Service Worker 缓存边界不变。内联 SVG 和原生 HTML 控件避免引入新的 UI、图标或动画依赖，使移动体验可以独立演进而不改变已经验证的业务规则。
