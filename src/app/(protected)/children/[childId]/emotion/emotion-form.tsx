@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 
 import { CSRF_COOKIE_NAME } from "@/modules/auth/auth-constants";
 
+import { OptionalFields } from "../../../_components/optional-fields";
+
 export type EmotionDto = {
   id: string;
   mood: "HAPPY" | "CALM" | "ANXIOUS" | "SAD" | "ANGRY" | "MIXED" | "OTHER";
@@ -87,18 +89,27 @@ export function EmotionForm({ childId, record }: { childId: string; record?: Emo
     <button disabled={pending} onClick={() => lifecycle("restore")}>恢复记录</button>
   </div>;
 
+  const showOptionalFields = Boolean(record && (
+    record.context || record.durationMinutes !== null || record.peerInteraction
+      || record.parentInteraction || record.notes || record.source !== "HOME"
+  ));
+
   return <form className="growth-form" onSubmit={submit}>
     <div className="form-grid">
       <label>总体情绪<select name="mood" defaultValue={record?.mood ?? "CALM"}>{Object.entries(moodLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
       <label>发生时间<input type="datetime-local" name="occurredAt" required defaultValue={local(record?.occurredAt ?? new Date().toISOString())} /></label>
       <label>标签（逗号分隔）<input name="tags" maxLength={500} placeholder="如：入园，同伴互动" defaultValue={record?.tags.join("，") ?? ""} /></label>
-      <label>持续时间（分钟）<input type="number" name="durationMinutes" min="1" max="1440" step="1" defaultValue={record?.durationMinutes ?? ""} /></label>
-      <label>来源 / 场景<select name="source" defaultValue={record?.source ?? "HOME"}><option value="HOME">家庭</option><option value="KINDERGARTEN">幼儿园</option><option value="MANUAL">其他手工记录</option><option value="HOSPITAL">医院</option><option value="IMPORT">导入</option></select></label>
-      <label>情境<input name="context" maxLength={500} placeholder="如：早晨入园" defaultValue={record?.context ?? ""} /></label>
-      <label>与同伴互动<input name="peerInteraction" maxLength={500} defaultValue={record?.peerInteraction ?? ""} /></label>
-      <label>亲子互动<input name="parentInteraction" maxLength={500} defaultValue={record?.parentInteraction ?? ""} /></label>
     </div>
-    <label>家长观察备注<textarea name="notes" rows={3} maxLength={2000} defaultValue={record?.notes ?? ""} /></label>
+    <OptionalFields defaultOpen={showOptionalFields}>
+      <div className="form-grid">
+        <label>持续时间（分钟）<input type="number" name="durationMinutes" min="1" max="1440" step="1" defaultValue={record?.durationMinutes ?? ""} /></label>
+        <label>情境<input name="context" maxLength={500} placeholder="如：早晨入园" defaultValue={record?.context ?? ""} /></label>
+        <label>与同伴互动<input name="peerInteraction" maxLength={500} defaultValue={record?.peerInteraction ?? ""} /></label>
+        <label>亲子互动<input name="parentInteraction" maxLength={500} defaultValue={record?.parentInteraction ?? ""} /></label>
+        <label>来源 / 场景<select name="source" defaultValue={record?.source ?? "HOME"}><option value="HOME">家庭</option><option value="KINDERGARTEN">幼儿园</option><option value="MANUAL">其他手工记录</option><option value="HOSPITAL">医院</option><option value="IMPORT">导入</option></select></label>
+      </div>
+      <label>家长观察备注<textarea name="notes" rows={3} maxLength={2000} defaultValue={record?.notes ?? ""} /></label>
+    </OptionalFields>
     <p className="care-note">这些记录只用于回顾观察频次和情境，不能用于诊断心理或神经发育状况。</p>
     {message ? <p className="form-message">{message}</p> : null}
     <div className="record-actions">

@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 
 import { CSRF_COOKIE_NAME } from "@/modules/auth/auth-constants";
 
+import { OptionalFields } from "../../../_components/optional-fields";
+
 export type ActivityDto = {
   id: string;
   activityType: string;
@@ -81,6 +83,10 @@ export function ActivityForm({ childId, record }: { childId: string; record?: Ac
     <button disabled={pending} onClick={() => lifecycle("restore")}>恢复记录</button>
   </div>;
 
+  const showOptionalFields = Boolean(record && (
+    record.structure !== "FREE_PLAY" || record.engagement || record.notes || record.source !== "HOME"
+  ));
+
   return <form className="growth-form" onSubmit={submit}>
     <div className="form-grid">
       <label>活动类型<input name="activityType" required maxLength={100} placeholder="如：骑车、跑步、攀爬" defaultValue={record?.activityType ?? ""} /></label>
@@ -88,11 +94,15 @@ export function ActivityForm({ childId, record }: { childId: string; record?: Ac
       <label>活动总时长（分钟）<input type="number" name="durationMinutes" required min="1" max="1440" step="1" defaultValue={record?.durationMinutes ?? 30} /></label>
       <label>其中户外时长（分钟）<input type="number" name="outdoorMinutes" min="0" max="1440" step="1" defaultValue={record?.outdoorMinutes ?? ""} /></label>
       <label>强度<select name="intensity" defaultValue={record?.intensity ?? "LIGHT"}><option value="LIGHT">轻强度</option><option value="MODERATE">中等强度</option><option value="VIGOROUS">高强度</option></select></label>
-      <label>组织形式<select name="structure" defaultValue={record?.structure ?? "FREE_PLAY"}><option value="FREE_PLAY">自由玩耍</option><option value="STRUCTURED">结构化活动/课程</option><option value="MIXED">混合</option></select></label>
-      <label>来源 / 场景<select name="source" defaultValue={record?.source ?? "HOME"}><option value="HOME">家庭</option><option value="KINDERGARTEN">幼儿园</option><option value="MANUAL">其他手工记录</option><option value="HOSPITAL">医院</option><option value="IMPORT">导入</option></select></label>
-      <label>参与表现<input name="engagement" maxLength={200} placeholder="可选，如：主动参与" defaultValue={record?.engagement ?? ""} /></label>
     </div>
-    <label>备注<textarea name="notes" rows={3} maxLength={2000} defaultValue={record?.notes ?? ""} /></label>
+    <OptionalFields defaultOpen={showOptionalFields}>
+      <div className="form-grid">
+        <label>组织形式<select name="structure" defaultValue={record?.structure ?? "FREE_PLAY"}><option value="FREE_PLAY">自由玩耍</option><option value="STRUCTURED">结构化活动/课程</option><option value="MIXED">混合</option></select></label>
+        <label>参与表现<input name="engagement" maxLength={200} placeholder="可选，如：主动参与" defaultValue={record?.engagement ?? ""} /></label>
+        <label>来源 / 场景<select name="source" defaultValue={record?.source ?? "HOME"}><option value="HOME">家庭</option><option value="KINDERGARTEN">幼儿园</option><option value="MANUAL">其他手工记录</option><option value="HOSPITAL">医院</option><option value="IMPORT">导入</option></select></label>
+      </div>
+      <label>备注<textarea name="notes" rows={3} maxLength={2000} defaultValue={record?.notes ?? ""} /></label>
+    </OptionalFields>
     <p className="care-note">户外时长和运动强度分别记录；户外活动不会自动计为中高强度运动。</p>
     {message ? <p className="form-message">{message}</p> : null}
     <div className="record-actions">
