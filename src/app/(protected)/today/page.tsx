@@ -6,7 +6,6 @@ import { requireServerSession } from "@/modules/auth/server-session";
 import { listChildrenForHousehold } from "@/modules/children/child-repository";
 import { buildDashboardSnapshot } from "@/modules/dashboard/dashboard-snapshot";
 import { listEmotionsForChild } from "@/modules/emotion/emotion-repository";
-import { listGrowthForChild } from "@/modules/growth/growth-repository";
 import { listBeveragesForChild, listMealsForChild } from "@/modules/nutrition/nutrition-repository";
 import { dateInTimeZone } from "@/modules/sleep/sleep-record";
 import { listSleepForChild } from "@/modules/sleep/sleep-repository";
@@ -32,8 +31,7 @@ export default async function TodayPage() {
   const timeZone = household?.timeZone ?? "UTC";
   const date = dateInTimeZone(new Date(), timeZone);
   const dashboards = await Promise.all(children.map(async (child) => {
-    const [growth, sleep, meals, beverages, activities, emotions] = await Promise.all([
-      listGrowthForChild(prisma, auth.householdId, child.id),
+    const [sleep, meals, beverages, activities, emotions] = await Promise.all([
       listSleepForChild(prisma, auth.householdId, child.id),
       listMealsForChild(prisma, auth.householdId, child.id),
       listBeveragesForChild(prisma, auth.householdId, child.id),
@@ -42,7 +40,7 @@ export default async function TodayPage() {
     ]);
     return {
       child,
-      snapshot: buildDashboardSnapshot({ date, timeZone, growth, sleep, meals, beverages, activities, emotions })
+      snapshot: buildDashboardSnapshot({ date, timeZone, sleep, meals, beverages, activities, emotions })
     };
   }));
 
@@ -65,21 +63,19 @@ export default async function TodayPage() {
           ] as const).map(([key, label, route]) => <Link className={`completion-item ${snapshot.completion[key] ? "done" : "missing"}`} href={`/settings/children/${child.id}/records/${route}`} key={key}><span>{snapshot.completion[key] ? "已记录" : "待记录"}</span><strong>{label}</strong></Link>)}
         </div>
 
+        <h3 className="dashboard-section-title">今日概览</h3>
+        <div className="today-overview-grid">
+          <div className="today-overview-item"><span>睡眠</span><strong>{snapshot.today.sleepMinutes === null ? "待记录" : `${snapshot.today.sleepMinutes} 分钟`}</strong></div>
+          <div className="today-overview-item"><span>饮食</span><strong>{snapshot.completion.nutrition ? `${snapshot.today.meals} 餐 · ${snapshot.today.foodItems} 项食物` : "待记录"}</strong></div>
+          <div className="today-overview-item"><span>奶 / 水</span><strong>{valueOrUnknown(snapshot.today.milkMl, "ml")} · {valueOrUnknown(snapshot.today.waterMl, "ml")}</strong>{snapshot.today.unknownBeverages ? <small>{snapshot.today.unknownBeverages} 条未填容量</small> : null}</div>
+          <div className="today-overview-item"><span>活动</span><strong>{snapshot.completion.activity ? `${snapshot.today.activityMinutes} 分钟 · 户外 ${valueOrUnknown(snapshot.today.outdoorMinutes, "分钟")}` : "待记录"}</strong>{snapshot.today.unknownOutdoorActivities ? <small>{snapshot.today.unknownOutdoorActivities} 条活动未填户外时长</small> : null}</div>
+          <div className="today-overview-item emotion"><span>情绪观察</span><strong>{snapshot.today.mood ? moodLabels[snapshot.today.mood] : "待记录"}</strong><small>仅呈现家长今日填写的观察</small></div>
+        </div>
+
         <h3 className="dashboard-section-title">快捷记录</h3>
         <div className="quick-actions" aria-label={`${child.name} 的快捷记录`}>
           <Link href={`/settings/children/${child.id}/records/nutrition`}>＋ 饮食奶水</Link><Link href={`/settings/children/${child.id}/records/sleep`}>＋ 睡眠</Link><Link href={`/settings/children/${child.id}/records/activity`}>＋ 运动</Link><Link href={`/settings/children/${child.id}/records/emotion`}>＋ 情绪</Link><Link href={`/settings/children/${child.id}/records/growth`}>＋ 身高体重</Link>
         </div>
-
-        <h3 className="dashboard-section-title">最近数据</h3>
-        <div className="dashboard-metrics">
-          <div><span>最近身高体重</span><strong>{snapshot.latestGrowth ? `${valueOrUnknown(snapshot.latestGrowth.heightCm, "cm")} · ${valueOrUnknown(snapshot.latestGrowth.weightKg, "kg")}` : "尚无记录"}</strong><small>{snapshot.latestGrowth?.date ?? "添加首次测量"}</small></div>
-          <div><span>最近睡眠</span><strong>{snapshot.recentSleep ? `${snapshot.recentSleep.minutes} 分钟` : "尚无记录"}</strong><small>{snapshot.recentSleep?.date ?? "记录夜间睡眠或小睡"}</small></div>
-          <div><span>今日奶 / 水</span><strong>{valueOrUnknown(snapshot.today.milkMl, "ml")} · {valueOrUnknown(snapshot.today.waterMl, "ml")}</strong><small>{snapshot.today.unknownBeverages ? `${snapshot.today.unknownBeverages} 条饮品未填容量` : `${snapshot.today.meals} 餐 · ${snapshot.today.foodItems} 项食物`}</small></div>
-          <div><span>今日活动</span><strong>{snapshot.today.activityMinutes} 分钟</strong><small>其中户外 {snapshot.today.outdoorMinutes} 分钟</small></div>
-          <div><span>今日最近情绪</span><strong>{snapshot.today.mood ? moodLabels[snapshot.today.mood] : "尚无记录"}</strong><small>仅显示家长填写的观察</small></div>
-        </div>
-
-        {snapshot.notices.length ? <aside className="trend-notices" aria-label="描述性趋势"><strong>最近记录</strong><ul>{snapshot.notices.map((notice) => <li key={notice}>{notice}</li>)}</ul></aside> : null}
       </article>)}
     </section>}
   </main>;

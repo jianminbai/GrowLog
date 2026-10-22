@@ -14,7 +14,7 @@ vi.mock("@/modules/growth/growth-repository", () => ({ listGrowthForChild: async
   precisionNote: null, notes: null, deletedAt: null, createdAt: new Date(), updatedAt: new Date()
 }, {
   id: "g1", childId: "c1", measuredAt: new Date("2026-10-20T01:00:00Z"), heightCm: 104, weightKg: 17,
-  headCircumferenceCm: null, source: "HOME", place: null, method: null, device: null,
+  headCircumferenceCm: 50, source: "HOME", place: "家中", method: "站立测量", device: "儿童身高尺",
   precisionNote: null, notes: "早晨测量", deletedAt: null, createdAt: new Date(), updatedAt: new Date()
 }] }));
 vi.mock("@/modules/activity/activity-repository", () => ({ listActivitiesForChild: async () => [], getActivityHouseholdTimeZone: async () => "Asia/Shanghai" }));
@@ -43,9 +43,15 @@ describe("read-only child reports", () => {
     expect(screen.getByRole("cell", { name: "104" })).toBeInTheDocument();
     expect(screen.getByRole("cell", { name: "17" })).toBeInTheDocument();
     expect(screen.getByText(/早晨测量/)).toBeInTheDocument();
-    expect(screen.getByRole("columnheader", { name: "年化身高增长（cm/年）" })).toBeInTheDocument();
+    expect(screen.getAllByRole("columnheader").map(header => header.textContent)).toEqual([
+      "测量时间", "身高（cm）", "年化身高增长（cm/年）", "体重（kg）", "BMI（kg/m²）",
+      "身高变化（cm）", "体重变化（kg）", "来源", "详情"
+    ]);
+    expect(screen.queryByRole("columnheader", { name: "头围（cm）" })).not.toBeInTheDocument();
     const latestRow = screen.getByRole("row", { name: /2026.*10.*20.*104.*17/ });
-    expect(within(latestRow).getAllByRole("cell")[6]).toHaveTextContent("4");
+    expect(within(latestRow).getAllByRole("cell")[2]).toHaveTextContent("4");
+    expect(within(latestRow).getByText("查看详情")).toBeInTheDocument();
+    expect(within(latestRow).getByText(/家中.*站立测量.*儿童身高尺.*早晨测量/)).toBeInTheDocument();
   });
   it("includes yogurt drinks in the nutrition chart and table", async () => {
     render(await NutritionPage({ params: Promise.resolve({ childId: "c1" }) }));

@@ -10,34 +10,36 @@ const labels = {
 } as const;
 
 export default function SettingsPage() {
-  return <main className="profile-shell">
-    <header className="profile-header compact"><h1>设置</h1><p>管理儿童资料和成长记录，下载家庭数据，或安全退出本设备。导出不包含登录会话、密码哈希或 CSRF 凭据。</p></header>
-    <section className="profile-panel export-panel">
-      <h2>儿童与成长记录</h2>
-      <p>添加孩子、编辑基础资料，以及录入或修改身高体重、睡眠、饮食、运动和情绪记录。</p>
-      <div className="settings-management-links"><Link href="/settings/children/new">添加孩子</Link><Link href="/settings/children">基础资料与记录管理</Link></div>
+  const menuLink = (href: string, symbol: string, title: string, description: string) => <Link className="settings-menu-item" href={href}>
+    <span className="settings-menu-icon" aria-hidden="true">{symbol}</span><span className="settings-menu-copy"><strong>{title}</strong><small>{description}</small></span><span className="settings-menu-arrow" aria-hidden="true">›</span>
+  </Link>;
+  return <main className="profile-shell settings-shell">
+    <header className="profile-header compact"><span className="settings-eyebrow">管理中心</span><h1>设置</h1><p>集中管理儿童资料、成长记录、家庭数据和本设备登录状态。</p></header>
+    <section className="settings-menu-section" aria-labelledby="children-settings-heading">
+      <h2 id="children-settings-heading">儿童与记录</h2>
+      <div className="settings-menu-list">
+        {menuLink("/settings/children/new", "＋", "添加孩子", "建立新的儿童档案")}
+        {menuLink("/settings/children", "档", "基础资料与记录", "编辑资料并录入五类成长记录")}
+      </div>
     </section>
-    <section className="profile-panel export-panel">
-      <h2>数据管理</h2>
-      <p>在低频管理页面恢复已删除记录，或查看脱敏后的操作审计。</p>
-      <Link className="secondary-download" href="/settings/data-management">打开数据管理</Link>
+    <section className="settings-menu-section" aria-labelledby="data-settings-heading">
+      <h2 id="data-settings-heading">数据与备份</h2>
+      <div className="settings-menu-list">
+        {menuLink("/settings/data-management", "数", "删除记录与审计", "恢复已删除记录，查看脱敏操作记录")}
+        <details className="settings-menu-disclosure">
+          <summary className="settings-menu-item"><span className="settings-menu-icon" aria-hidden="true">{`{ }`}</span><span className="settings-menu-copy"><strong>JSON 备份</strong><small>完整、版本化的家庭数据</small></span><span className="settings-menu-arrow" aria-hidden="true">⌄</span></summary>
+          <div className="settings-submenu"><a href="/api/export/json">下载当前数据</a><a href="/api/export/json?includeDeleted=true">下载并包含已删除记录</a></div>
+        </details>
+        <details className="settings-menu-disclosure">
+          <summary className="settings-menu-item"><span className="settings-menu-icon" aria-hidden="true">表</span><span className="settings-menu-copy"><strong>分领域 CSV</strong><small>按业务分类下载 UTF-8 表格</small></span><span className="settings-menu-arrow" aria-hidden="true">⌄</span></summary>
+          <div className="settings-submenu">{exportDomains.map((domain) => <a href={`/api/export/csv?domain=${domain}`} key={domain}>{labels[domain]} CSV</a>)}</div>
+        </details>
+      </div>
+      <p className="care-note">导出不包含登录会话、密码哈希或 CSRF 凭据。</p>
     </section>
-    <section className="profile-panel export-panel">
-      <h2>完整 JSON</h2>
-      <p>版本化 JSON 保留领域结构、明确单位字段和 ISO 时间戳，适合备份或迁移。</p>
-      <div className="record-actions"><a className="primary-action" href="/api/export/json">下载当前数据</a><a className="secondary-download" href="/api/export/json?includeDeleted=true">包含已删除记录</a></div>
-    </section>
-    <section className="profile-panel export-panel">
-      <h2>分领域 CSV</h2>
-      <p>CSV 使用 UTF-8，按领域拆分；列名标明 cm、kg、ml 和 minutes 等单位。</p>
-      <div className="export-links">{exportDomains.map((domain) => <a href={`/api/export/csv?domain=${domain}`} key={domain}>{labels[domain]} CSV</a>)}</div>
-      <p className="care-note">如需保留软删除记录，可在下载地址后追加 <code>&amp;includeDeleted=true</code>。默认导出只包含当前有效记录。</p>
-    </section>
-    <section className="profile-panel account-panel" aria-labelledby="account-heading">
+    <section className="settings-menu-section settings-account" aria-labelledby="account-heading">
       <h2 id="account-heading">账户</h2>
-      <p>退出后，本设备需要重新输入管理员邮箱和密码才能访问家庭记录。</p>
-      <LogoutButton />
+      <div className="settings-account-card"><div><strong>管理员会话</strong><small>退出后需要重新输入邮箱和密码</small></div><LogoutButton /></div>
     </section>
-    <Link className="back-link" href="/today">← 返回今天</Link>
   </main>;
 }

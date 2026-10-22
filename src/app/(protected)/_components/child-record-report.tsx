@@ -49,9 +49,9 @@ export async function ChildRecordReport({ childId, domain }: { childId: string; 
       { title: "身高趋势", unit: "cm", points: rows.map(r => ({ at: r.measuredAt, value: r.heightCm })) },
       { title: "体重趋势", unit: "kg", points: rows.map(r => ({ at: r.measuredAt, value: r.weightKg })) }
     );
-    tables.push({ title: "测量记录", headers: ["测量时间", "身高（cm）", "体重（kg）", "头围（cm）", "BMI（kg/m²）", "身高变化（cm）", "年化身高增长（cm/年）", "体重变化（kg）", "来源", "测量条件与备注"],
-      rows: rows.map((r, index) => ({ id: r.id, cells: [timestamp(r.measuredAt), r.heightCm, r.weightKg, r.headCircumferenceCm, r.bmi, r.heightChangeCm, annualizedHeightGrowth[index], r.weightChangeKg, sourceLabels[r.source],
-        `地点：${optional(r.place)}；方法：${optional(r.method)}；设备：${optional(r.device)}；精度：${optional(r.precisionNote)}；备注：${optional(r.notes)}`] })).reverse() });
+    tables.push({ title: "测量记录", headers: ["测量时间", "身高（cm）", "年化身高增长（cm/年）", "体重（kg）", "BMI（kg/m²）", "身高变化（cm）", "体重变化（kg）", "来源", "详情"],
+      rows: rows.map((r, index) => ({ id: r.id, cells: [timestamp(r.measuredAt), r.heightCm, annualizedHeightGrowth[index], r.weightKg, r.bmi, r.heightChangeCm, r.weightChangeKg, sourceLabels[r.source],
+        <details className="measurement-detail" key={`${r.id}-detail`}><summary>查看详情</summary><p>地点：{optional(r.place)}；方法：{optional(r.method)}；设备：{optional(r.device)}；精度：{optional(r.precisionNote)}；备注：{optional(r.notes)}</p></details>] })).reverse() });
   } else if (domain === "sleep") {
     const rows = (await listSleepForChild(prisma, auth.householdId, childId)).map(serializeSleep);
     dailyChart("每日净睡眠时长", "分钟", rows.map(r => ({ at: r.endedAt, value: r.sleepMinutes })));

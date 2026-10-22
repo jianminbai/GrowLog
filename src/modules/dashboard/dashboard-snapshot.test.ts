@@ -7,9 +7,6 @@ describe("dashboard snapshot", () => {
     const snapshot = buildDashboardSnapshot({
       date: "2026-10-20",
       timeZone: "Asia/Shanghai",
-      growth: [
-        { measuredAt: new Date("2026-10-18T01:00:00Z"), heightCm: 101.2, weightKg: 15.8 }
-      ],
       sleep: [
         { kind: "NIGHT", startedAt: new Date("2026-10-19T13:00:00Z"), endedAt: new Date("2026-10-19T21:00:00Z"), awakeMinutes: 30 }
       ],
@@ -27,28 +24,63 @@ describe("dashboard snapshot", () => {
     });
 
     expect(snapshot.completion).toEqual({ sleep: true, nutrition: true, activity: true, emotion: true });
-    expect(snapshot.latestGrowth).toEqual({ date: "2026-10-18", heightCm: 101.2, weightKg: 15.8 });
-    expect(snapshot.recentSleep).toEqual({ date: "2026-10-20", minutes: 450, kind: "NIGHT" });
+    expect(snapshot).not.toHaveProperty("latestGrowth");
+    expect(snapshot).not.toHaveProperty("recentSleep");
+    expect(snapshot).not.toHaveProperty("notices");
     expect(snapshot.today).toMatchObject({
-      meals: 1, milkMl: 180, waterMl: 0, unknownBeverages: 1,
-      activityMinutes: 45, outdoorMinutes: 30, mood: "CALM"
+      sleepMinutes: 450, meals: 1, milkMl: 180, waterMl: null, unknownBeverages: 1,
+      activityMinutes: 45, outdoorMinutes: 30, unknownOutdoorActivities: 0, mood: "CALM"
     });
-    expect(snapshot.notices.join(" ")).toContain("只反映已填写记录");
-    expect(snapshot.notices.join(" ")).toContain("不用于诊断");
   });
 
   it("reports missing categories without inventing zero-valued measurements", () => {
     const snapshot = buildDashboardSnapshot({
-      date: "2026-10-20", timeZone: "UTC", growth: [], sleep: [], meals: [], beverages: [],
+      date: "2026-10-20", timeZone: "UTC", sleep: [], meals: [], beverages: [],
       activities: [], emotions: []
     });
 
     expect(snapshot.completion).toEqual({ sleep: false, nutrition: false, activity: false, emotion: false });
-    expect(snapshot.latestGrowth).toBeNull();
-    expect(snapshot.recentSleep).toBeNull();
+    expect(snapshot).not.toHaveProperty("latestGrowth");
+    expect(snapshot).not.toHaveProperty("recentSleep");
     expect(snapshot.today.milkMl).toBeNull();
     expect(snapshot.today.waterMl).toBeNull();
+    expect(snapshot.today.sleepMinutes).toBeNull();
+    expect(snapshot.today.outdoorMinutes).toBeNull();
+    expect(snapshot.today.unknownOutdoorActivities).toBe(0);
     expect(snapshot.today.mood).toBeNull();
-    expect(snapshot.notices).toContain("近 7 天暂无睡眠记录，当前无法判断睡眠趋势。");
+    expect(snapshot).not.toHaveProperty("notices");
+  });
+
+  it("keeps drink types unknown when a meal or a different drink type was recorded", () => {
+    const snapshot = buildDashboardSnapshot({
+      date: "2026-10-20", timeZone: "UTC", sleep: [],
+      meals: [{ occurredAt: new Date("2026-10-20T08:00:00Z"), items: [] }],
+      beverages: [{ occurredAt: new Date("2026-10-20T09:00:00Z"), type: "MILK", volumeMl: 120 }],
+      activities: [], emotions: []
+    });
+
+    expect(snapshot.today.milkMl).toBe(120);
+    expect(snapshot.today.waterMl).toBeNull();
+  });
+
+  it("marks outdoor totals as unknown or partial when activities omit outdoor duration", () => {
+    const noKnownOutdoor = buildDashboardSnapshot({
+      date: "2026-10-20", timeZone: "UTC", sleep: [], meals: [], beverages: [],
+      activities: [{ occurredAt: new Date("2026-10-20T08:00:00Z"), durationMinutes: 30, outdoorMinutes: null, intensity: "LIGHT" }],
+      emotions: []
+    });
+    const partialOutdoor = buildDashboardSnapshot({
+      date: "2026-10-20", timeZone: "UTC", sleep: [], meals: [], beverages: [],
+      activities: [
+        { occurredAt: new Date("2026-10-20T08:00:00Z"), durationMinutes: 30, outdoorMinutes: 10, intensity: "LIGHT" },
+        { occurredAt: new Date("2026-10-20T09:00:00Z"), durationMinutes: 20, outdoorMinutes: null, intensity: "MODERATE" }
+      ],
+      emotions: []
+    });
+
+    expect(noKnownOutdoor.today.outdoorMinutes).toBeNull();
+    expect(noKnownOutdoor.today.unknownOutdoorActivities).toBe(1);
+    expect(partialOutdoor.today.outdoorMinutes).toBe(10);
+    expect(partialOutdoor.today.unknownOutdoorActivities).toBe(1);
   });
 });

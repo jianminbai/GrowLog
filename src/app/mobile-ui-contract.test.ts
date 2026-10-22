@@ -83,4 +83,11 @@ describe("mobile UI CSS contract", () => {
     expect(css).toMatch(/\.history-copy\s*\{[^}]*min-width:\s*0/);
     expect(css).toMatch(/\.history-copy strong,[\s\S]*overflow-wrap:\s*anywhere/);
   });
+
+  it("uses compact touch-safe settings menus and measurement details", () => {
+    expect(css).toMatch(/\.settings-menu-list\s*\{[^}]*display:\s*grid/);
+    expect(css).toMatch(/\.settings-menu-item\s*\{[^}]*min-height:\s*var\(--control-min\)/);
+    expect(css).toMatch(/\.measurement-detail summary\s*\{[^}]*min-height:\s*var\(--tap-min\)/);
+    expect(css).toMatch(/\.report-table th\s*\{[^}]*position:\s*sticky/);
+  });
 });

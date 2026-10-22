@@ -27,11 +27,12 @@
 - M13 deployment and recovery: Node 24 production image stages, PostgreSQL 16, Caddy, persistent volumes, dependency-aware health checks, idempotent household bootstrap, checksummed backups, guarded named-database restores, and an operator runbook are implemented and smoke-tested.
 - M14 end-to-end and security review: a reusable authenticated HTTP smoke script verifies the complete P0 lifecycle and API contract through Caddy; security controls and dependency advisories are documented with explicit follow-up work.
 - M15 mobile-first interface: the protected application now has four-item mobile navigation, a 760px desktop navigation breakpoint, one-handed Dashboard and child-domain entry points, progressively disclosed optional form fields, confirmed destructive actions, accessible status messages, safe account logout, and a responsive light/dark visual system.
+- M20 focused mobile refinement: Today is a same-day dashboard, growth records use a compact essential-column table with expandable measurement context, and Settings uses grouped low-frequency management menus.
 - Repository documentation: the root README provides an accurate Chinese product overview, Docker/VPS quick start, development checks, backup/restore entry points, security boundaries, and links to durable project records.
 
 ## Current task
 
-- All GrowLog MVP milestones M0–M19 are implemented and verified. Deferred P1/P2 work remains listed in `TASKS.md`.
+- All GrowLog MVP milestones M0–M20 are implemented and verified. Deferred P1/P2 work remains listed in `TASKS.md`.
 
 ## Test record
 
@@ -96,6 +97,10 @@
 - M19 browser verification: authenticated growth and History pages at 320, 390, and 768 px have no page-level horizontal overflow; focusing a height point exposes its household-local timestamp and exact value, annualized growth is populated, History shows its overview and category timeline, and keyboard intent reveals the settings editor link (2026-10-22).
 - M19 review fixes: normalized SVG path lengths keep long lines complete and reduced-motion lines visible; dense point hit testing delegates to a two-dimensional nearest-point calculation while keyboard controls remain available; History swipe hints use theme-safe contrast; long card content wraps instead of being clipped; native SVG titles render as one text node (2026-10-22).
 - M19 final gate: clean test-database reset, lint with zero warnings, typecheck, 157/157 tests across 50 files with PostgreSQL enabled, and the production build including the interactive report and refined History routes pass (2026-10-22).
+- M20 RED→GREEN: Today-only dashboard content/query assertions, growth-table column/detail assertions, grouped Settings navigation, and responsive CSS contracts first failed against the previous presentation, then 28 focused assertions across 5 files passed (2026-10-22).
+- M20 review fixes: milk and water totals now remain independently unknown until that drink type has an explicit volume; missing or partial outdoor duration remains visible instead of becoming a fabricated zero; the new regression cases first failed and then 5/5 focused tests passed; independent re-review found no remaining Critical or Important issues (2026-10-22).
+- M20 final gate: clean test-database reset, lint with zero warnings, typecheck, 161/161 tests across 51 files with PostgreSQL enabled, and the production build including Today, profile reports, and Settings routes pass (2026-10-22).
+- M20 browser verification: authenticated production pages at 320, 390, and 768 px produced 9 successful page checks; Today contains completion, five same-day overview items, and five quick actions without latest blocks; growth uses the requested column order and expandable details; Settings exposes three grouped menu sections; no page-level horizontal overflow was detected (2026-10-22).
 
 ## Work implemented
 
@@ -113,7 +118,7 @@
 - Sleep sessions are attributed to the household-local date containing `endedAt`; net minutes subtract explicit awake time, while absent awake time means none recorded rather than an invented value.
 - Activity summaries use the household-local occurrence date. Outdoor minutes are summed independently; only records explicitly marked moderate or vigorous contribute their full duration to the moderate/vigorous total.
 - Emotion summaries count recorded observations by household-local date, mood, and tag over 7/30-day windows. They intentionally expose no aggregate score, diagnosis, or inferred condition.
-- The Today dashboard distinguishes unknown quantities from recorded zero, attributes records by household-local date, and labels trend notices as summaries of submitted data. Quick actions lead directly to the short forms already used by each domain page.
+- The Today dashboard attributes records by household-local date and shows completion, same-day sleep/nutrition/activity/emotion values, and direct quick-entry actions. It does not query growth history or present latest/trend blocks; optional milk, water, and outdoor quantities remain independently unknown and partial values are identified.
 - Unified history reads every domain by authenticated household, normalizes occurrence time without copying sensitive values into audit output, and sends users to the existing domain form for edits or restoration. Nutrition edit forms now expose the already-tested PATCH APIs.
 - Export loads data directly by authenticated household, never exports `AdminSession`, converts decimals and timestamps explicitly, and reduces audit metadata to changed field names. CSV cells are quoted and spreadsheet-formula prefixes are neutralized.
 - The service worker caches only the offline fallback, manifest, icons, and immutable Next static assets. Navigations use the network with an offline fallback but are not stored; `/api/` requests bypass service-worker caching entirely.
@@ -124,6 +129,7 @@
 - The child area is view-first: the list offers creation only when empty, child detail contains five report categories, and each category displays time-based charts plus complete read-only tables. Child creation, profile editing, and all record editors live under Settings; Today, History, and the legacy profile-edit route point to those management routes.
 - The active history timeline is grouped by household-local day and uses compact cards that retain category, child, title, detail, and time; right swipe or keyboard intent reveals the edit link. Deleted records and redacted audits live under Settings → Data management, where restore actions reuse the existing household-scoped APIs and CSRF contract.
 - Profile charts now use native SVG plus accessible HTML point controls to expose exact household-local timestamps and values through pointer, touch, and keyboard input. Growth reports add retrospective annualized height change between consecutive valid measurements, while History adds a compact summary and category-marked visual timeline without removing any record detail or edit path.
+- Growth tables prioritize measurement time, height, annualized height growth, weight, BMI, changes, and source; lower-frequency measurement conditions and notes remain available through a native disclosure. Settings groups children/records, data/backup, and account controls into compact touch-safe menus without changing the existing APIs or authorization boundary.
 
 ## Blockers
 
