@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import "@testing-library/jest-dom/vitest";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 const state = vi.hoisted(() => ({ allowed: true }));
 vi.mock("next/navigation", () => ({ notFound: () => { throw new Error("NOT_FOUND"); }, useRouter: () => ({}) }));
@@ -9,6 +9,10 @@ vi.mock("@/lib/db", () => ({ getPrisma: () => ({}) }));
 vi.mock("@/modules/children/child-repository", () => ({ findChildForHousehold: async (_db: unknown, h: string, id: string) => state.allowed && h === "h1" && id === "c1" ? { id, name: "小满" } : null }));
 vi.mock("@/modules/sleep/sleep-repository", () => ({ getHouseholdTimeZone: async () => "Asia/Shanghai", listSleepForChild: async () => [] }));
 vi.mock("@/modules/growth/growth-repository", () => ({ listGrowthForChild: async () => [{
+  id: "g0", childId: "c1", measuredAt: new Date("2025-10-20T01:00:00Z"), heightCm: 100, weightKg: 15,
+  headCircumferenceCm: null, source: "HOME", place: null, method: null, device: null,
+  precisionNote: null, notes: null, deletedAt: null, createdAt: new Date(), updatedAt: new Date()
+}, {
   id: "g1", childId: "c1", measuredAt: new Date("2026-10-20T01:00:00Z"), heightCm: 104, weightKg: 17,
   headCircumferenceCm: null, source: "HOME", place: null, method: null, device: null,
   precisionNote: null, notes: "早晨测量", deletedAt: null, createdAt: new Date(), updatedAt: new Date()
@@ -39,6 +43,9 @@ describe("read-only child reports", () => {
     expect(screen.getByRole("cell", { name: "104" })).toBeInTheDocument();
     expect(screen.getByRole("cell", { name: "17" })).toBeInTheDocument();
     expect(screen.getByText(/早晨测量/)).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "年化身高增长（cm/年）" })).toBeInTheDocument();
+    const latestRow = screen.getByRole("row", { name: /2026.*10.*20.*104.*17/ });
+    expect(within(latestRow).getAllByRole("cell")[6]).toHaveTextContent("4");
   });
   it("includes yogurt drinks in the nutrition chart and table", async () => {
     render(await NutritionPage({ params: Promise.resolve({ childId: "c1" }) }));

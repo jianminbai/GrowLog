@@ -8,6 +8,7 @@ const revealThreshold = 56;
 
 type SwipeableHistoryEntryProps = {
   href: string;
+  kind: "GROWTH" | "SLEEP" | "MEAL" | "BEVERAGE" | "ACTIVITY" | "EMOTION";
   category: string;
   childName: string;
   title: string;
@@ -16,7 +17,7 @@ type SwipeableHistoryEntryProps = {
 };
 
 export function SwipeableHistoryEntry({
-  href, category, childName, title, detail, time
+  href, kind, category, childName, title, detail, time
 }: SwipeableHistoryEntryProps) {
   const [open, setOpen] = useState(false);
   const [offset, setOffset] = useState(0);
@@ -69,7 +70,8 @@ export function SwipeableHistoryEntry({
   }
 
   return <div
-    className={`swipe-history-item${open ? " is-open" : ""}`}
+    className={`swipe-history-item history-kind-${kind.toLowerCase()}${open ? " is-open" : ""}`}
+    data-kind={kind.toLowerCase()}
     role="group"
     aria-label={title}
     tabIndex={0}
@@ -84,11 +86,11 @@ export function SwipeableHistoryEntry({
     </div>
     <article className="history-entry" style={{ transform: `translateX(${offset}px)` }}>
       <div className="history-copy">
-        <span>{category} · {childName}</span>
+        <span className="history-kind-badge">{category} · {childName}</span>
         <strong>{title}</strong>
         <small>{detail}</small>
       </div>
-      <div className="history-time"><time>{time}</time></div>
+      <div className="history-time"><time>{time}</time><span className="history-swipe-hint" aria-hidden="true">右滑编辑</span></div>
       <span className="sr-only">向右滑动或按 Enter 显示编辑入口</span>
     </article>
   </div>;

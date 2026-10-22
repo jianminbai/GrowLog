@@ -6,6 +6,7 @@ import { getPrisma } from "@/lib/db";
 import { requireServerSession } from "@/modules/auth/server-session";
 import { findChildForHousehold } from "@/modules/children/child-repository";
 import { serializeGrowthHistory } from "@/modules/growth/growth-handlers";
+import { calculateAnnualizedHeightGrowth } from "@/modules/growth/growth-record";
 import { listGrowthForChild } from "@/modules/growth/growth-repository";
 import { serializeSleep } from "@/modules/sleep/sleep-handlers";
 import { getHouseholdTimeZone, listSleepForChild } from "@/modules/sleep/sleep-repository";
@@ -41,13 +42,16 @@ export async function ChildRecordReport({ childId, domain }: { childId: string; 
 
   if (domain === "growth") {
     const rows = serializeGrowthHistory(await listGrowthForChild(prisma, auth.householdId, childId));
+    const annualizedHeightGrowth = calculateAnnualizedHeightGrowth(rows.map(r => ({
+      measuredAt: new Date(r.measuredAt), heightCm: r.heightCm
+    })));
     charts.push(
       { title: "身高趋势", unit: "cm", points: rows.map(r => ({ at: r.measuredAt, value: r.heightCm })) },
       { title: "体重趋势", unit: "kg", points: rows.map(r => ({ at: r.measuredAt, value: r.weightKg })) }
     );
-    tables.push({ title: "测量记录", headers: ["测量时间", "身高（cm）", "体重（kg）", "头围（cm）", "BMI（kg/m²）", "身高变化（cm）", "体重变化（kg）", "来源", "测量条件与备注"],
-      rows: rows.slice().reverse().map(r => ({ id: r.id, cells: [timestamp(r.measuredAt), r.heightCm, r.weightKg, r.headCircumferenceCm, r.bmi, r.heightChangeCm, r.weightChangeKg, sourceLabels[r.source],
-        `地点：${optional(r.place)}；方法：${optional(r.method)}；设备：${optional(r.device)}；精度：${optional(r.precisionNote)}；备注：${optional(r.notes)}`] })) });
+    tables.push({ title: "测量记录", headers: ["测量时间", "身高（cm）", "体重（kg）", "头围（cm）", "BMI（kg/m²）", "身高变化（cm）", "年化身高增长（cm/年）", "体重变化（kg）", "来源", "测量条件与备注"],
+      rows: rows.map((r, index) => ({ id: r.id, cells: [timestamp(r.measuredAt), r.heightCm, r.weightKg, r.headCircumferenceCm, r.bmi, r.heightChangeCm, annualizedHeightGrowth[index], r.weightChangeKg, sourceLabels[r.source],
+        `地点：${optional(r.place)}；方法：${optional(r.method)}；设备：${optional(r.device)}；精度：${optional(r.precisionNote)}；备注：${optional(r.notes)}`] })).reverse() });
   } else if (domain === "sleep") {
     const rows = (await listSleepForChild(prisma, auth.householdId, childId)).map(serializeSleep);
     dailyChart("每日净睡眠时长", "分钟", rows.map(r => ({ at: r.endedAt, value: r.sleepMinutes })));

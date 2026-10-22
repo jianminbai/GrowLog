@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   calculateBmi,
+  calculateAnnualizedHeightGrowth,
   calculateGrowthChanges,
   growthCreateSchema,
   growthUpdateSchema
@@ -74,5 +75,21 @@ describe("growth calculations", () => {
       { heightChangeCm: null, weightChangeKg: 0.5 },
       { heightChangeCm: 2.3, weightChangeKg: null }
     ]);
+  });
+
+  it("annualizes height change using the real interval and the previous available height", () => {
+    expect(calculateAnnualizedHeightGrowth([
+      { measuredAt: new Date("2025-01-01T00:00:00Z"), heightCm: 100 },
+      { measuredAt: new Date("2025-06-01T00:00:00Z"), heightCm: null },
+      { measuredAt: new Date("2026-01-01T00:00:00Z"), heightCm: 104 }
+    ])).toEqual([null, null, 4]);
+  });
+
+  it("keeps annualized growth unknown when there is no positive time interval", () => {
+    expect(calculateAnnualizedHeightGrowth([
+      { measuredAt: new Date("2026-01-01T00:00:00Z"), heightCm: 100 },
+      { measuredAt: new Date("2026-01-31T00:00:00Z"), heightCm: 101 },
+      { measuredAt: new Date("2026-01-31T00:00:00Z"), heightCm: 102 }
+    ])).toEqual([null, 12.17, null]);
   });
 });

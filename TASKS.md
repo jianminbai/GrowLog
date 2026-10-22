@@ -49,6 +49,8 @@ Status keys: `[ ]` pending, `[~]` in progress, `[x]` verified.
 
 - [x] M18 — Read-only child reports and settings-based record management.
   - Acceptance: empty profiles offer Add child; populated profiles never show creation forms; all five child domains show time-based charts and complete read-only tables; growth height/weight have separate labeled axes with actual time spacing; missing values remain unknown; settings hosts child creation, basic profile editing and all existing record editors; Today and History entry links continue to work; authentication, household isolation, full checks and mobile browser verification pass.
+- [x] M19 — Interactive profile charts, annualized height growth, and history visual refinement.
+  - Acceptance: chart points expose household-local time and exact values to pointer, touch, and keyboard users; chart motion respects reduced-motion preferences; the growth table calculates retrospective annualized height growth only between valid measurements with a positive interval; History shows a compact date-based timeline, record/day overview, category markers, and a visible swipe affordance while preserving all details and the existing swipe/keyboard edit behavior; focused tests and 320/390/768 px browser checks pass.
 
 ## Deferred after MVP
 

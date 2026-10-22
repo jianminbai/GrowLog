@@ -23,20 +23,22 @@ export default async function HistoryPage() {
     timeZone, hour: "2-digit", minute: "2-digit", hour12: false
   });
 
-  return <main className="profile-shell">
-    <header className="profile-header compact"><h1>历史记录</h1><p>按日期回顾全部有效记录。向右滑动记录卡片可进入原始表单修改。</p></header>
-    <div className="history-toolbar">
-      <strong>{entries.length} 条记录</strong>
+  return <main className="profile-shell history-shell">
+    <header className="profile-header compact history-hero"><span className="history-eyebrow">成长足迹</span><h1>历史记录</h1><p>按日期回顾全部有效记录。向右滑动记录卡片可进入原始表单修改。</p></header>
+    <div className="history-overview" aria-label="历史概览">
+      <div><strong>{entries.length}</strong><span> 条记录</span></div>
+      <div><strong>{groups.length}</strong><span> 个记录日</span></div>
     </div>
     <section className="unified-history" aria-labelledby="all-records">
-      <h2 id="all-records">全部记录</h2>
+      <div className="history-section-heading"><h2 id="all-records">全部记录</h2><span>按时间倒序</span></div>
       {groups.length === 0 ? <div className="empty-state">尚无历史记录。</div> : groups.map((group) => {
         const headingId = `history-day-${group.dateKey}`;
-        return <section className="history-day" aria-labelledby={headingId} key={group.dateKey}>
-          <h3 id={headingId}>{group.label}</h3>
+        return <section className="history-day" aria-label={group.label} key={group.dateKey}>
+          <h3 id={headingId}><span>{group.label}</span><small>{group.entries.length} 条</small></h3>
           <div className="history-list">{group.entries.map((entry) =>
             <SwipeableHistoryEntry
               href={entry.href}
+              kind={entry.kind}
               category={kindLabels[entry.kind]}
               childName={entry.childName}
               title={entry.title}

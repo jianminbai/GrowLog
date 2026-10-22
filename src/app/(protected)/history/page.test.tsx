@@ -54,7 +54,10 @@ beforeEach(() => {
 
 describe("history page", () => {
   it("groups complete active-record cards by household-local day", async () => {
-    render(await HistoryPage());
+    const { container } = render(await HistoryPage());
+
+    expect(screen.getByLabelText("历史概览")).toHaveTextContent("3 条记录");
+    expect(screen.getByLabelText("历史概览")).toHaveTextContent("3 个记录日");
 
     const today = screen.getByRole("region", { name: "今天" });
     expect(within(today).getByText("生长 · 小满")).toBeInTheDocument();
@@ -66,6 +69,8 @@ describe("history page", () => {
     expect(screen.getByRole("region", { name: /10月20日/ })).toHaveTextContent("骑车");
     expect(screen.queryByText("parent@example.com")).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /已删除/ })).not.toBeInTheDocument();
+    expect(container.querySelector('[data-kind="growth"]')).not.toBeNull();
+    expect(within(today).getByText("右滑编辑")).toBeInTheDocument();
   });
 
   it("reveals the edit entry after a deliberate right swipe", async () => {

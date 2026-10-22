@@ -31,7 +31,7 @@
 
 ## Current task
 
-- All GrowLog MVP milestones M0–M18 are implemented and verified. Deferred P1/P2 work remains listed in `TASKS.md`.
+- All GrowLog MVP milestones M0–M19 are implemented and verified. Deferred P1/P2 work remains listed in `TASKS.md`.
 
 ## Test record
 
@@ -92,6 +92,10 @@
 - M18 review fixes: all meal/beverage/activity enum values have readable labels, yogurt drinks receive their own chart, unknown daily quantities stay unknown, inherited editor-route keys return 404, and every report remains household scoped (2026-10-22).
 - M18 final gate: clean test-database reset, lint with zero warnings, typecheck, 151/151 tests across 50 files with PostgreSQL enabled, and the production build including all report and settings-management routes pass (2026-10-22).
 - M18 browser verification: authenticated seeded pages at 320, 390, and 768 px produced 34 successful page checks; five reports contained chart/table output without forms, five settings editors retained forms, Today and swipe-revealed History links reached those editors, and no page-level horizontal overflow was detected (2026-10-22).
+- M19 RED→GREEN: pointer/keyboard chart interaction, annualized height-growth edge cases, report-table output, and History overview/category/affordance assertions first failed against the static presentation, then 41 focused assertions across 5 files passed (2026-10-22).
+- M19 browser verification: authenticated growth and History pages at 320, 390, and 768 px have no page-level horizontal overflow; focusing a height point exposes its household-local timestamp and exact value, annualized growth is populated, History shows its overview and category timeline, and keyboard intent reveals the settings editor link (2026-10-22).
+- M19 review fixes: normalized SVG path lengths keep long lines complete and reduced-motion lines visible; dense point hit testing delegates to a two-dimensional nearest-point calculation while keyboard controls remain available; History swipe hints use theme-safe contrast; long card content wraps instead of being clipped; native SVG titles render as one text node (2026-10-22).
+- M19 final gate: clean test-database reset, lint with zero warnings, typecheck, 157/157 tests across 50 files with PostgreSQL enabled, and the production build including the interactive report and refined History routes pass (2026-10-22).
 
 ## Work implemented
 
@@ -119,6 +123,7 @@
 - Mobile presentation logic stays in small client components for pathname state, logout, and existing forms; server components, API routes, Prisma schema, audit behavior, household isolation, and service-worker cache policy remain unchanged. Nutrition requests retain their validated schema while the creation/edit UI now exposes previously omitted optional payload fields.
 - The child area is view-first: the list offers creation only when empty, child detail contains five report categories, and each category displays time-based charts plus complete read-only tables. Child creation, profile editing, and all record editors live under Settings; Today, History, and the legacy profile-edit route point to those management routes.
 - The active history timeline is grouped by household-local day and uses compact cards that retain category, child, title, detail, and time; right swipe or keyboard intent reveals the edit link. Deleted records and redacted audits live under Settings → Data management, where restore actions reuse the existing household-scoped APIs and CSRF contract.
+- Profile charts now use native SVG plus accessible HTML point controls to expose exact household-local timestamps and values through pointer, touch, and keyboard input. Growth reports add retrospective annualized height change between consecutive valid measurements, while History adds a compact summary and category-marked visual timeline without removing any record detail or edit path.
 
 ## Blockers
 

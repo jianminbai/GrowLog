@@ -74,5 +74,13 @@ describe("mobile UI CSS contract", () => {
 
   it("disables nonessential motion when the user requests it", () => {
     expect(css).toMatch(/@media\s*\(prefers-reduced-motion:\s*reduce\)/);
+    expect(css).toMatch(/@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[\s\S]*\.report-line[^}]*stroke-dashoffset:\s*0/);
+  });
+
+  it("keeps dense chart points selectable and history hints readable", () => {
+    expect(css).toMatch(/\.chart-point-control\s*\{[^}]*pointer-events:\s*none/);
+    expect(css).toMatch(/\.history-swipe-hint\s*\{[^}]*color:\s*var\(--ink\)\s*!important/);
+    expect(css).toMatch(/\.history-copy\s*\{[^}]*min-width:\s*0/);
+    expect(css).toMatch(/\.history-copy strong,[\s\S]*overflow-wrap:\s*anywhere/);
   });
 });

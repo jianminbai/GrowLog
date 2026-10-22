@@ -87,3 +87,27 @@ export function calculateGrowthChanges(
     return result;
   });
 }
+
+const millisecondsPerDay = 24 * 60 * 60 * 1_000;
+const meanDaysPerYear = 365.2425;
+
+export function calculateAnnualizedHeightGrowth(
+  records: Array<{ measuredAt: Date; heightCm: number | null }>
+): Array<number | null> {
+  let previousHeight: number | null = null;
+  let previousTime: number | null = null;
+
+  return records.map((record) => {
+    const time = record.measuredAt.getTime();
+    const elapsedDays = previousTime === null ? null : (time - previousTime) / millisecondsPerDay;
+    const annualized = record.heightCm === null || previousHeight === null || elapsedDays === null || elapsedDays <= 0
+      ? null
+      : rounded(((record.heightCm - previousHeight) / elapsedDays) * meanDaysPerYear, 2);
+
+    if (record.heightCm !== null && Number.isFinite(time)) {
+      previousHeight = record.heightCm;
+      previousTime = time;
+    }
+    return annualized;
+  });
+}
