@@ -7,24 +7,25 @@ export function LoginForm() {
   const router = useRouter();
   const [message, setMessage] = useState("");
   const [pending, setPending] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setPending(true);
     setMessage("");
-    const form = new FormData(event.currentTarget);
-
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
-          email: form.get("email"),
-          password: form.get("password")
+          email,
+          password
         })
       });
 
       if (!response.ok) {
+        setPassword("");
         setMessage("邮箱或密码不正确，请重新输入。");
         return;
       }
@@ -32,6 +33,7 @@ export function LoginForm() {
       router.replace("/today");
       router.refresh();
     } catch {
+      setPassword("");
       setMessage("暂时无法连接 GrowLog，请稍后重试。");
     } finally {
       setPending(false);
@@ -42,7 +44,7 @@ export function LoginForm() {
     <form className="login-form" onSubmit={submit}>
       <label>
         <span>管理员邮箱</span>
-        <input name="email" type="email" autoComplete="username" required />
+        <input name="email" type="email" autoComplete="username" required value={email} onChange={(event) => setEmail(event.target.value)} />
       </label>
       <label>
         <span>密码</span>
@@ -52,6 +54,8 @@ export function LoginForm() {
           autoComplete="current-password"
           minLength={8}
           required
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
         />
       </label>
       {message ? (
