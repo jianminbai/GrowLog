@@ -5,7 +5,7 @@
   --surface: #ffffff;
   --surface-muted: #f3f0f6;
   --ink: #211d26;
-  --muted: #77717d;
+  --muted: #6f6974;
   --line: #e9e6ed;
   --brand-violet: #76558f;
   --brand-violet-strong: #5e3f76;
@@ -278,7 +278,7 @@ h2 {
 }
 
 .login-form input:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--brand-violet) 28%, transparent);
+  outline: 3px solid var(--brand-violet);
   border-color: var(--brand-violet);
 }
 
@@ -379,7 +379,7 @@ h2 {
 
 .completion-item.done { background: var(--success-bg); color: var(--success-ink); }
 .completion-item.missing { background: var(--warning-bg); color: var(--warning-ink); }
-.completion-item span { color: currentColor; opacity: 0.72; font-size: 0.75rem; font-weight: 750; }
+.completion-item span { color: currentColor; font-size: 0.75rem; font-weight: 750; }
 
 .dashboard-section-title {
   margin: 1.35rem 0 0.6rem;
@@ -1549,6 +1549,7 @@ h2 {
 .settings-menu-disclosure summary::-webkit-details-marker { display: none; }
 .settings-menu-disclosure[open] .settings-menu-arrow .app-icon { transform: rotate(90deg); }
 .settings-submenu { display: grid; grid-template-columns: 1fr; border-top: 1px solid var(--line); background: var(--surface-muted); padding: 0.35rem 0.85rem 0.55rem 3.8rem; }
+.settings-menu-disclosure:not([open]) > .settings-submenu { display: none; }
 .settings-submenu a { min-height: var(--tap-min); color: var(--brand-violet); display: flex; align-items: center; font-size: 0.8rem; font-weight: 750; text-decoration: none; }
 .settings-account-card { border: 1px solid var(--line); border-radius: 1.1rem; background: var(--surface); display: grid; gap: 0.8rem; padding: 0.9rem; box-shadow: 0 4px 16px rgba(44, 34, 52, 0.04); }
 .settings-account-card > div:first-child { display: grid; gap: 0.2rem; }

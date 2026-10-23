@@ -31,11 +31,12 @@
 - M21 comparison and navigation refinement: Today shows preceding-seven-day recorded-day baselines, growth uses date-only measurement labels, navigation is named “今天/足迹/趋势/设置”, nutrition history uses consistent expandable cards, and semantic green/orange/red roles replace ambiguous neutral red accents.
 - M22 compact longitudinal review: Footprints is now a read-only compact timeline without time-of-day or swipe editing, growth dates stay on one line, and Today compares compact values across today plus preceding 7/14/30-day windows while preserving unknown values.
 - M23 copy and table-density refinement: Today and Trends use task-focused header copy, report-level instructional notes are removed, and growth measurements align in compact centered rows while preserving the details touch target.
+- M24 modern minimalist visual refresh: the full public and authenticated application now uses a neutral surface hierarchy, violet brand actions, semantic status colors, shared line icons, consistent mobile forms and tables, and explicit light/dark theme pairs without changing routes, APIs, persistence, or business rules.
 - Repository documentation: the root README provides an accurate Chinese product overview, Docker/VPS quick start, development checks, backup/restore entry points, security boundaries, and links to durable project records.
 
 ## Current task
 
-- All GrowLog MVP milestones M0–M23 are implemented and verified. Deferred P1/P2 work remains listed in `TASKS.md`.
+- All GrowLog MVP milestones M0–M24 are implemented and verified. Deferred P1/P2 work remains listed in `TASKS.md`.
 
 ## Test record
 
@@ -116,6 +117,10 @@
 - M23 review: independent review found no remaining Critical or Important issue; the scoped measurement style preserves the 44px details target and lets expanded detail text wrap normally (2026-10-23).
 - M23 final gate: clean test-database reset, lint with zero warnings, strict typecheck, 169/169 tests across 51 files with PostgreSQL enabled, and the production build all pass (2026-10-23).
 - M23 browser verification: authenticated production pages at 320, 390, and 768 px show the revised Today/Trends copy, omit both requested instructions, keep all growth measurement rows at 53px with a 44px details target, center every cell vertically and horizontally without wrapping, and avoid page-level horizontal overflow (2026-10-23).
+- M24 RED→GREEN: visual-token, semantic-pair, shell, navigation, card, chart, settings, and editor CSS contracts plus shared SVG-icon component tests failed against the previous presentation, then passed after the visual refresh; a screenshot review found and locked down the dark-mode snapshot-label contrast fix (2026-10-23).
+- M24 review: independent review found no Critical issue and three Important contrast gaps; solid login focus rings, fully opaque small status labels, and a darker light-theme muted token fixed all three, with tests calculating contrast against every neutral surface. Browser verification then exposed nested Settings current-state and closed-disclosure geometry defects, both fixed with focused regressions (2026-10-23).
+- M24 final gate: a clean test-database reset and migration, 179/179 tests across 52 files with PostgreSQL enabled, lint with zero warnings, strict typecheck, production build, and diff checks all pass (2026-10-23).
+- M24 browser matrix: 164 checks across public and authenticated production pages, all five read-only reports, profile management, recovery, expanded Settings export menus, and all five expanded record editors passed at 320×568, 390×844, 430×932, and 768×1024 in light and dark themes; there was no page overflow, sub-16px input text, navigation breakpoint/current-state error, or fixed-navigation overlap, and 16 representative screenshots were visually reviewed (2026-10-23).
 
 ## Work implemented
 
@@ -148,6 +153,8 @@
 - Today baselines divide each metric only by dates with complete values; the snapshot retains sample-day counts for verification while the compact UI presents only the resulting values, and today stays a partial-day snapshot. Growth alone uses date-only labels, while domains where time of day matters retain their timestamps. Navigation and nutrition-history presentation now share the same mobile information hierarchy and semantic color system.
 - Today now repeats that baseline policy for the preceding 7, 14, and 30 household-local dates and presents the results in four compact columns alongside today. Footprints keeps daily grouping and complete summaries but removes time-of-day plus direct editing interactions; record maintenance remains available in Settings. Growth measurement dates use a dedicated no-wrap element inside the horizontally scrollable report table.
 - Today and Trends headers now state the current task directly. Trend reports rely on chart/table labels and accessible point controls instead of repeating timezone, management, and pointer instructions. The growth measurement table uses a scoped centered-row style with reduced cell padding while its details summary remains touch sized.
+- The visual system now separates violet brand actions from green success, orange warning, and red danger states; shared stroke-based SVG icons replace mixed glyphs in primary navigation, report entry points, and Settings. Neutral canvas/surface tokens, 1.5rem panels, muted inputs, consistent focus rings, and compact mobile tables/forms apply across public and authenticated routes in both color schemes.
+- Primary navigation treats every nested Settings route as part of Settings. Closed export disclosures explicitly remove submenu geometry, while opened disclosures remain within the protected shell's bottom safe space so fixed mobile navigation cannot cover their final action.
 
 ## Blockers
 

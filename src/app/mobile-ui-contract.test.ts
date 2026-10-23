@@ -36,7 +36,7 @@ describe("mobile UI CSS contract", () => {
     expect(light).toContain("--surface: #ffffff");
     expect(light).toContain("--surface-muted: #f3f0f6");
     expect(light).toContain("--ink: #211d26");
-    expect(light).toContain("--muted: #77717d");
+    expect(light).toContain("--muted: #6f6974");
     expect(light).toContain("--line: #e9e6ed");
     expect(light).toContain("--brand-violet: #76558f");
     expect(light).toContain("--brand-violet-strong: #5e3f76");
@@ -78,6 +78,17 @@ describe("mobile UI CSS contract", () => {
     });
   });
 
+  it("keeps muted copy readable on every neutral surface", () => {
+    const rootBlocks = [...css.matchAll(/:root\s*\{([^}]+)\}/g)].map((match) => match[1]!);
+
+    rootBlocks.forEach((block) => {
+      const muted = tokenValue(block, "--muted");
+      ["--canvas", "--surface", "--surface-muted"].forEach((backgroundToken) => {
+        expect(contrastRatio(muted, tokenValue(block, backgroundToken))).toBeGreaterThanOrEqual(4.5);
+      });
+    });
+  });
+
   it("defines touch and input sizes that are safe on phones", () => {
     expect(css).toMatch(/--tap-min:\s*44px/);
     expect(css).toMatch(/--control-min:\s*48px/);
@@ -100,6 +111,7 @@ describe("mobile UI CSS contract", () => {
     expect(css).toMatch(/\.snapshot-card span\s*\{[^}]*color:\s*currentColor[^}]*opacity:\s*0\.72/);
     expect(css).toMatch(/\.completion-item\.done\s*\{[^}]*color:\s*var\(--success-ink\)/);
     expect(css).toMatch(/\.completion-item\.missing\s*\{[^}]*color:\s*var\(--warning-ink\)/);
+    expect(css).not.toMatch(/\.completion-item span\s*\{[^}]*opacity:/);
     expect(css).toMatch(/\.trend-notices\s*\{[^}]*background:\s*var\(--brand-subtle\)[^}]*color:\s*var\(--brand-subtle-ink\)/);
     expect(css).toMatch(/\.trend-notices li\s*\{[^}]*color:\s*inherit/);
   });
@@ -176,6 +188,7 @@ describe("mobile UI CSS contract", () => {
     expect(css).toMatch(/\.preview\s*\{[^}]*border-radius:\s*1\.5rem[^}]*background:\s*var\(--surface\)[^}]*box-shadow:\s*0 8px 24px/);
     expect(css).toMatch(/\.login-panel\s*\{[^}]*border-radius:\s*1\.5rem[^}]*background:\s*var\(--surface\)[^}]*box-shadow:\s*0 8px 24px/);
     expect(css).toMatch(/\.form-message\s*\{[^}]*overflow-wrap:\s*anywhere/);
+    expect(css).toMatch(/\.login-form input:focus-visible\s*\{[^}]*outline:\s*3px solid var\(--brand-violet\)[^}]*border-color:\s*var\(--brand-violet\)/);
     expect(css).toMatch(/\.app-brand\s*\{[^}]*font-family:\s*inherit[^}]*letter-spacing:\s*-0\.02em/);
     expect(css).toMatch(/\.mobile-app-nav\s*\{[^}]*background:\s*color-mix\(in srgb, var\(--surface\) 96%, transparent\)/);
     expect(css).toMatch(/\.mobile-app-nav a\s*\{[^}]*min-height:\s*3\.25rem/);
@@ -199,6 +212,7 @@ describe("mobile UI CSS contract", () => {
   it("uses one management and editor system for settings, recovery, and all forms", () => {
     expect(css).toMatch(/\.settings-menu-list\s*\{[^}]*background:\s*var\(--surface\)[^}]*box-shadow:\s*0 4px 16px/);
     expect(css).toMatch(/\.settings-menu-icon\s*\{[^}]*background:\s*var\(--brand-subtle\)[^}]*color:\s*var\(--brand-subtle-ink\)/);
+    expect(css).toMatch(/\.settings-menu-disclosure:not\(\[open\]\)\s*>\s*\.settings-submenu\s*\{[^}]*display:\s*none/);
     expect(css).toMatch(/\.settings-account-card\s*\{[^}]*background:\s*var\(--surface\)/);
     expect(css).toMatch(/\.deleted-management-entry\s*\{[^}]*border:\s*1px solid var\(--line\)[^}]*background:\s*var\(--surface-muted\)/);
     expect(css).toMatch(/\.restore-action\s*\{[^}]*background:\s*var\(--brand-subtle\)[^}]*color:\s*var\(--brand-subtle-ink\)/);

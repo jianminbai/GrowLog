@@ -49,4 +49,16 @@ describe("AppNavigation", () => {
     expect(within(mobile).getByRole("link", { name: "趋势" })).toHaveAttribute("aria-current", "page");
     expect(within(mobile).getByRole("link", { name: "今天" })).not.toHaveAttribute("aria-current");
   });
+
+  it("marks every settings management route as the current settings destination", () => {
+    pathname = "/settings/children/child-1/records/growth";
+    render(<AppNavigation />);
+
+    const desktop = screen.getByRole("navigation", { name: "桌面主要导航" });
+    const mobile = screen.getByRole("navigation", { name: "手机主要导航" });
+
+    expect(within(desktop).getByRole("link", { name: "设置" })).toHaveAttribute("aria-current", "page");
+    expect(within(mobile).getByRole("link", { name: "设置" })).toHaveAttribute("aria-current", "page");
+    expect(within(mobile).getByRole("link", { name: "趋势" })).not.toHaveAttribute("aria-current");
+  });
 });

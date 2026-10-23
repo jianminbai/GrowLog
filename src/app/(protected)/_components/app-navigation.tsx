@@ -13,7 +13,7 @@ const destinations = [
 ] as const;
 
 function isCurrent(pathname: string, href: string) {
-  return pathname === href || (href === "/children" && pathname.startsWith("/children/"));
+  return pathname === href || pathname.startsWith(`${href}/`);
 }
 
 function NavigationLinks({ mobile = false }: { mobile?: boolean }) {
