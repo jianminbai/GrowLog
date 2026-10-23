@@ -64,6 +64,11 @@ enum Mood {
   OTHER
 }
 
+enum KindergartenDocumentType {
+  DAILY_CARE_SHEET
+  WEEKLY_MENU
+}
+
 enum AuditAction {
   CREATE
   UPDATE
@@ -89,6 +94,7 @@ model Household {
   beverages  BeverageIntake[]
   activities PhysicalActivity[]
   emotions   EmotionRecord[]
+  kindergartenDocuments KindergartenDocument[]
 }
 
 model Child {
@@ -112,6 +118,7 @@ model Child {
   beverages          BeverageIntake[]
   activities         PhysicalActivity[]
   emotions           EmotionRecord[]
+  kindergartenDocuments KindergartenDocument[]
 
   @@index([householdId, deletedAt])
   @@index([householdId, birthDate])
@@ -267,6 +274,25 @@ model EmotionRecord {
 
   @@index([householdId, childId, occurredAt])
   @@index([householdId, deletedAt])
+}
+
+model KindergartenDocument {
+  id               String                   @id @default(cuid())
+  householdId      String
+  household        Household                @relation(fields: [householdId], references: [id], onDelete: Restrict)
+  childId          String
+  child            Child                    @relation(fields: [childId], references: [id], onDelete: Restrict)
+  type             KindergartenDocumentType
+  periodStart      DateTime                 @db.Date
+  originalFileName String
+  storageKey       String                   @unique
+  mimeType         String
+  sizeBytes        Int
+  createdAt        DateTime                 @default(now())
+  updatedAt        DateTime                 @updatedAt
+
+  @@unique([householdId, childId, type, periodStart])
+  @@index([householdId, childId, type, periodStart])
 }
 
 model AuditLog {

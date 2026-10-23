@@ -14,11 +14,11 @@ suite("nutrition persistence", () => {
   beforeEach(async () => {
     await prisma.adminSession.deleteMany(); await prisma.auditLog.deleteMany(); await prisma.mealItem.deleteMany(); await prisma.meal.deleteMany();
     await prisma.beverageIntake.deleteMany(); await prisma.sleepSession.deleteMany();
-    await prisma.growthMeasurement.deleteMany(); await prisma.child.deleteMany(); await prisma.household.deleteMany();
+    await prisma.growthMeasurement.deleteMany(); await prisma.kindergartenDocument.deleteMany(); await prisma.child.deleteMany(); await prisma.household.deleteMany();
   });
   afterAll(async () => {
     await prisma.adminSession.deleteMany(); await prisma.auditLog.deleteMany(); await prisma.mealItem.deleteMany(); await prisma.meal.deleteMany();
-    await prisma.beverageIntake.deleteMany(); await prisma.child.deleteMany(); await prisma.household.deleteMany();
+    await prisma.beverageIntake.deleteMany(); await prisma.kindergartenDocument.deleteMany(); await prisma.child.deleteMany(); await prisma.household.deleteMany();
     await prisma.$disconnect();
   });
   it("persists meals/items and beverages through edit, delete, and restore", async () => {

@@ -12,7 +12,7 @@ async function clean() {
   await prisma.emotionRecord.deleteMany(); await prisma.physicalActivity.deleteMany();
   await prisma.mealItem.deleteMany(); await prisma.meal.deleteMany(); await prisma.beverageIntake.deleteMany();
   await prisma.sleepSession.deleteMany(); await prisma.growthMeasurement.deleteMany();
-  await prisma.child.deleteMany(); await prisma.household.deleteMany();
+  await prisma.kindergartenDocument.deleteMany(); await prisma.child.deleteMany(); await prisma.household.deleteMany();
 }
 
 suite("household export", () => {

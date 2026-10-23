@@ -23,7 +23,7 @@ async function clean() {
   await prisma.beverageIntake.deleteMany();
   await prisma.sleepSession.deleteMany();
   await prisma.growthMeasurement.deleteMany();
-  await prisma.child.deleteMany();
+  await prisma.kindergartenDocument.deleteMany(); await prisma.child.deleteMany();
   await prisma.household.deleteMany();
 }
 
