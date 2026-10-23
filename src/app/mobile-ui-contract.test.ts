@@ -195,6 +195,22 @@ describe("mobile UI CSS contract", () => {
     expect(css).toMatch(/\.report-table th\s*\{[^}]*background:\s*var\(--surface-muted\)/);
   });
 
+  it("uses one management and editor system for settings, recovery, and all forms", () => {
+    expect(css).toMatch(/\.settings-menu-list\s*\{[^}]*background:\s*var\(--surface\)[^}]*box-shadow:\s*0 4px 16px/);
+    expect(css).toMatch(/\.settings-menu-icon\s*\{[^}]*background:\s*var\(--brand-subtle\)[^}]*color:\s*var\(--brand-subtle-ink\)/);
+    expect(css).toMatch(/\.settings-account-card\s*\{[^}]*background:\s*var\(--surface\)/);
+    expect(css).toMatch(/\.deleted-management-entry\s*\{[^}]*border:\s*1px solid var\(--line\)[^}]*background:\s*var\(--surface-muted\)/);
+    expect(css).toMatch(/\.restore-action\s*\{[^}]*background:\s*var\(--brand-subtle\)[^}]*color:\s*var\(--brand-subtle-ink\)/);
+    expect(css).toMatch(/\.profile-panel\s*\{[^}]*border-radius:\s*1\.5rem[^}]*background:\s*var\(--surface\)[^}]*box-shadow:\s*0 4px 16px/);
+    expect(css).toMatch(/\.growth-form input,[\s\S]*background:\s*var\(--surface-muted\)[^}]*font-size:\s*16px[^}]*accent-color:\s*var\(--brand-violet\)/);
+    expect(css).toMatch(/\.growth-form input:focus-visible,[\s\S]*border-color:\s*var\(--brand-violet\)/);
+    expect(css).toMatch(/\.optional-fields\s*\{[^}]*background:\s*var\(--surface-muted\)/);
+    expect(css).toMatch(/\.record-card\s*\{[^}]*background:\s*var\(--surface\)[^}]*box-shadow:\s*0 4px 16px/);
+    expect(css).toMatch(/\.record-card\s*>\s*summary::after\s*\{[^}]*color:\s*var\(--brand-violet\)/);
+    expect(css).toMatch(/\.danger-action,[\s\S]*background:\s*var\(--danger-bg\)[^}]*color:\s*var\(--danger-ink\)/);
+    expect(css).toMatch(/\.profile-submit:disabled,[\s\S]*opacity:\s*0\.6/);
+  });
+
   it("makes record cards visibly expandable before destructive actions appear", () => {
     expect(css).toMatch(/\.record-card\s*>\s*summary::after\s*\{[^}]*content:\s*"›"/);
     expect(css).toMatch(/\.record-card\[open\]\s*>\s*summary::after\s*\{[^}]*transform:\s*rotate\(90deg\)/);

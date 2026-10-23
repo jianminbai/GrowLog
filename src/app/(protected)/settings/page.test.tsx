@@ -32,8 +32,8 @@ describe("settings page", () => {
     for (const name of ["plus", "child", "database", "backup", "table", "account", "chevron"]) {
       expect(container.querySelector(`[data-icon="${name}"]`)).toBeInTheDocument();
     }
-    for (const symbol of ["＋", "档", "数", "{ }", "表", "⌄", "›"]) {
-      expect(screen.queryByText(symbol, { exact: true })).not.toBeInTheDocument();
-    }
+    const iconContainers = [...container.querySelectorAll(".settings-menu-icon")];
+    expect(iconContainers).toHaveLength(6);
+    expect(iconContainers.every((icon) => icon.textContent === "")).toBe(true);
   });
 });
