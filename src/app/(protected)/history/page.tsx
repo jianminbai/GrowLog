@@ -3,8 +3,6 @@ import { requireServerSession } from "@/modules/auth/server-session";
 import { listHistoryEntries } from "@/modules/history/history-repository";
 import { groupHistoryEntries } from "@/modules/history/history-view";
 
-import { SwipeableHistoryEntry } from "./swipeable-history-entry";
-
 export const dynamic = "force-dynamic";
 
 const kindLabels = {
@@ -19,12 +17,9 @@ export default async function HistoryPage() {
   ]);
   const timeZone = household?.timeZone ?? "UTC";
   const groups = groupHistoryEntries(entries, timeZone);
-  const timestamp = (value: Date) => value.toLocaleTimeString("zh-CN", {
-    timeZone, hour: "2-digit", minute: "2-digit", hour12: false
-  });
 
   return <main className="profile-shell history-shell">
-    <header className="profile-header compact history-hero"><span className="history-eyebrow">按日回顾</span><h1>成长足迹</h1><p>按日期回顾全部有效记录。向右滑动记录卡片可进入原始表单修改。</p></header>
+    <header className="profile-header compact history-hero"><span className="history-eyebrow">按日回顾</span><h1>成长足迹</h1><p>按日期回顾全部有效记录。</p></header>
     <div className="history-overview" aria-label="历史概览">
       <div><strong>{entries.length}</strong><span> 条记录</span></div>
       <div><strong>{groups.length}</strong><span> 个记录日</span></div>
@@ -36,16 +31,10 @@ export default async function HistoryPage() {
         return <section className="history-day" aria-label={group.label} key={group.dateKey}>
           <h3 id={headingId}><span>{group.label}</span><small>{group.entries.length} 条</small></h3>
           <div className="history-list">{group.entries.map((entry) =>
-            <SwipeableHistoryEntry
-              href={entry.href}
-              kind={entry.kind}
-              category={kindLabels[entry.kind]}
-              childName={entry.childName}
-              title={entry.title}
-              detail={entry.detail}
-              time={timestamp(entry.occurredAt)}
-              key={`${entry.kind}-${entry.id}`}
-            />)}</div>
+            <article className={`history-entry history-kind-${entry.kind.toLowerCase()}`} data-kind={entry.kind.toLowerCase()} key={`${entry.kind}-${entry.id}`}>
+              <strong>{entry.title}</strong>
+              <span className="history-meta">{kindLabels[entry.kind]} · {entry.childName} · {entry.detail}</span>
+            </article>)}</div>
         </section>;
       })}
     </section>

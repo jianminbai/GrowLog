@@ -2,7 +2,7 @@
 
 import "@testing-library/jest-dom/vitest";
 
-import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const entries = vi.hoisted(() => [
@@ -61,55 +61,24 @@ describe("history page", () => {
     expect(screen.getByLabelText("历史概览")).toHaveTextContent("3 个记录日");
 
     const today = screen.getByRole("region", { name: "今天" });
-    expect(within(today).getByText("生长 · 小满")).toBeInTheDocument();
     expect(within(today).getByText("身高体重")).toBeInTheDocument();
-    expect(within(today).getByText("104 cm · 17 kg")).toBeInTheDocument();
-    expect(within(today).getByText("09:00")).toBeInTheDocument();
+    expect(within(today).getByText("生长 · 小满 · 104 cm · 17 kg")).toBeInTheDocument();
+    expect(within(today).queryByText("09:00")).not.toBeInTheDocument();
 
     expect(screen.getByRole("region", { name: "昨天" })).toHaveTextContent("夜间睡眠");
     expect(screen.getByRole("region", { name: /10月20日/ })).toHaveTextContent("骑车");
     expect(screen.queryByText("parent@example.com")).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /已删除/ })).not.toBeInTheDocument();
     expect(container.querySelector('[data-kind="growth"]')).not.toBeNull();
-    expect(within(today).getByText("右滑编辑")).toBeInTheDocument();
+    expect(container.querySelector(".swipe-history-item")).toBeNull();
+    expect(screen.queryByText("右滑编辑")).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "前往编辑" })).not.toBeInTheDocument();
   });
 
-  it("reveals the edit entry after a deliberate right swipe", async () => {
+  it("places category, child, and value together on the right", async () => {
     render(await HistoryPage());
-
-    const card = screen.getByRole("group", { name: "身高体重" });
-    expect(within(card).queryByRole("link", { name: "前往编辑" })).not.toBeInTheDocument();
-
-    fireEvent.pointerDown(card, { clientX: 12, clientY: 30, pointerId: 1 });
-    fireEvent.pointerMove(card, { clientX: 84, clientY: 34, pointerId: 1 });
-    fireEvent.pointerUp(card, { clientX: 84, clientY: 34, pointerId: 1 });
-
-    expect(within(card).getByRole("link", { name: "前往编辑" })).toHaveAttribute(
-      "href",
-      "/children/child-1/growth"
-    );
-  });
-
-  it("keeps the revealed edit link actionable by touch and keyboard", async () => {
-    render(await HistoryPage());
-    const card = screen.getByRole("group", { name: "身高体重" });
-    fireEvent.keyDown(card, { key: "Enter" });
-    const link = within(card).getByRole("link", { name: "前往编辑" });
-
-    fireEvent.pointerDown(link, { clientX: 84, clientY: 30, pointerId: 1 });
-    fireEvent.pointerUp(link, { clientX: 84, clientY: 30, pointerId: 1 });
-    expect(link).toBeInTheDocument();
-    expect(fireEvent.keyDown(link, { key: "Enter" })).toBe(true);
-  });
-
-  it("does not reveal editing after the browser cancels a gesture", async () => {
-    render(await HistoryPage());
-    const card = screen.getByRole("group", { name: "身高体重" });
-
-    fireEvent.pointerDown(card, { clientX: 12, clientY: 30, pointerId: 1 });
-    fireEvent.pointerMove(card, { clientX: 84, clientY: 34, pointerId: 1 });
-    fireEvent.pointerCancel(card, { pointerId: 1 });
-
-    expect(within(card).queryByRole("link", { name: "前往编辑" })).not.toBeInTheDocument();
+    const sleepCard = screen.getByText("夜间睡眠").closest("article");
+    expect(sleepCard).not.toBeNull();
+    expect(within(sleepCard!).getByText("睡眠 · 小满 · 540 分钟")).toHaveClass("history-meta");
   });
 });

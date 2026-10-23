@@ -75,7 +75,7 @@ export async function listHistoryEntries(
     ...activities.map((record) => ({
       id: record.id, kind: "ACTIVITY" as const, childId: record.childId, childName: record.child.name,
       occurredAt: record.occurredAt, title: record.activityType,
-      detail: `${record.durationMinutes} 分钟 · 户外 ${record.outdoorMinutes ?? 0} 分钟`,
+      detail: `${record.durationMinutes} 分钟 · ${record.outdoorMinutes === null ? "户外未记录" : `户外 ${record.outdoorMinutes} 分钟`}`,
       href: `/settings/children/${record.childId}/records/activity`, deletedAt: record.deletedAt
     })),
     ...emotions.map((record) => ({

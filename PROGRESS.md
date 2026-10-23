@@ -29,11 +29,12 @@
 - M15 mobile-first interface: the protected application now has four-item mobile navigation, a 760px desktop navigation breakpoint, one-handed Dashboard and child-domain entry points, progressively disclosed optional form fields, confirmed destructive actions, accessible status messages, safe account logout, and a responsive light/dark visual system.
 - M20 focused mobile refinement: Today is a same-day dashboard, growth records use a compact essential-column table with expandable measurement context, and Settings uses grouped low-frequency management menus.
 - M21 comparison and navigation refinement: Today shows preceding-seven-day recorded-day baselines, growth uses date-only measurement labels, navigation is named “今天/足迹/趋势/设置”, nutrition history uses consistent expandable cards, and semantic green/orange/red roles replace ambiguous neutral red accents.
+- M22 compact longitudinal review: Footprints is now a read-only compact timeline without time-of-day or swipe editing, growth dates stay on one line, and Today compares compact values across today plus preceding 7/14/30-day windows while preserving unknown values.
 - Repository documentation: the root README provides an accurate Chinese product overview, Docker/VPS quick start, development checks, backup/restore entry points, security boundaries, and links to durable project records.
 
 ## Current task
 
-- All GrowLog MVP milestones M0–M21 are implemented and verified. Deferred P1/P2 work remains listed in `TASKS.md`.
+- All GrowLog MVP milestones M0–M22 are implemented and verified. Deferred P1/P2 work remains listed in `TASKS.md`.
 
 ## Test record
 
@@ -106,6 +107,10 @@
 - M21 review fixes: current-day milk, water, and outdoor totals now remain unknown when any same-metric record omits its value instead of publishing a partial total; regression tests first failed and then passed; neutral rose/emotion accents now use orange; strict TypeScript narrowing was corrected; independent review found no remaining Critical issue (2026-10-23).
 - M21 final gate: clean test-database reset, lint with zero warnings, strict typecheck, 166/166 tests across 51 files with PostgreSQL enabled, and the production build all pass (2026-10-23).
 - M21 browser verification: authenticated production pages at 320, 390, and 768 px passed all checks for five Today comparisons with recorded-day samples, date-only growth table/chart labels, “今天/足迹/趋势/设置” navigation, the “成长足迹” heading, two localized expandable nutrition-history cards with paired save/delete actions, and no page-level horizontal overflow (2026-10-23).
+- M22 RED→GREEN: Footprints presentation, growth date wrapping, 7/14/30-day aggregation, compact Today markup, and responsive CSS contracts produced 9 expected failures against the previous UI, then 36 focused assertions across 5 files passed (2026-10-23).
+- M22 review fixes: beverage-only days keep meal and food-item counts unknown instead of displaying `0餐/0项`; activities without an outdoor duration show `户外未记录` instead of a fabricated zero. The regression tests failed before the fixes and then passed; independent re-review found no remaining Critical or Important issue (2026-10-23).
+- M22 final gate: clean test-database reset, lint with zero warnings, strict typecheck, 168/168 tests across 51 files with PostgreSQL enabled, and the production build all pass (2026-10-23).
+- M22 browser verification: authenticated production pages at 320, 390, and 768 px show five 72px Today comparison rows with four periods each, Footprints rows no taller than 51px without time/swipe/edit UI, and three single-line growth dates; all checked pages avoid horizontal overflow. The seeded boundary case also verifies that beverage-only nutrition leaves meals unknown and missing outdoor duration remains explicitly unknown (2026-10-23).
 
 ## Work implemented
 
@@ -132,10 +137,11 @@
 - `scripts/mvp-smoke.mjs` is an environment-driven release check that exercises the deployed application through its public proxy without embedding credentials. It also asserts security cookie flags, CSRF/origin behavior, API envelope shape, and no-store policy.
 - Mobile presentation logic stays in small client components for pathname state, logout, and existing forms; server components, API routes, Prisma schema, audit behavior, household isolation, and service-worker cache policy remain unchanged. Nutrition requests retain their validated schema while the creation/edit UI now exposes previously omitted optional payload fields.
 - The child area is view-first: the list offers creation only when empty, child detail contains five report categories, and each category displays time-based charts plus complete read-only tables. Child creation, profile editing, and all record editors live under Settings; Today, History, and the legacy profile-edit route point to those management routes.
-- The active history timeline is grouped by household-local day and uses compact cards that retain category, child, title, detail, and time; right swipe or keyboard intent reveals the edit link. Deleted records and redacted audits live under Settings → Data management, where restore actions reuse the existing household-scoped APIs and CSRF contract.
+- The active history timeline is grouped by household-local day and uses compact rows that retain category, child, title, and detail without time-of-day or inline editing. Record maintenance, deleted records, and redacted audits live under Settings, where restore actions reuse the existing household-scoped APIs and CSRF contract.
 - Profile charts now use native SVG plus accessible HTML point controls to expose exact household-local timestamps and values through pointer, touch, and keyboard input. Growth reports add retrospective annualized height change between consecutive valid measurements, while History adds a compact summary and category-marked visual timeline without removing any record detail or edit path.
 - Growth tables prioritize measurement time, height, annualized height growth, weight, BMI, changes, and source; lower-frequency measurement conditions and notes remain available through a native disclosure. Settings groups children/records, data/backup, and account controls into compact touch-safe menus without changing the existing APIs or authorization boundary.
-- Today baselines use the seven household-local dates immediately before today and divide each metric only by dates with complete values; sample counts remain visible and today stays a partial-day snapshot. Growth alone uses date-only labels, while domains where time of day matters retain their timestamps. Navigation and nutrition-history presentation now share the same mobile information hierarchy and semantic color system.
+- Today baselines divide each metric only by dates with complete values; the snapshot retains sample-day counts for verification while the compact UI presents only the resulting values, and today stays a partial-day snapshot. Growth alone uses date-only labels, while domains where time of day matters retain their timestamps. Navigation and nutrition-history presentation now share the same mobile information hierarchy and semantic color system.
+- Today now repeats that baseline policy for the preceding 7, 14, and 30 household-local dates and presents the results in four compact columns alongside today. Footprints keeps daily grouping and complete summaries but removes time-of-day plus direct editing interactions; record maintenance remains available in Settings. Growth measurement dates use a dedicated no-wrap element inside the horizontally scrollable report table.
 
 ## Blockers
 

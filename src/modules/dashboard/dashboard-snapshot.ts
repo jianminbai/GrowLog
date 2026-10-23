@@ -56,24 +56,8 @@ export type DashboardInput = {
   emotions: EmotionRecord[];
 };
 
-export function buildDashboardSnapshot(input: DashboardInput) {
-  const todaySleep = input.sleep.filter((record) => dateInTimeZone(record.endedAt, input.timeZone) === input.date);
-  const todayMeals = input.meals.filter((record) => dateInTimeZone(record.occurredAt, input.timeZone) === input.date);
-  const todayBeverages = input.beverages.filter((record) => dateInTimeZone(record.occurredAt, input.timeZone) === input.date);
-  const todayActivities = input.activities.filter((record) => dateInTimeZone(record.occurredAt, input.timeZone) === input.date);
-  const todayEmotions = input.emotions.filter((record) => dateInTimeZone(record.occurredAt, input.timeZone) === input.date)
-    .sort((left, right) => left.occurredAt.getTime() - right.occurredAt.getTime());
-
-  const optionalTotal = (values: Array<number | null>) => {
-    const knownValues = values.filter((value): value is number => value !== null);
-    if (values.length === 0 || knownValues.length !== values.length) return null;
-    return knownValues.reduce((total, value) => total + value, 0);
-  };
-  const volume = (type: "MILK" | "WATER") => optionalTotal(todayBeverages
-    .filter((record) => record.type === type)
-    .map((record) => record.volumeMl));
-  const hasDailyNutrition = todayMeals.length > 0 || todayBeverages.length > 0;
-  const startDate = offsetDate(input.date, -7);
+function buildComparison(input: DashboardInput, days: number) {
+  const startDate = offsetDate(input.date, -days);
   const endDate = offsetDate(input.date, -1);
   const comparisonDate = (at: Date) => {
     const date = dateInTimeZone(at, input.timeZone);
@@ -119,6 +103,38 @@ export function buildDashboardSnapshot(input: DashboardInput) {
   const commonMood = [...moodCounts.entries()].sort((left, right) => right[1] - left[1])[0] ?? null;
 
   return {
+    startDate,
+    endDate,
+    sleepMinutes: recordedDayAverage(sleepTotals),
+    meals: recordedDayAverage(mealTotals),
+    foodItems: recordedDayAverage(foodItemTotals),
+    milkMl: recordedDayAverage(milkTotals),
+    waterMl: recordedDayAverage(waterTotals),
+    activityMinutes: recordedDayAverage(activityTotals),
+    outdoorMinutes: recordedDayAverage(outdoorTotals),
+    mood: commonMood ? { mood: commonMood[0], count: commonMood[1], total: moodTotal } : null
+  };
+}
+
+export function buildDashboardSnapshot(input: DashboardInput) {
+  const todaySleep = input.sleep.filter((record) => dateInTimeZone(record.endedAt, input.timeZone) === input.date);
+  const todayMeals = input.meals.filter((record) => dateInTimeZone(record.occurredAt, input.timeZone) === input.date);
+  const todayBeverages = input.beverages.filter((record) => dateInTimeZone(record.occurredAt, input.timeZone) === input.date);
+  const todayActivities = input.activities.filter((record) => dateInTimeZone(record.occurredAt, input.timeZone) === input.date);
+  const todayEmotions = input.emotions.filter((record) => dateInTimeZone(record.occurredAt, input.timeZone) === input.date)
+    .sort((left, right) => left.occurredAt.getTime() - right.occurredAt.getTime());
+
+  const optionalTotal = (values: Array<number | null>) => {
+    const knownValues = values.filter((value): value is number => value !== null);
+    if (values.length === 0 || knownValues.length !== values.length) return null;
+    return knownValues.reduce((total, value) => total + value, 0);
+  };
+  const volume = (type: "MILK" | "WATER") => optionalTotal(todayBeverages
+    .filter((record) => record.type === type)
+    .map((record) => record.volumeMl));
+  const hasDailyNutrition = todayMeals.length > 0 || todayBeverages.length > 0;
+
+  return {
     completion: {
       sleep: todaySleep.length > 0,
       nutrition: hasDailyNutrition,
@@ -129,9 +145,11 @@ export function buildDashboardSnapshot(input: DashboardInput) {
       sleepMinutes: todaySleep.length > 0
         ? todaySleep.reduce((total, record) => total + calculateSleepMinutes(record.startedAt, record.endedAt, record.awakeMinutes), 0)
         : null,
-      meals: todayMeals.length,
-      foodItems: todayMeals.reduce((total, meal) =>
-        total + meal.items.filter((item) => !item.deletedAt).length, 0),
+      meals: todayMeals.length > 0 ? todayMeals.length : null,
+      foodItems: todayMeals.length > 0
+        ? todayMeals.reduce((total, meal) =>
+            total + meal.items.filter((item) => !item.deletedAt).length, 0)
+        : null,
       milkMl: volume("MILK"),
       waterMl: volume("WATER"),
       unknownBeverages: todayBeverages.filter((record) => record.volumeMl === null).length,
@@ -141,16 +159,9 @@ export function buildDashboardSnapshot(input: DashboardInput) {
       mood: todayEmotions.at(-1)?.mood ?? null
     },
     comparison: {
-      startDate,
-      endDate,
-      sleepMinutes: recordedDayAverage(sleepTotals),
-      meals: recordedDayAverage(mealTotals),
-      foodItems: recordedDayAverage(foodItemTotals),
-      milkMl: recordedDayAverage(milkTotals),
-      waterMl: recordedDayAverage(waterTotals),
-      activityMinutes: recordedDayAverage(activityTotals),
-      outdoorMinutes: recordedDayAverage(outdoorTotals),
-      mood: commonMood ? { mood: commonMood[0], count: commonMood[1], total: moodTotal } : null
+      sevenDays: buildComparison(input, 7),
+      twoWeeks: buildComparison(input, 14),
+      oneMonth: buildComparison(input, 30)
     }
   };
 }

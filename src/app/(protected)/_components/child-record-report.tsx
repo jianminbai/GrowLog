@@ -51,7 +51,7 @@ export async function ChildRecordReport({ childId, domain }: { childId: string; 
       { title: "体重趋势", unit: "kg", dateOnly: true, points: rows.map(r => ({ at: r.measuredAt, value: r.weightKg })) }
     );
     tables.push({ title: "测量记录", headers: ["测量时间", "身高（cm）", "年化身高增长（cm/年）", "体重（kg）", "BMI（kg/m²）", "身高变化（cm）", "体重变化（kg）", "来源", "详情"],
-      rows: rows.map((r, index) => ({ id: r.id, cells: [dateInTimeZone(new Date(r.measuredAt), timeZone), r.heightCm, annualizedHeightGrowth[index], r.weightKg, r.bmi, r.heightChangeCm, r.weightChangeKg, sourceLabels[r.source],
+      rows: rows.map((r, index) => ({ id: r.id, cells: [<time className="measurement-date" dateTime={r.measuredAt} key={`${r.id}-date`}>{dateInTimeZone(new Date(r.measuredAt), timeZone)}</time>, r.heightCm, annualizedHeightGrowth[index], r.weightKg, r.bmi, r.heightChangeCm, r.weightChangeKg, sourceLabels[r.source],
         <details className="measurement-detail" key={`${r.id}-detail`}><summary>查看详情</summary><p>地点：{optional(r.place)}；方法：{optional(r.method)}；设备：{optional(r.device)}；精度：{optional(r.precisionNote)}；备注：{optional(r.notes)}</p></details>] })).reverse() });
   } else if (domain === "sleep") {
     const rows = (await listSleepForChild(prisma, auth.householdId, childId)).map(serializeSleep);

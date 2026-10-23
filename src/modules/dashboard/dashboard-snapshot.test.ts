@@ -45,24 +45,29 @@ describe("dashboard snapshot", () => {
     expect(snapshot.today.milkMl).toBeNull();
     expect(snapshot.today.waterMl).toBeNull();
     expect(snapshot.today.sleepMinutes).toBeNull();
+    expect(snapshot.today.meals).toBeNull();
+    expect(snapshot.today.foodItems).toBeNull();
     expect(snapshot.today.outdoorMinutes).toBeNull();
     expect(snapshot.today.unknownOutdoorActivities).toBe(0);
     expect(snapshot.today.mood).toBeNull();
-    expect(snapshot.comparison).toMatchObject({
+    expect(snapshot.comparison.sevenDays).toMatchObject({
       sleepMinutes: null, meals: null, foodItems: null, milkMl: null, waterMl: null,
       activityMinutes: null, outdoorMinutes: null, mood: null
     });
+    expect(snapshot.comparison.twoWeeks).toMatchObject({ sleepMinutes: null, mood: null });
+    expect(snapshot.comparison.oneMonth).toMatchObject({ sleepMinutes: null, mood: null });
     expect(snapshot).not.toHaveProperty("notices");
   });
 
-  it("compares today with recorded-day averages from the preceding seven household dates", () => {
+  it("compares today with recorded-day averages from the preceding 7, 14, and 30 household dates", () => {
     const snapshot = buildDashboardSnapshot({
       date: "2026-10-20", timeZone: "UTC",
       sleep: [
         { kind: "NIGHT", startedAt: new Date("2026-10-18T16:00:00Z"), endedAt: new Date("2026-10-19T00:00:00Z"), awakeMinutes: 0 },
         { kind: "NIGHT", startedAt: new Date("2026-10-17T17:00:00Z"), endedAt: new Date("2026-10-18T00:00:00Z"), awakeMinutes: 0 },
         { kind: "NAP", startedAt: new Date("2026-10-20T08:00:00Z"), endedAt: new Date("2026-10-20T09:00:00Z"), awakeMinutes: 0 },
-        { kind: "NAP", startedAt: new Date("2026-10-12T08:00:00Z"), endedAt: new Date("2026-10-12T09:00:00Z"), awakeMinutes: 0 }
+        { kind: "NAP", startedAt: new Date("2026-10-12T08:00:00Z"), endedAt: new Date("2026-10-12T09:00:00Z"), awakeMinutes: 0 },
+        { kind: "NAP", startedAt: new Date("2026-09-25T08:00:00Z"), endedAt: new Date("2026-09-25T10:00:00Z"), awakeMinutes: 0 }
       ],
       meals: [
         { occurredAt: new Date("2026-10-19T08:00:00Z"), items: [{ deletedAt: null }] },
@@ -90,15 +95,27 @@ describe("dashboard snapshot", () => {
     });
 
     expect(snapshot.comparison).toEqual({
-      startDate: "2026-10-13", endDate: "2026-10-19",
-      sleepMinutes: { value: 450, days: 2 },
-      meals: { value: 1.5, days: 2 },
-      foodItems: { value: 2, days: 2 },
-      milkMl: { value: 200, days: 1 },
-      waterMl: { value: 60, days: 1 },
-      activityMinutes: { value: 45, days: 2 },
-      outdoorMinutes: { value: 20, days: 1 },
-      mood: { mood: "CALM", count: 2, total: 3 }
+      sevenDays: {
+        startDate: "2026-10-13", endDate: "2026-10-19",
+        sleepMinutes: { value: 450, days: 2 }, meals: { value: 1.5, days: 2 },
+        foodItems: { value: 2, days: 2 }, milkMl: { value: 200, days: 1 },
+        waterMl: { value: 60, days: 1 }, activityMinutes: { value: 45, days: 2 },
+        outdoorMinutes: { value: 20, days: 1 }, mood: { mood: "CALM", count: 2, total: 3 }
+      },
+      twoWeeks: {
+        startDate: "2026-10-06", endDate: "2026-10-19",
+        sleepMinutes: { value: 320, days: 3 }, meals: { value: 1.5, days: 2 },
+        foodItems: { value: 2, days: 2 }, milkMl: { value: 200, days: 1 },
+        waterMl: { value: 60, days: 1 }, activityMinutes: { value: 45, days: 2 },
+        outdoorMinutes: { value: 20, days: 1 }, mood: { mood: "CALM", count: 2, total: 3 }
+      },
+      oneMonth: {
+        startDate: "2026-09-20", endDate: "2026-10-19",
+        sleepMinutes: { value: 270, days: 4 }, meals: { value: 1.5, days: 2 },
+        foodItems: { value: 2, days: 2 }, milkMl: { value: 200, days: 1 },
+        waterMl: { value: 60, days: 1 }, activityMinutes: { value: 45, days: 2 },
+        outdoorMinutes: { value: 20, days: 1 }, mood: { mood: "CALM", count: 2, total: 3 }
+      }
     });
   });
 
@@ -112,6 +129,19 @@ describe("dashboard snapshot", () => {
 
     expect(snapshot.today.milkMl).toBe(120);
     expect(snapshot.today.waterMl).toBeNull();
+  });
+
+  it("keeps meal counts unknown when only a beverage was recorded", () => {
+    const snapshot = buildDashboardSnapshot({
+      date: "2026-10-20", timeZone: "UTC", sleep: [], meals: [],
+      beverages: [{ occurredAt: new Date("2026-10-20T09:00:00Z"), type: "MILK", volumeMl: 120 }],
+      activities: [], emotions: []
+    });
+
+    expect(snapshot.completion.nutrition).toBe(true);
+    expect(snapshot.today.meals).toBeNull();
+    expect(snapshot.today.foodItems).toBeNull();
+    expect(snapshot.today.milkMl).toBe(120);
   });
 
   it("keeps a drink total unknown when any same-type record omits its volume", () => {

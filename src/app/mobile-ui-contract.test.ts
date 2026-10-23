@@ -61,10 +61,11 @@ describe("mobile UI CSS contract", () => {
     expect(css).toMatch(/\.restore-action\s*\{[^}]*min-height:\s*var\(--tap-min\)/);
   });
 
-  it("keeps history rows compact while reserving a touch-safe swipe action", () => {
-    expect(css).toMatch(/\.swipe-history-item\s*\{[^}]*overflow:\s*hidden[^}]*touch-action:\s*pan-y/);
+  it("keeps history rows compact without swipe editing controls", () => {
     expect(css).toMatch(/\.history-entry\s*\{[^}]*gap:\s*0\.35rem[^}]*padding:\s*0\.55rem 0\.75rem/);
-    expect(css).toMatch(/\.swipe-edit-slot a\s*\{[^}]*min-width:\s*var\(--tap-min\)[^}]*min-height:\s*var\(--tap-min\)/);
+    expect(css).toMatch(/\.history-meta\s*\{[^}]*text-align:\s*right/);
+    expect(css).not.toContain(".swipe-edit-slot");
+    expect(css).not.toContain(".history-swipe-hint");
   });
 
   it("keeps deleted-record recovery readable and touch safe on phones", () => {
@@ -77,11 +78,9 @@ describe("mobile UI CSS contract", () => {
     expect(css).toMatch(/@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[\s\S]*\.report-line[^}]*stroke-dashoffset:\s*0/);
   });
 
-  it("keeps dense chart points selectable and history hints readable", () => {
+  it("keeps dense chart points selectable and long history content readable", () => {
     expect(css).toMatch(/\.chart-point-control\s*\{[^}]*pointer-events:\s*none/);
-    expect(css).toMatch(/\.history-swipe-hint\s*\{[^}]*color:\s*var\(--ink\)\s*!important/);
-    expect(css).toMatch(/\.history-copy\s*\{[^}]*min-width:\s*0/);
-    expect(css).toMatch(/\.history-copy strong,[\s\S]*overflow-wrap:\s*anywhere/);
+    expect(css).toMatch(/\.history-meta\s*\{[^}]*min-width:\s*0[^}]*overflow-wrap:\s*anywhere/);
   });
 
   it("uses compact touch-safe settings menus and measurement details", () => {
@@ -89,6 +88,12 @@ describe("mobile UI CSS contract", () => {
     expect(css).toMatch(/\.settings-menu-item\s*\{[^}]*min-height:\s*var\(--control-min\)/);
     expect(css).toMatch(/\.measurement-detail summary\s*\{[^}]*min-height:\s*var\(--tap-min\)/);
     expect(css).toMatch(/\.report-table th\s*\{[^}]*position:\s*sticky/);
+    expect(css).toMatch(/\.measurement-date\s*\{[^}]*white-space:\s*nowrap/);
+  });
+
+  it("uses full-width Today cards with four compact comparison columns", () => {
+    expect(css).toMatch(/\.today-overview-grid\s*\{[^}]*grid-template-columns:\s*1fr/);
+    expect(css).toMatch(/\.today-period-grid\s*\{[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/);
   });
 
   it("uses green, orange, and red as semantic theme colors", () => {
@@ -97,7 +102,7 @@ describe("mobile UI CSS contract", () => {
     expect(css.match(/--danger-red:/g)).toHaveLength(2);
     expect(css).toMatch(/\.primary-action\s*\{[^}]*background:\s*var\(--brand-green\)/);
     expect(css).toMatch(/\.danger-action,[\s\S]*color:\s*var\(--danger-red\)/);
-    expect(css).toMatch(/\.today-comparison\s*\{[^}]*color:\s*var\(--brand-green\)/);
+    expect(css).toMatch(/\.today-period strong\s*\{[^}]*color:\s*var\(--brand-green\)/);
     expect(css).toMatch(/\.rose\s*\{[^}]*var\(--accent-orange\)/);
     expect(css).toMatch(/\.history-kind-emotion\s*\{[^}]*--history-accent:\s*var\(--accent-orange\)/);
   });

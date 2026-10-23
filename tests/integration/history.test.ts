@@ -69,4 +69,20 @@ suite("unified household history", () => {
     ]);
     expect(JSON.stringify(await listAuditEvents(prisma, owner.id, 20))).not.toContain("private note");
   });
+
+  it("preserves an unknown outdoor duration in activity history", async () => {
+    const household = await prisma.household.create({ data: { name: "Owner" } });
+    const child = await prisma.child.create({ data: {
+      householdId: household.id, name: "小满", birthDate: new Date("2022-05-12")
+    } });
+    const activity = await prisma.physicalActivity.create({ data: {
+      householdId: household.id, childId: child.id, activityType: "散步", durationMinutes: 30,
+      outdoorMinutes: null, intensity: "LIGHT", structure: "FREE_PLAY",
+      occurredAt: new Date("2026-10-20T01:00:00Z"), source: "HOME"
+    } });
+
+    await expect(listHistoryEntries(prisma, household.id)).resolves.toEqual([
+      expect.objectContaining({ id: activity.id, detail: "30 分钟 · 户外未记录" })
+    ]);
+  });
 });

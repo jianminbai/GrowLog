@@ -2,10 +2,16 @@
 
 import "@testing-library/jest-dom/vitest";
 
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const listGrowthForChild = vi.hoisted(() => vi.fn(async () => [{ measuredAt: new Date("2026-10-01T00:00:00Z"), heightCm: 100, weightKg: 15 }]));
+const listMealsForChild = vi.hoisted(() => vi.fn(async () => [
+  { occurredAt: new Date("2026-10-20T01:00:00Z"), items: [{ deletedAt: null }] },
+  { occurredAt: new Date("2026-10-19T01:00:00Z"), items: [{ deletedAt: null }] },
+  { occurredAt: new Date("2026-10-18T01:00:00Z"), items: [{ deletedAt: null }] },
+  { occurredAt: new Date("2026-10-18T04:00:00Z"), items: [{ deletedAt: null }, { deletedAt: null }] }
+]));
 
 vi.mock("@/modules/auth/server-session", () => ({ requireServerSession: async () => ({ householdId: "h1" }) }));
 vi.mock("@/lib/db", () => ({ getPrisma: () => ({ household: { findUnique: async () => ({ timeZone: "Asia/Shanghai" }) } }) }));
@@ -17,12 +23,7 @@ vi.mock("@/modules/sleep/sleep-repository", () => ({ listSleepForChild: async ()
   { kind: "NIGHT", startedAt: new Date("2026-10-17T17:00:00Z"), endedAt: new Date("2026-10-18T00:00:00Z"), awakeMinutes: 0 }
 ] }));
 vi.mock("@/modules/nutrition/nutrition-repository", () => ({
-  listMealsForChild: async () => [
-    { occurredAt: new Date("2026-10-20T01:00:00Z"), items: [{ deletedAt: null }] },
-    { occurredAt: new Date("2026-10-19T01:00:00Z"), items: [{ deletedAt: null }] },
-    { occurredAt: new Date("2026-10-18T01:00:00Z"), items: [{ deletedAt: null }] },
-    { occurredAt: new Date("2026-10-18T04:00:00Z"), items: [{ deletedAt: null }, { deletedAt: null }] }
-  ],
+  listMealsForChild,
   listBeveragesForChild: async () => [
     { occurredAt: new Date("2026-10-20T02:00:00Z"), type: "MILK", volumeMl: 180 },
     { occurredAt: new Date("2026-10-20T03:00:00Z"), type: "WATER", volumeMl: 60 },
@@ -60,21 +61,28 @@ describe("today dashboard", () => {
     render(await TodayPage());
 
     expect(screen.getByRole("heading", { name: "今日概览" })).toBeInTheDocument();
-    expect(screen.getByText("480 分钟")).toBeInTheDocument();
-    expect(screen.getByText("1 餐 · 1 项食物")).toBeInTheDocument();
-    expect(screen.getByText("180 ml · 60 ml")).toBeInTheDocument();
-    expect(screen.getByText("45 分钟 · 户外 未记录")).toBeInTheDocument();
-    expect(screen.getByText("1 条活动未填户外时长")).toBeInTheDocument();
-    expect(screen.getByText("🙂 平静")).toBeInTheDocument();
-    expect(screen.getByText("过去7天有记录日均 450 分钟（2天）")).toBeInTheDocument();
-    expect(screen.getByText("过去7天有记录日均 1.5 餐 · 2 项食物（2天）")).toBeInTheDocument();
-    expect(screen.getByText("过去7天有记录日均 奶 150 ml（2天） · 水 80 ml（1天）")).toBeInTheDocument();
-    expect(screen.getByText("过去7天有记录日均 活动 45 分钟（2天） · 户外 30 分钟（2天）")).toBeInTheDocument();
-    expect(screen.getByText("过去7天最常记录 平静（2/3次）")).toBeInTheDocument();
-    expect(screen.getByText(/今天为截至当前数据/)).toBeInTheDocument();
+    expect(screen.getByText("480分")).toBeInTheDocument();
+    expect(screen.getByText("1餐/1项")).toBeInTheDocument();
+    expect(screen.getByText("180/60ml")).toBeInTheDocument();
+    expect(screen.getByText("45/—分")).toBeInTheDocument();
+    expect(screen.getAllByText("平静")).toHaveLength(4);
+    expect(screen.getByText("对照为有记录日均，不含今天。")).toBeInTheDocument();
+    const sleep = screen.getByLabelText("睡眠对照");
+    expect(within(sleep).getAllByText(/今天|7天|2周|1个月/).map(node => node.textContent)).toEqual(["今天", "7天", "2周", "1个月"]);
+    expect(within(sleep).getAllByText("450分")).toHaveLength(3);
+    expect(screen.queryByText(/过去7天有记录日均/)).not.toBeInTheDocument();
     expect(screen.queryByText("最近数据")).not.toBeInTheDocument();
     expect(screen.queryByText("最近身高体重")).not.toBeInTheDocument();
     expect(screen.queryByText("最近记录")).not.toBeInTheDocument();
     expect(listGrowthForChild).not.toHaveBeenCalled();
+  });
+
+  it("does not turn an unrecorded meal into zero when only a beverage exists", async () => {
+    listMealsForChild.mockResolvedValueOnce([]);
+
+    render(await TodayPage());
+
+    expect(within(screen.getByLabelText("饮食对照")).getAllByText("—")).toHaveLength(4);
+    expect(screen.getByText("180/60ml")).toBeInTheDocument();
   });
 });
