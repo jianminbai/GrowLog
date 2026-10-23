@@ -15,7 +15,7 @@ afterEach(cleanup);
 
 describe("settings page", () => {
   it("groups child, data, and account actions into compact menu sections", () => {
-    render(<SettingsPage />);
+    const { container } = render(<SettingsPage />);
 
     expect(screen.getByRole("heading", { name: "儿童与记录" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "数据与备份" })).toBeInTheDocument();
@@ -29,5 +29,11 @@ describe("settings page", () => {
     expect(screen.getByText("JSON 备份")).toBeInTheDocument();
     expect(screen.getByText("分领域 CSV")).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "完整 JSON" })).not.toBeInTheDocument();
+    for (const name of ["plus", "child", "database", "backup", "table", "account", "chevron"]) {
+      expect(container.querySelector(`[data-icon="${name}"]`)).toBeInTheDocument();
+    }
+    for (const symbol of ["＋", "档", "数", "{ }", "表", "⌄", "›"]) {
+      expect(screen.queryByText(symbol, { exact: true })).not.toBeInTheDocument();
+    }
   });
 });

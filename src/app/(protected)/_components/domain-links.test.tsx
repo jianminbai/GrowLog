@@ -22,5 +22,13 @@ describe("DomainLinks", () => {
     for (const [label, href] of destinations) {
       expect(within(navigation).getByRole("link", { name: label })).toHaveAttribute("href", href);
     }
+
+    expect(navigation.querySelectorAll("svg.app-icon")).toHaveLength(5);
+    for (const name of ["growth", "sleep", "nutrition", "activity", "emotion"]) {
+      expect(navigation.querySelector(`[data-icon="${name}"]`)).toBeInTheDocument();
+    }
+    for (const symbol of ["↗", "☾", "◌", "◇", "☺"]) {
+      expect(within(navigation).queryByText(symbol)).not.toBeInTheDocument();
+    }
   });
 });

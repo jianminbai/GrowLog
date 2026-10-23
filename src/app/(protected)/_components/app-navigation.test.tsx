@@ -31,6 +31,11 @@ describe("AppNavigation", () => {
       expect(within(desktop).getByRole("link", { name: label })).toBeVisible();
       expect(within(mobile).getByRole("link", { name: label })).toBeVisible();
     }
+    expect(mobile.querySelectorAll("svg.app-icon")).toHaveLength(4);
+    expect(mobile.querySelector('[data-icon="today"]')).toBeInTheDocument();
+    expect(mobile.querySelector('[data-icon="history"]')).toBeInTheDocument();
+    expect(mobile.querySelector('[data-icon="trend"]')).toBeInTheDocument();
+    expect(mobile.querySelector('[data-icon="settings"]')).toBeInTheDocument();
   });
 
   it("marks a nested child route as the current profile destination", () => {

@@ -32,6 +32,13 @@
 img,
 svg { max-width: 100%; }
 
+.app-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  display: block;
+  flex: 0 0 auto;
+}
+
 code { overflow-wrap: anywhere; }
 
 .sr-only {
@@ -973,8 +980,9 @@ h2 {
   display: grid;
   flex: 0 0 auto;
   place-items: center;
-  font-weight: 800;
 }
+
+.domain-symbol .app-icon { width: 1.2rem; height: 1.2rem; }
 
 .form-grid {
   grid-template-columns: 1fr;
@@ -1502,14 +1510,17 @@ h2 {
 .settings-menu-copy { min-width: 0; display: grid; gap: 0.18rem; }
 .settings-menu-copy strong { font-size: 0.9rem; }
 .settings-menu-copy small { color: var(--muted); font-size: 0.72rem; line-height: 1.4; overflow-wrap: anywhere; }
-.settings-menu-arrow { color: var(--muted); font-size: 1.25rem; }
+.settings-menu-arrow { color: var(--muted); display: grid; place-items: center; }
+.settings-menu-arrow .app-icon { width: 1rem; height: 1rem; transition: transform 160ms ease-out; }
 .settings-menu-disclosure summary { cursor: pointer; list-style: none; }
 .settings-menu-disclosure summary::-webkit-details-marker { display: none; }
-.settings-menu-disclosure[open] .settings-menu-arrow { transform: rotate(180deg); }
+.settings-menu-disclosure[open] .settings-menu-arrow .app-icon { transform: rotate(90deg); }
 .settings-submenu { display: grid; grid-template-columns: 1fr; border-top: 1px solid var(--line); background: color-mix(in srgb, var(--canvas) 38%, transparent); padding: 0.35rem 0.85rem 0.55rem 3.8rem; }
 .settings-submenu a { min-height: var(--tap-min); color: var(--brand-violet); display: flex; align-items: center; font-size: 0.8rem; font-weight: 750; text-decoration: none; }
 .settings-account-card { border: 1px solid var(--line); border-radius: 1rem; background: color-mix(in srgb, var(--surface) 90%, transparent); display: grid; gap: 0.8rem; padding: 0.9rem; }
 .settings-account-card > div:first-child { display: grid; gap: 0.2rem; }
+.settings-account-copy { grid-template-columns: 2.1rem minmax(0, 1fr); align-items: center; gap: 0.7rem !important; }
+.settings-account-copy > span:last-child { min-width: 0; display: grid; gap: 0.2rem; }
 .settings-account-card small { color: var(--muted); font-size: 0.74rem; }
 @media (prefers-reduced-motion: reduce) {
   .report-line { stroke-dashoffset: 0; }
