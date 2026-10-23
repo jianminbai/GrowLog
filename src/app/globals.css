@@ -186,7 +186,8 @@ h2 {
 }
 
 .snapshot-card span {
-  color: rgba(23, 52, 45, 0.68);
+  color: currentColor;
+  opacity: 0.72;
   font-size: 0.85rem;
 }
 

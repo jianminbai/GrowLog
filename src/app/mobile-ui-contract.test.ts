@@ -97,6 +97,7 @@ describe("mobile UI CSS contract", () => {
   });
 
   it("gives completion and notice surfaces explicit dark-mode-safe pairs", () => {
+    expect(css).toMatch(/\.snapshot-card span\s*\{[^}]*color:\s*currentColor[^}]*opacity:\s*0\.72/);
     expect(css).toMatch(/\.completion-item\.done\s*\{[^}]*color:\s*var\(--success-ink\)/);
     expect(css).toMatch(/\.completion-item\.missing\s*\{[^}]*color:\s*var\(--warning-ink\)/);
     expect(css).toMatch(/\.trend-notices\s*\{[^}]*background:\s*var\(--brand-subtle\)[^}]*color:\s*var\(--brand-subtle-ink\)/);
