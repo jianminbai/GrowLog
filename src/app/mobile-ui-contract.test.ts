@@ -4,6 +4,12 @@ import { describe, expect, it } from "vitest";
 
 const css = readFileSync(new URL("./globals.css", import.meta.url), "utf8");
 
+function tokenValue(block: string, token: string) {
+  const match = block.match(new RegExp(`${token}:\\s*(#[0-9a-f]{6})`, "i"));
+  if (!match?.[1]) throw new Error(`Missing ${token}`);
+  return match[1];
+}
+
 function relativeLuminance(hex: string) {
   const channels = hex.slice(1).match(/.{2}/g)!.map((channel) => {
     const value = Number.parseInt(channel, 16) / 255;
@@ -21,6 +27,57 @@ function contrastRatio(first: string, second: string) {
 }
 
 describe("mobile UI CSS contract", () => {
+  it("uses the approved modern light and dark visual tokens", () => {
+    const rootBlocks = [...css.matchAll(/:root\s*\{([^}]+)\}/g)].map((match) => match[1]!);
+    expect(rootBlocks).toHaveLength(2);
+
+    const [light, dark] = rootBlocks;
+    expect(light).toContain("--canvas: #f7f7fa");
+    expect(light).toContain("--surface: #ffffff");
+    expect(light).toContain("--surface-muted: #f3f0f6");
+    expect(light).toContain("--ink: #211d26");
+    expect(light).toContain("--muted: #77717d");
+    expect(light).toContain("--line: #e9e6ed");
+    expect(light).toContain("--brand-violet: #76558f");
+    expect(light).toContain("--brand-violet-strong: #5e3f76");
+    expect(light).toContain("--success-bg: #e9f5f0");
+    expect(light).toContain("--success-ink: #256a52");
+    expect(light).toContain("--warning-bg: #fff1e7");
+    expect(light).toContain("--warning-ink: #7a3b15");
+    expect(light).toContain("--danger-bg: #fdecec");
+    expect(light).toContain("--danger-ink: #963a3a");
+    expect(light).toContain("--brand-subtle: #f1eaf5");
+    expect(light).toContain("--brand-subtle-ink: #5e3f76");
+
+    expect(dark).toContain("--success-bg: #1e3b32");
+    expect(dark).toContain("--success-ink: #a8dcc8");
+    expect(dark).toContain("--warning-bg: #412b1d");
+    expect(dark).toContain("--warning-ink: #ffc49b");
+    expect(dark).toContain("--danger-bg: #452628");
+    expect(dark).toContain("--danger-ink: #ffb3b3");
+    expect(dark).toContain("--brand-subtle: #30273a");
+    expect(dark).toContain("--brand-subtle-ink: #d8c0e8");
+
+    expect(css).not.toContain("--brand-green");
+    expect(css).not.toContain("--green");
+  });
+
+  it("keeps every semantic foreground and background pair at AA contrast", () => {
+    const rootBlocks = [...css.matchAll(/:root\s*\{([^}]+)\}/g)].map((match) => match[1]!);
+    const pairs = [
+      ["--success-bg", "--success-ink"],
+      ["--warning-bg", "--warning-ink"],
+      ["--danger-bg", "--danger-ink"],
+      ["--brand-subtle", "--brand-subtle-ink"],
+    ] as const;
+
+    rootBlocks.forEach((block) => {
+      pairs.forEach(([backgroundToken, foregroundToken]) => {
+        expect(contrastRatio(tokenValue(block, backgroundToken), tokenValue(block, foregroundToken))).toBeGreaterThanOrEqual(4.5);
+      });
+    });
+  });
+
   it("defines touch and input sizes that are safe on phones", () => {
     expect(css).toMatch(/--tap-min:\s*44px/);
     expect(css).toMatch(/--control-min:\s*48px/);
@@ -39,21 +96,11 @@ describe("mobile UI CSS contract", () => {
     expect(css).toMatch(/\.profile-summary-notes dd\s*\{[^}]*white-space:\s*pre-wrap/);
   });
 
-  it("gives completion states their own dark-mode-safe foreground", () => {
-    expect(css).toMatch(/--status-done-ink:/);
-    expect(css).toMatch(/\.completion-item\.done\s*\{[^}]*color:\s*var\(--status-done-ink\)/);
-    expect(css.match(/--notice-ink:/g)).toHaveLength(2);
-    expect(css.match(/--notice-bg:/g)).toHaveLength(2);
-    expect(css).toMatch(/\.trend-notices\s*\{[^}]*color:\s*var\(--notice-ink\)/);
+  it("gives completion and notice surfaces explicit dark-mode-safe pairs", () => {
+    expect(css).toMatch(/\.completion-item\.done\s*\{[^}]*color:\s*var\(--success-ink\)/);
+    expect(css).toMatch(/\.completion-item\.missing\s*\{[^}]*color:\s*var\(--warning-ink\)/);
+    expect(css).toMatch(/\.trend-notices\s*\{[^}]*background:\s*var\(--brand-subtle\)[^}]*color:\s*var\(--brand-subtle-ink\)/);
     expect(css).toMatch(/\.trend-notices li\s*\{[^}]*color:\s*inherit/);
-
-    const backgrounds = [...css.matchAll(/--notice-bg:\s*(#[0-9a-f]{6})/gi)].map((match) => match[1]!);
-    const foregrounds = [...css.matchAll(/--notice-ink:\s*(#[0-9a-f]{6})/gi)].map((match) => match[1]!);
-    expect(backgrounds).toHaveLength(2);
-    expect(foregrounds).toHaveLength(2);
-    backgrounds.forEach((background, index) => {
-      expect(contrastRatio(background, foregrounds[index]!)).toBeGreaterThanOrEqual(4.5);
-    });
   });
 
   it("keeps secondary and restore actions touch sized", () => {
@@ -102,15 +149,25 @@ describe("mobile UI CSS contract", () => {
     expect(css).toMatch(/\.today-period-grid\s*\{[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/);
   });
 
-  it("uses green, orange, and red as semantic theme colors", () => {
-    expect(css.match(/--brand-green:/g)).toHaveLength(2);
-    expect(css.match(/--accent-orange:/g)).toHaveLength(2);
-    expect(css.match(/--danger-red:/g)).toHaveLength(2);
-    expect(css).toMatch(/\.primary-action\s*\{[^}]*background:\s*var\(--brand-green\)/);
-    expect(css).toMatch(/\.danger-action,[\s\S]*color:\s*var\(--danger-red\)/);
-    expect(css).toMatch(/\.today-period strong\s*\{[^}]*color:\s*var\(--brand-green\)/);
-    expect(css).toMatch(/\.rose\s*\{[^}]*var\(--accent-orange\)/);
-    expect(css).toMatch(/\.history-kind-emotion\s*\{[^}]*--history-accent:\s*var\(--accent-orange\)/);
+  it("uses violet for brand actions while preserving green, orange, and red semantics", () => {
+    expect([...css.matchAll(/--brand-violet:/g)]).toHaveLength(2);
+    expect([...css.matchAll(/--success-green:/g)]).toHaveLength(2);
+    expect([...css.matchAll(/--warning-orange:/g)]).toHaveLength(2);
+    expect([...css.matchAll(/--danger-red:/g)]).toHaveLength(2);
+    expect(css).toMatch(/\.primary-action\s*\{[^}]*background:\s*var\(--brand-violet\)/);
+    expect(css).toMatch(/\.primary-action:focus-visible,[\s\S]*outline:\s*3px solid var\(--brand-violet\)/);
+    expect(css).toMatch(/\.danger-action,[\s\S]*color:\s*var\(--danger-ink\)/);
+    expect(css).toMatch(/\.today-period strong\s*\{[^}]*color:\s*var\(--brand-violet-strong\)/);
+    expect(css).toMatch(/\.completion-item\.done\s*\{[^}]*background:\s*var\(--success-bg\)[^}]*color:\s*var\(--success-ink\)/);
+    expect(css).toMatch(/\.completion-item\.missing\s*\{[^}]*background:\s*var\(--warning-bg\)[^}]*color:\s*var\(--warning-ink\)/);
+    expect(css).toMatch(/\.history-kind-emotion\s*\{[^}]*--history-accent:\s*var\(--warning-orange\)/);
+  });
+
+  it("uses neutral surfaces and system sans typography without legacy gradients", () => {
+    expect(css).toMatch(/body\s*\{[^}]*background:\s*var\(--canvas\)/);
+    expect(css).not.toContain("Georgia");
+    expect(css).not.toContain("radial-gradient");
+    expect(css).toMatch(/\.wordmark\s*\{[^}]*font-family:\s*inherit/);
   });
 
   it("makes record cards visibly expandable before destructive actions appear", () => {
