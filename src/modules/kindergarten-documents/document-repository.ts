@@ -1,4 +1,4 @@
-import type { KindergartenDocument, KindergartenDocumentType, Prisma, PrismaClient } from "@prisma/client";
+import type { KindergartenDocument, KindergartenDocumentType, PrismaClient } from "@prisma/client";
 
 export type DocumentRepositoryClient = PrismaClient;
 
