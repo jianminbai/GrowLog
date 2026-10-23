@@ -56,6 +56,7 @@ describe("history page", () => {
   it("groups complete active-record cards by household-local day", async () => {
     const { container } = render(await HistoryPage());
 
+    expect(screen.getByRole("heading", { level: 1, name: "成长足迹" })).toBeInTheDocument();
     expect(screen.getByLabelText("历史概览")).toHaveTextContent("3 条记录");
     expect(screen.getByLabelText("历史概览")).toHaveTextContent("3 个记录日");
 

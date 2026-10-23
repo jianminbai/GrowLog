@@ -9,6 +9,7 @@ import { serializeGrowthHistory } from "@/modules/growth/growth-handlers";
 import { calculateAnnualizedHeightGrowth } from "@/modules/growth/growth-record";
 import { listGrowthForChild } from "@/modules/growth/growth-repository";
 import { serializeSleep } from "@/modules/sleep/sleep-handlers";
+import { dateInTimeZone } from "@/modules/sleep/sleep-record";
 import { getHouseholdTimeZone, listSleepForChild } from "@/modules/sleep/sleep-repository";
 import { listActivitiesForChild } from "@/modules/activity/activity-repository";
 import { listEmotionsForChild } from "@/modules/emotion/emotion-repository";
@@ -35,7 +36,7 @@ export async function ChildRecordReport({ childId, domain }: { childId: string; 
   if (!child) notFound();
   const timeZone = await getHouseholdTimeZone(prisma, auth.householdId);
   const timestamp = (at: string | Date) => new Date(at).toLocaleString("zh-CN", { timeZone, hour12: false });
-  const charts: { title: string; unit: string; points: SeriesPoint[] }[] = [];
+  const charts: { title: string; unit: string; points: SeriesPoint[]; dateOnly?: boolean }[] = [];
   const tables: ReportTable[] = [];
   let distribution: ReactNode = null;
   const dailyChart = (title: string, unit: string, points: SeriesPoint[]) => charts.push({ title, unit, points: dailyTotals(points, timeZone) });
@@ -46,11 +47,11 @@ export async function ChildRecordReport({ childId, domain }: { childId: string; 
       measuredAt: new Date(r.measuredAt), heightCm: r.heightCm
     })));
     charts.push(
-      { title: "身高趋势", unit: "cm", points: rows.map(r => ({ at: r.measuredAt, value: r.heightCm })) },
-      { title: "体重趋势", unit: "kg", points: rows.map(r => ({ at: r.measuredAt, value: r.weightKg })) }
+      { title: "身高趋势", unit: "cm", dateOnly: true, points: rows.map(r => ({ at: r.measuredAt, value: r.heightCm })) },
+      { title: "体重趋势", unit: "kg", dateOnly: true, points: rows.map(r => ({ at: r.measuredAt, value: r.weightKg })) }
     );
     tables.push({ title: "测量记录", headers: ["测量时间", "身高（cm）", "年化身高增长（cm/年）", "体重（kg）", "BMI（kg/m²）", "身高变化（cm）", "体重变化（kg）", "来源", "详情"],
-      rows: rows.map((r, index) => ({ id: r.id, cells: [timestamp(r.measuredAt), r.heightCm, annualizedHeightGrowth[index], r.weightKg, r.bmi, r.heightChangeCm, r.weightChangeKg, sourceLabels[r.source],
+      rows: rows.map((r, index) => ({ id: r.id, cells: [dateInTimeZone(new Date(r.measuredAt), timeZone), r.heightCm, annualizedHeightGrowth[index], r.weightKg, r.bmi, r.heightChangeCm, r.weightChangeKg, sourceLabels[r.source],
         <details className="measurement-detail" key={`${r.id}-detail`}><summary>查看详情</summary><p>地点：{optional(r.place)}；方法：{optional(r.method)}；设备：{optional(r.device)}；精度：{optional(r.precisionNote)}；备注：{optional(r.notes)}</p></details>] })).reverse() });
   } else if (domain === "sleep") {
     const rows = (await listSleepForChild(prisma, auth.householdId, childId)).map(serializeSleep);

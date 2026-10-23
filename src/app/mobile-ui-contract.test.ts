@@ -90,4 +90,20 @@ describe("mobile UI CSS contract", () => {
     expect(css).toMatch(/\.measurement-detail summary\s*\{[^}]*min-height:\s*var\(--tap-min\)/);
     expect(css).toMatch(/\.report-table th\s*\{[^}]*position:\s*sticky/);
   });
+
+  it("uses green, orange, and red as semantic theme colors", () => {
+    expect(css.match(/--brand-green:/g)).toHaveLength(2);
+    expect(css.match(/--accent-orange:/g)).toHaveLength(2);
+    expect(css.match(/--danger-red:/g)).toHaveLength(2);
+    expect(css).toMatch(/\.primary-action\s*\{[^}]*background:\s*var\(--brand-green\)/);
+    expect(css).toMatch(/\.danger-action,[\s\S]*color:\s*var\(--danger-red\)/);
+    expect(css).toMatch(/\.today-comparison\s*\{[^}]*color:\s*var\(--brand-green\)/);
+    expect(css).toMatch(/\.rose\s*\{[^}]*var\(--accent-orange\)/);
+    expect(css).toMatch(/\.history-kind-emotion\s*\{[^}]*--history-accent:\s*var\(--accent-orange\)/);
+  });
+
+  it("makes record cards visibly expandable before destructive actions appear", () => {
+    expect(css).toMatch(/\.record-card\s*>\s*summary::after\s*\{[^}]*content:\s*"›"/);
+    expect(css).toMatch(/\.record-card\[open\]\s*>\s*summary::after\s*\{[^}]*transform:\s*rotate\(90deg\)/);
+  });
 });

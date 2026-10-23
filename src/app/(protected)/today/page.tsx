@@ -16,9 +16,17 @@ const moodLabels = {
   HAPPY: "😊 开心", CALM: "🙂 平静", ANXIOUS: "😟 焦虑表现", SAD: "😢 难过",
   ANGRY: "😠 愤怒", MIXED: "😶 多种情绪", OTHER: "📝 其他"
 } as const;
+const moodNames = {
+  HAPPY: "开心", CALM: "平静", ANXIOUS: "焦虑表现", SAD: "难过",
+  ANGRY: "愤怒", MIXED: "多种情绪", OTHER: "其他"
+} as const;
 
 function valueOrUnknown(value: number | null, unit: string) {
   return value === null ? "未记录" : `${value} ${unit}`;
+}
+
+function averageValue(average: { value: number; days: number } | null, unit: string) {
+  return average ? `${average.value} ${unit}（${average.days}天）` : "暂无可比较记录";
 }
 
 export default async function TodayPage() {
@@ -64,12 +72,13 @@ export default async function TodayPage() {
         </div>
 
         <h3 className="dashboard-section-title">今日概览</h3>
+        <p className="dashboard-comparison-note">过去7天对照仅基于有记录日期；今天为截至当前数据。</p>
         <div className="today-overview-grid">
-          <div className="today-overview-item"><span>睡眠</span><strong>{snapshot.today.sleepMinutes === null ? "待记录" : `${snapshot.today.sleepMinutes} 分钟`}</strong></div>
-          <div className="today-overview-item"><span>饮食</span><strong>{snapshot.completion.nutrition ? `${snapshot.today.meals} 餐 · ${snapshot.today.foodItems} 项食物` : "待记录"}</strong></div>
-          <div className="today-overview-item"><span>奶 / 水</span><strong>{valueOrUnknown(snapshot.today.milkMl, "ml")} · {valueOrUnknown(snapshot.today.waterMl, "ml")}</strong>{snapshot.today.unknownBeverages ? <small>{snapshot.today.unknownBeverages} 条未填容量</small> : null}</div>
-          <div className="today-overview-item"><span>活动</span><strong>{snapshot.completion.activity ? `${snapshot.today.activityMinutes} 分钟 · 户外 ${valueOrUnknown(snapshot.today.outdoorMinutes, "分钟")}` : "待记录"}</strong>{snapshot.today.unknownOutdoorActivities ? <small>{snapshot.today.unknownOutdoorActivities} 条活动未填户外时长</small> : null}</div>
-          <div className="today-overview-item emotion"><span>情绪观察</span><strong>{snapshot.today.mood ? moodLabels[snapshot.today.mood] : "待记录"}</strong><small>仅呈现家长今日填写的观察</small></div>
+          <div className="today-overview-item"><span>睡眠</span><strong>{snapshot.today.sleepMinutes === null ? "待记录" : `${snapshot.today.sleepMinutes} 分钟`}</strong><small className="today-comparison">过去7天有记录日均 {averageValue(snapshot.comparison.sleepMinutes, "分钟")}</small></div>
+          <div className="today-overview-item"><span>饮食</span><strong>{snapshot.completion.nutrition ? `${snapshot.today.meals} 餐 · ${snapshot.today.foodItems} 项食物` : "待记录"}</strong><small className="today-comparison">{snapshot.comparison.meals && snapshot.comparison.foodItems ? `过去7天有记录日均 ${snapshot.comparison.meals.value} 餐 · ${snapshot.comparison.foodItems.value} 项食物（${snapshot.comparison.meals.days}天）` : "过去7天暂无可比较记录"}</small></div>
+          <div className="today-overview-item"><span>奶 / 水</span><strong>{valueOrUnknown(snapshot.today.milkMl, "ml")} · {valueOrUnknown(snapshot.today.waterMl, "ml")}</strong>{snapshot.today.unknownBeverages ? <small>{snapshot.today.unknownBeverages} 条未填容量</small> : null}<small className="today-comparison">过去7天有记录日均 奶 {averageValue(snapshot.comparison.milkMl, "ml")} · 水 {averageValue(snapshot.comparison.waterMl, "ml")}</small></div>
+          <div className="today-overview-item"><span>活动</span><strong>{snapshot.completion.activity ? `${snapshot.today.activityMinutes} 分钟 · 户外 ${valueOrUnknown(snapshot.today.outdoorMinutes, "分钟")}` : "待记录"}</strong>{snapshot.today.unknownOutdoorActivities ? <small>{snapshot.today.unknownOutdoorActivities} 条活动未填户外时长</small> : null}<small className="today-comparison">过去7天有记录日均 活动 {averageValue(snapshot.comparison.activityMinutes, "分钟")} · 户外 {averageValue(snapshot.comparison.outdoorMinutes, "分钟")}</small></div>
+          <div className="today-overview-item emotion"><span>情绪观察</span><strong>{snapshot.today.mood ? moodLabels[snapshot.today.mood] : "待记录"}</strong><small className="today-comparison">{snapshot.comparison.mood ? `过去7天最常记录 ${moodNames[snapshot.comparison.mood.mood]}（${snapshot.comparison.mood.count}/${snapshot.comparison.mood.total}次）` : "过去7天暂无可比较记录"}</small></div>
         </div>
 
         <h3 className="dashboard-section-title">快捷记录</h3>

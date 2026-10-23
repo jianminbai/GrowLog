@@ -13,7 +13,7 @@ vi.mock("next/navigation", () => ({
   usePathname: () => pathname
 }));
 
-const navItems = ["今天", "历史", "档案", "设置"];
+const navItems = ["今天", "足迹", "趋势", "设置"];
 
 afterEach(() => {
   cleanup();
@@ -40,8 +40,8 @@ describe("AppNavigation", () => {
     const desktop = screen.getByRole("navigation", { name: "桌面主要导航" });
     const mobile = screen.getByRole("navigation", { name: "手机主要导航" });
 
-    expect(within(desktop).getByRole("link", { name: "档案" })).toHaveAttribute("aria-current", "page");
-    expect(within(mobile).getByRole("link", { name: "档案" })).toHaveAttribute("aria-current", "page");
+    expect(within(desktop).getByRole("link", { name: "趋势" })).toHaveAttribute("aria-current", "page");
+    expect(within(mobile).getByRole("link", { name: "趋势" })).toHaveAttribute("aria-current", "page");
     expect(within(mobile).getByRole("link", { name: "今天" })).not.toHaveAttribute("aria-current");
   });
 });

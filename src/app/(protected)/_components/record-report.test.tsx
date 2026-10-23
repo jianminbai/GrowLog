@@ -49,6 +49,7 @@ describe("read-only child reports", () => {
     ]);
     expect(screen.queryByRole("columnheader", { name: "头围（cm）" })).not.toBeInTheDocument();
     const latestRow = screen.getByRole("row", { name: /2026.*10.*20.*104.*17/ });
+    expect(within(latestRow).getAllByRole("cell")[0]).toHaveTextContent(/^2026-10-20$/);
     expect(within(latestRow).getAllByRole("cell")[2]).toHaveTextContent("4");
     expect(within(latestRow).getByText("查看详情")).toBeInTheDocument();
     expect(within(latestRow).getByText(/家中.*站立测量.*儿童身高尺.*早晨测量/)).toBeInTheDocument();

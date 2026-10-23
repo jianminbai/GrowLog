@@ -24,7 +24,7 @@ export default async function HistoryPage() {
   });
 
   return <main className="profile-shell history-shell">
-    <header className="profile-header compact history-hero"><span className="history-eyebrow">成长足迹</span><h1>历史记录</h1><p>按日期回顾全部有效记录。向右滑动记录卡片可进入原始表单修改。</p></header>
+    <header className="profile-header compact history-hero"><span className="history-eyebrow">按日回顾</span><h1>成长足迹</h1><p>按日期回顾全部有效记录。向右滑动记录卡片可进入原始表单修改。</p></header>
     <div className="history-overview" aria-label="历史概览">
       <div><strong>{entries.length}</strong><span> 条记录</span></div>
       <div><strong>{groups.length}</strong><span> 个记录日</span></div>

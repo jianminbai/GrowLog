@@ -66,6 +66,14 @@ describe("time-series chart", () => {
     expect(screen.getByRole("status")).toHaveTextContent("15.4 kg");
   });
 
+  it("uses date-only labels for measurements that do not need time-of-day precision", () => {
+    render(<TimeSeriesChart title="身高趋势" unit="cm" timeZone="Asia/Shanghai" dateOnly points={[
+      { at: "2026-10-20T01:00:00Z", value: 104 }
+    ]} />);
+
+    expect(screen.getByRole("button", { name: /104 cm/ })).toHaveAccessibleName("2026-10-20，104 cm");
+  });
+
   it("uses vertical distance to distinguish points recorded at the same time", () => {
     render(<TimeSeriesChart title="身高趋势" unit="cm" timeZone="Asia/Shanghai" points={[
       { at: "2026-10-01T00:00:00Z", value: 100 },

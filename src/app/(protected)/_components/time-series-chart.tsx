@@ -5,13 +5,13 @@ import { useState } from "react";
 
 import type { SeriesPoint } from "@/modules/reports/daily-series";
 
-type Props = { title: string; unit: string; timeZone: string; points: SeriesPoint[] };
+type Props = { title: string; unit: string; timeZone: string; points: SeriesPoint[]; dateOnly?: boolean };
 type KnownPoint = SeriesPoint & { value: number };
 
 const chartWidth = 340;
 const chartHeight = 214;
 
-export function TimeSeriesChart({ title, unit, timeZone, points }: Props) {
+export function TimeSeriesChart({ title, unit, timeZone, points, dateOnly = false }: Props) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const sorted = points.filter(p => Number.isFinite(Date.parse(p.at))).slice().sort((a, b) => Date.parse(a.at) - Date.parse(b.at));
   const known = sorted.filter((p): p is KnownPoint => p.value !== null && Number.isFinite(p.value));
@@ -27,10 +27,16 @@ export function TimeSeriesChart({ title, unit, timeZone, points }: Props) {
   const maximum = high + padding;
   const x = (at: string) => first === last ? 181 : 52 + ((Date.parse(at) - first) / (last - first)) * 258;
   const y = (value: number) => 162 - ((value - minimum) / (maximum - minimum)) * 126;
-  const axisLabel = (at: string) => /^\d{4}-\d{2}-\d{2}$/.test(at)
-    ? at
-    : new Date(at).toLocaleDateString("zh-CN", { timeZone, year: "numeric", month: "2-digit", day: "2-digit" });
-  const pointLabel = (at: string) => /^\d{4}-\d{2}-\d{2}$/.test(at)
+  const dateLabel = (at: string) => {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(at)) return at;
+    const parts = new Intl.DateTimeFormat("en-US", { timeZone, year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date(at));
+    const part = (type: Intl.DateTimeFormatPartTypes) => parts.find(item => item.type === type)?.value ?? "";
+    return `${part("year")}-${part("month")}-${part("day")}`;
+  };
+  const axisLabel = (at: string) => dateLabel(at);
+  const pointLabel = (at: string) => dateOnly
+    ? dateLabel(at)
+    : /^\d{4}-\d{2}-\d{2}$/.test(at)
     ? new Date(`${at}T12:00:00Z`).toLocaleDateString("zh-CN", { timeZone: "UTC", year: "numeric", month: "2-digit", day: "2-digit" })
     : new Date(at).toLocaleString("zh-CN", { timeZone, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false });
 
