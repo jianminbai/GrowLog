@@ -50,7 +50,7 @@ export async function ChildRecordReport({ childId, domain }: { childId: string; 
       { title: "身高趋势", unit: "cm", dateOnly: true, points: rows.map(r => ({ at: r.measuredAt, value: r.heightCm })) },
       { title: "体重趋势", unit: "kg", dateOnly: true, points: rows.map(r => ({ at: r.measuredAt, value: r.weightKg })) }
     );
-    tables.push({ title: "测量记录", headers: ["测量时间", "身高（cm）", "年化身高增长（cm/年）", "体重（kg）", "BMI（kg/m²）", "身高变化（cm）", "体重变化（kg）", "来源", "详情"],
+    tables.push({ title: "测量记录", className: "measurement-table", headers: ["测量时间", "身高（cm）", "年化身高增长（cm/年）", "体重（kg）", "BMI（kg/m²）", "身高变化（cm）", "体重变化（kg）", "来源", "详情"],
       rows: rows.map((r, index) => ({ id: r.id, cells: [<time className="measurement-date" dateTime={r.measuredAt} key={`${r.id}-date`}>{dateInTimeZone(new Date(r.measuredAt), timeZone)}</time>, r.heightCm, annualizedHeightGrowth[index], r.weightKg, r.bmi, r.heightChangeCm, r.weightChangeKg, sourceLabels[r.source],
         <details className="measurement-detail" key={`${r.id}-detail`}><summary>查看详情</summary><p>地点：{optional(r.place)}；方法：{optional(r.method)}；设备：{optional(r.device)}；精度：{optional(r.precisionNote)}；备注：{optional(r.notes)}</p></details>] })).reverse() });
   } else if (domain === "sleep") {
@@ -97,7 +97,6 @@ export async function ChildRecordReport({ childId, domain }: { childId: string; 
   return <main className="profile-shell report-shell">
     <Link className="back-link" href={`/children/${child.id}`}>← 返回 {child.name} 的档案</Link>
     <header className="profile-header compact"><h1>{recordDomains.find(d => d.route === domain)!.label}</h1><p>{child.name} · 成长趋势与记录明细</p></header>
-    <p className="care-note">时间按家庭时区 {timeZone} 显示。{domain === "sleep" ? "睡眠归入醒来当天。" : ""}添加或修改记录请前往设置中的“基础资料与记录管理”。</p>
     <div className="report-charts">{charts.map(c => <TimeSeriesChart key={c.title} {...c} timeZone={timeZone} />)}{distribution}</div>
     {tables.map(t => <RecordTable key={t.title} {...t} />)}
   </main>;

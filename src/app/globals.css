@@ -1467,6 +1467,9 @@ h2 {
 .report-table th { position: sticky; top: 0; z-index: 1; background: var(--paper); color: var(--muted); white-space: nowrap; }
 .report-table td { white-space: pre-wrap; overflow-wrap: anywhere; max-width: 22rem; }
 .measurement-date { white-space: nowrap; }
+.measurement-table th, .measurement-table td { padding: 0.25rem 0.55rem; vertical-align: middle; text-align: center; white-space: nowrap; }
+.measurement-table .measurement-detail { margin: 0 auto; }
+.measurement-table .measurement-detail summary { justify-content: center; }
 .report-table tr:last-child td { border-bottom: 0; }
 .report-table tbody tr:nth-child(even) { background: color-mix(in srgb, var(--canvas) 45%, transparent); }
 .measurement-detail { width: max-content; max-width: min(15rem, 70vw); }

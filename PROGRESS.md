@@ -30,11 +30,12 @@
 - M20 focused mobile refinement: Today is a same-day dashboard, growth records use a compact essential-column table with expandable measurement context, and Settings uses grouped low-frequency management menus.
 - M21 comparison and navigation refinement: Today shows preceding-seven-day recorded-day baselines, growth uses date-only measurement labels, navigation is named “今天/足迹/趋势/设置”, nutrition history uses consistent expandable cards, and semantic green/orange/red roles replace ambiguous neutral red accents.
 - M22 compact longitudinal review: Footprints is now a read-only compact timeline without time-of-day or swipe editing, growth dates stay on one line, and Today compares compact values across today plus preceding 7/14/30-day windows while preserving unknown values.
+- M23 copy and table-density refinement: Today and Trends use task-focused header copy, report-level instructional notes are removed, and growth measurements align in compact centered rows while preserving the details touch target.
 - Repository documentation: the root README provides an accurate Chinese product overview, Docker/VPS quick start, development checks, backup/restore entry points, security boundaries, and links to durable project records.
 
 ## Current task
 
-- All GrowLog MVP milestones M0–M22 are implemented and verified. Deferred P1/P2 work remains listed in `TASKS.md`.
+- All GrowLog MVP milestones M0–M23 are implemented and verified. Deferred P1/P2 work remains listed in `TASKS.md`.
 
 ## Test record
 
@@ -111,6 +112,10 @@
 - M22 review fixes: beverage-only days keep meal and food-item counts unknown instead of displaying `0餐/0项`; activities without an outdoor duration show `户外未记录` instead of a fabricated zero. The regression tests failed before the fixes and then passed; independent re-review found no remaining Critical or Important issue (2026-10-23).
 - M22 final gate: clean test-database reset, lint with zero warnings, strict typecheck, 168/168 tests across 51 files with PostgreSQL enabled, and the production build all pass (2026-10-23).
 - M22 browser verification: authenticated production pages at 320, 390, and 768 px show five 72px Today comparison rows with four periods each, Footprints rows no taller than 51px without time/swipe/edit UI, and three single-line growth dates; all checked pages avoid horizontal overflow. The seeded boundary case also verifies that beverage-only nutrition leaves meals unknown and missing outdoor duration remains explicitly unknown (2026-10-23).
+- M23 RED→GREEN: task-focused header copy, removal of redundant instructional notes, growth-table class assignment, and compact centered measurement CSS produced 4 expected failures, then 32 focused assertions across 4 files passed (2026-10-23).
+- M23 review: independent review found no remaining Critical or Important issue; the scoped measurement style preserves the 44px details target and lets expanded detail text wrap normally (2026-10-23).
+- M23 final gate: clean test-database reset, lint with zero warnings, strict typecheck, 169/169 tests across 51 files with PostgreSQL enabled, and the production build all pass (2026-10-23).
+- M23 browser verification: authenticated production pages at 320, 390, and 768 px show the revised Today/Trends copy, omit both requested instructions, keep all growth measurement rows at 53px with a 44px details target, center every cell vertically and horizontally without wrapping, and avoid page-level horizontal overflow (2026-10-23).
 
 ## Work implemented
 
@@ -142,6 +147,7 @@
 - Growth tables prioritize measurement time, height, annualized height growth, weight, BMI, changes, and source; lower-frequency measurement conditions and notes remain available through a native disclosure. Settings groups children/records, data/backup, and account controls into compact touch-safe menus without changing the existing APIs or authorization boundary.
 - Today baselines divide each metric only by dates with complete values; the snapshot retains sample-day counts for verification while the compact UI presents only the resulting values, and today stays a partial-day snapshot. Growth alone uses date-only labels, while domains where time of day matters retain their timestamps. Navigation and nutrition-history presentation now share the same mobile information hierarchy and semantic color system.
 - Today now repeats that baseline policy for the preceding 7, 14, and 30 household-local dates and presents the results in four compact columns alongside today. Footprints keeps daily grouping and complete summaries but removes time-of-day plus direct editing interactions; record maintenance remains available in Settings. Growth measurement dates use a dedicated no-wrap element inside the horizontally scrollable report table.
+- Today and Trends headers now state the current task directly. Trend reports rely on chart/table labels and accessible point controls instead of repeating timezone, management, and pointer instructions. The growth measurement table uses a scoped centered-row style with reduced cell padding while its details summary remains touch sized.
 
 ## Blockers
 

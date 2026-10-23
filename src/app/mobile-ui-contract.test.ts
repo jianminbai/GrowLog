@@ -91,6 +91,12 @@ describe("mobile UI CSS contract", () => {
     expect(css).toMatch(/\.measurement-date\s*\{[^}]*white-space:\s*nowrap/);
   });
 
+  it("centers compact growth-measurement rows on one visual line", () => {
+    expect(css).toMatch(/\.measurement-table th,\s*\.measurement-table td\s*\{[^}]*padding:\s*0\.25rem 0\.55rem[^}]*vertical-align:\s*middle[^}]*text-align:\s*center[^}]*white-space:\s*nowrap/);
+    expect(css).toMatch(/\.measurement-table \.measurement-detail\s*\{[^}]*margin:\s*0 auto/);
+    expect(css).toMatch(/\.measurement-table \.measurement-detail summary\s*\{[^}]*justify-content:\s*center/);
+  });
+
   it("uses full-width Today cards with four compact comparison columns", () => {
     expect(css).toMatch(/\.today-overview-grid\s*\{[^}]*grid-template-columns:\s*1fr/);
     expect(css).toMatch(/\.today-period-grid\s*\{[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/);

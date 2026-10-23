@@ -17,14 +17,14 @@ export default async function ChildrenPage() {
     <main className="profile-shell">
       <header className="profile-header">
         <div>
-          <h1>儿童档案</h1>
-          <p>基础资料只需填写一次，之后每条成长记录都会归入相应档案。</p>
+          <h1>成长趋势</h1>
+          <p>选择孩子，查看身高体重、睡眠、饮食、活动和情绪记录。</p>
         </div>
       </header>
 
       {children.length > 0 ? (
         <section className="profile-list" aria-labelledby="saved-profiles">
-          <h2 id="saved-profiles">已有档案</h2>
+          <h2 id="saved-profiles">选择孩子</h2>
           <div className="profile-cards">
             {children.map((child) => (
               <Link className="profile-card" href={`/children/${child.id}`} key={child.id}>

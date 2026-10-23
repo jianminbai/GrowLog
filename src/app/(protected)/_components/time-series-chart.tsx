@@ -112,6 +112,5 @@ export function TimeSeriesChart({ title, unit, timeZone, points, dateOnly = fals
         style={{ "--chart-x": `${activeX / chartWidth * 100}%`, "--chart-y": `${activeY / chartHeight * 100}%` } as CSSProperties}
       ><span>{pointLabel(active.at)}</span><strong>{active.value} {unit}</strong></output> : null}
     </div>
-    <p className="care-note">移动光标、触摸或聚焦数据点可查看时间与数值。空缺不等于零。</p>
   </figure>;
 }

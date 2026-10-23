@@ -65,7 +65,7 @@ export default async function TodayPage() {
 
   return <main className="today-shell">
     <header className="today-header">
-      <div><h1>今天</h1><p className="today-date">{date} · {timeZone}</p><p>快速补齐今日记录。空白表示尚未填写，不代表发生了异常。</p></div>
+      <div><h1>今天</h1><p className="today-date">{date} · {timeZone}</p><p>查看今天的记录状态，并与近期有记录日对照。</p></div>
     </header>
 
     {dashboards.length === 0 ? <section className="empty-state dashboard-empty">

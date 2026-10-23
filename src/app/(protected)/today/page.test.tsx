@@ -60,6 +60,8 @@ describe("today dashboard", () => {
   it("shows only household-local today information instead of latest records", async () => {
     render(await TodayPage());
 
+    expect(screen.getByText("查看今天的记录状态，并与近期有记录日对照。")).toBeInTheDocument();
+    expect(screen.queryByText(/快速补齐今日记录/)).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "今日概览" })).toBeInTheDocument();
     expect(screen.getByText("480分")).toBeInTheDocument();
     expect(screen.getByText("1餐/1项")).toBeInTheDocument();
