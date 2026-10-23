@@ -170,6 +170,18 @@ describe("mobile UI CSS contract", () => {
     expect(css).toMatch(/\.wordmark\s*\{[^}]*font-family:\s*inherit/);
   });
 
+  it("gives the public shell, login, and navigation a shared modern surface hierarchy", () => {
+    expect(css).toMatch(/\.hero\s*\{[^}]*padding-top:\s*clamp\(2rem,[^}]*\}/);
+    expect(css).toMatch(/\.preview\s*\{[^}]*border-radius:\s*1\.5rem[^}]*background:\s*var\(--surface\)[^}]*box-shadow:\s*0 8px 24px/);
+    expect(css).toMatch(/\.login-panel\s*\{[^}]*border-radius:\s*1\.5rem[^}]*background:\s*var\(--surface\)[^}]*box-shadow:\s*0 8px 24px/);
+    expect(css).toMatch(/\.form-message\s*\{[^}]*overflow-wrap:\s*anywhere/);
+    expect(css).toMatch(/\.app-brand\s*\{[^}]*font-family:\s*inherit[^}]*letter-spacing:\s*-0\.02em/);
+    expect(css).toMatch(/\.mobile-app-nav\s*\{[^}]*background:\s*color-mix\(in srgb, var\(--surface\) 96%, transparent\)/);
+    expect(css).toMatch(/\.mobile-app-nav a\s*\{[^}]*min-height:\s*3\.25rem/);
+    expect(css).toMatch(/\.mobile-app-nav a\.is-current\s*\{[^}]*background:\s*var\(--brand-subtle\)[^}]*color:\s*var\(--brand-subtle-ink\)/);
+    expect(css).toMatch(/\.desktop-app-nav \.app-nav-links a\.is-current\s*\{[^}]*background:\s*var\(--brand-subtle\)[^}]*color:\s*var\(--brand-subtle-ink\)/);
+  });
+
   it("makes record cards visibly expandable before destructive actions appear", () => {
     expect(css).toMatch(/\.record-card\s*>\s*summary::after\s*\{[^}]*content:\s*"›"/);
     expect(css).toMatch(/\.record-card\[open\]\s*>\s*summary::after\s*\{[^}]*transform:\s*rotate\(90deg\)/);
