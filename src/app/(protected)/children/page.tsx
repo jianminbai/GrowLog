@@ -5,6 +5,7 @@ import { requireServerSession } from "@/modules/auth/server-session";
 import { serializeChild } from "@/modules/children/child-handlers";
 import { listChildrenForHousehold } from "@/modules/children/child-repository";
 
+import { AppIcon } from "../_components/app-icon";
 
 
 export const dynamic = "force-dynamic";
@@ -28,9 +29,9 @@ export default async function ChildrenPage() {
           <div className="profile-cards">
             {children.map((child) => (
               <Link className="profile-card" href={`/children/${child.id}`} key={child.id}>
-                <strong>{child.name}</strong>
-                <span>出生于 {child.birthDate}</span>
-                <span>查看成长趋势 →</span>
+                <span className="profile-card-icon"><AppIcon name="child" /></span>
+                <span className="profile-card-copy"><strong>{child.name}</strong><span>出生于 {child.birthDate}</span><span>查看成长趋势</span></span>
+                <AppIcon className="profile-card-chevron" name="chevron" />
               </Link>
             ))}
           </div>

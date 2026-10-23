@@ -182,6 +182,19 @@ describe("mobile UI CSS contract", () => {
     expect(css).toMatch(/\.desktop-app-nav \.app-nav-links a\.is-current\s*\{[^}]*background:\s*var\(--brand-subtle\)[^}]*color:\s*var\(--brand-subtle-ink\)/);
   });
 
+  it("uses the modern card and chart system across Today, Footprints, and Trends", () => {
+    expect(css).toMatch(/\.dashboard-card\s*\{[^}]*border-radius:\s*1\.5rem[^}]*background:\s*var\(--surface\)[^}]*box-shadow:\s*0 8px 24px/);
+    expect(css).toMatch(/\.completion-item\s*\{[^}]*border:\s*1px solid var\(--line\)/);
+    expect(css).toMatch(/\.quick-actions a\s*\{[^}]*background:\s*var\(--brand-subtle\)[^}]*color:\s*var\(--brand-subtle-ink\)/);
+    expect(css).toMatch(/\.history-entry\s*\{[^}]*background:\s*var\(--surface\)[^}]*box-shadow:\s*0 4px 16px rgba\(44, 34, 52, 0\.04\)/);
+    expect(css).toMatch(/\.profile-card\s*\{[^}]*grid-template-columns:\s*2\.5rem minmax\(0, 1fr\) auto[^}]*background:\s*var\(--surface\)/);
+    expect(css).toMatch(/\.domain-links a\s*\{[^}]*background:\s*var\(--surface\)[^}]*box-shadow:\s*0 4px 16px/);
+    expect(css).toMatch(/\.report-chart\s*\{[^}]*border-radius:\s*1\.25rem[^}]*background:\s*var\(--surface\)/);
+    expect(css).toMatch(/\.report-line\s*\{[^}]*stroke:\s*var\(--brand-violet\)/);
+    expect(css).toMatch(/\.chart-point-control:focus-visible\s*\{[^}]*outline:\s*3px solid var\(--brand-violet\)/);
+    expect(css).toMatch(/\.report-table th\s*\{[^}]*background:\s*var\(--surface-muted\)/);
+  });
+
   it("makes record cards visibly expandable before destructive actions appear", () => {
     expect(css).toMatch(/\.record-card\s*>\s*summary::after\s*\{[^}]*content:\s*"›"/);
     expect(css).toMatch(/\.record-card\[open\]\s*>\s*summary::after\s*\{[^}]*transform:\s*rotate\(90deg\)/);

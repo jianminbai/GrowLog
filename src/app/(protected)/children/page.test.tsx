@@ -23,7 +23,11 @@ describe("view-only children list", () => {
     expect(screen.getByRole("heading", { name: "成长趋势" })).toBeInTheDocument();
     expect(screen.getByText("选择孩子，查看身高体重、睡眠、饮食、活动和情绪记录。")).toBeInTheDocument();
     expect(screen.queryByText(/基础资料只需填写一次/)).not.toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /小满/ })).toHaveAttribute("href", "/children/c1");
+    const childLink = screen.getByRole("link", { name: /小满/ });
+    expect(childLink).toHaveAttribute("href", "/children/c1");
+    expect(childLink.querySelector('[data-icon="child"]')).toBeInTheDocument();
+    expect(childLink.querySelector('[data-icon="chevron"]')).toBeInTheDocument();
+    expect(screen.getByText("查看成长趋势")).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "添加孩子" })).not.toBeInTheDocument();
     expect(container.querySelector("form")).toBeNull();
   });
