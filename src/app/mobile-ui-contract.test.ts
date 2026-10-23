@@ -151,6 +151,15 @@ describe("mobile UI CSS contract", () => {
     expect(css).toMatch(/\.measurement-date\s*\{[^}]*white-space:\s*nowrap/);
   });
 
+  it("keeps kindergarten document uploads touch safe and images contained on narrow screens", () => {
+    expect(css).toMatch(/\.document-upload-card input,[\s\S]*font-size:\s*16px/);
+    expect(css).toMatch(/\.document-upload-card button,[\s\S]*min-height:\s*var\(--control-min\)/);
+    expect(css).toMatch(/\.document-upload-grid\s*\{[^}]*grid-template-columns:\s*1fr/);
+    expect(css).toMatch(/\.document-thumbnail\s*\{[^}]*aspect-ratio:\s*4\s*\/\s*3[^}]*object-fit:\s*cover/);
+    expect(css).toMatch(/\.document-viewer-backdrop\s*\{[^}]*position:\s*fixed[^}]*overflow-y:\s*auto/);
+    expect(css).toMatch(/\.document-history\s*\{[^}]*min-width:\s*0/);
+  });
+
   it("centers compact growth-measurement rows on one visual line", () => {
     expect(css).toMatch(/\.measurement-table th,\s*\.measurement-table td\s*\{[^}]*padding:\s*0\.25rem 0\.55rem[^}]*vertical-align:\s*middle[^}]*text-align:\s*center[^}]*white-space:\s*nowrap/);
     expect(css).toMatch(/\.measurement-table \.measurement-detail\s*\{[^}]*margin:\s*0 auto/);

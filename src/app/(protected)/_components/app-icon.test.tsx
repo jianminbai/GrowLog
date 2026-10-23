@@ -9,7 +9,7 @@ import { AppIcon, type AppIconName } from "./app-icon";
 
 const iconNames: AppIconName[] = [
   "today", "history", "trend", "settings", "growth", "sleep", "nutrition", "activity",
-  "emotion", "child", "database", "backup", "table", "account", "plus", "chevron"
+  "emotion", "child", "documents", "database", "backup", "table", "account", "plus", "chevron"
 ];
 
 describe("AppIcon", () => {

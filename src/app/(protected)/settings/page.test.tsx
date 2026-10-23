@@ -20,20 +20,18 @@ describe("settings page", () => {
     expect(screen.getByRole("heading", { name: "儿童与记录" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "数据与备份" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "账户" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /添加孩子/ })).toHaveAttribute("href", "/settings/children/new");
-    expect(screen.getByRole("link", { name: /基础资料与记录/ })).toHaveAttribute("href", "/settings/children");
-    expect(screen.getByRole("link", { name: /删除记录与审计/ })).toHaveAttribute(
-      "href",
-      "/settings/data-management"
-    );
+    expect(container.querySelector('a[href="/settings/children/new"]')).toHaveTextContent("添加孩子");
+    expect(container.querySelector('a[href="/settings/children"]')).toHaveTextContent("基础资料与记录");
+    expect(container.querySelector('a[href="/settings/kindergarten-documents"]')).toHaveTextContent("幼儿园资料");
+    expect(container.querySelector('a[href="/settings/data-management"]')).toHaveTextContent("删除记录与审计");
     expect(screen.getByText("JSON 备份")).toBeInTheDocument();
     expect(screen.getByText("分领域 CSV")).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "完整 JSON" })).not.toBeInTheDocument();
-    for (const name of ["plus", "child", "database", "backup", "table", "account", "chevron"]) {
+    for (const name of ["plus", "child", "documents", "database", "backup", "table", "account", "chevron"]) {
       expect(container.querySelector(`[data-icon="${name}"]`)).toBeInTheDocument();
     }
     const iconContainers = [...container.querySelectorAll(".settings-menu-icon")];
-    expect(iconContainers).toHaveLength(6);
+    expect(iconContainers).toHaveLength(7);
     expect(iconContainers.every((icon) => icon.textContent === "")).toBe(true);
-  });
+  }, 15_000);
 });

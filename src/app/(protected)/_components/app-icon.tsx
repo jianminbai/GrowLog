@@ -11,6 +11,7 @@ export type AppIconName =
   | "activity"
   | "emotion"
   | "child"
+  | "documents"
   | "database"
   | "backup"
   | "table"
@@ -29,6 +30,7 @@ const paths: Record<AppIconName, ReactNode> = {
   activity: <><circle cx="12" cy="4.5" r="2" /><path d="m9 21 2-6-3-2 2-5 4 3 3 1m-1 9-3-6 3-3" /></>,
   emotion: <><circle cx="12" cy="12" r="9" /><path d="M8.5 10h.01m6.99 0h.01M8.5 15c2.2 1.6 4.8 1.6 7 0" /></>,
   child: <><circle cx="12" cy="8" r="4" /><path d="M5 21c.7-4 3-6 7-6s6.3 2 7 6" /></>,
+  documents: <><rect x="4" y="3" width="16" height="18" rx="2" /><path d="M8 8h8M8 12h8M8 16h5" /></>,
   database: <><ellipse cx="12" cy="5" rx="8" ry="3" /><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5m-16 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6" /></>,
   backup: <><path d="M6 8a7 7 0 1 1-1 8m1-8H2m4 0V4" /><path d="M12 8v5l3 2" /></>,
   table: <><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M3 9h18M9 9v11m6-11v11" /></>,

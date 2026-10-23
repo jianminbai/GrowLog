@@ -21,6 +21,7 @@ export default function SettingsPage() {
       <div className="settings-menu-list">
         {menuLink("/settings/children/new", "plus", "添加孩子", "建立新的儿童档案")}
         {menuLink("/settings/children", "child", "基础资料与记录", "编辑资料并录入五类成长记录")}
+        {menuLink("/settings/kindergarten-documents", "documents", "幼儿园资料", "上传和查看每日保教单、每周菜单")}
       </div>
     </section>
     <section className="settings-menu-section" aria-labelledby="data-settings-heading">
