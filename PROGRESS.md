@@ -32,11 +32,12 @@
 - M22 compact longitudinal review: Footprints is now a read-only compact timeline without time-of-day or swipe editing, growth dates stay on one line, and Today compares compact values across today plus preceding 7/14/30-day windows while preserving unknown values.
 - M23 copy and table-density refinement: Today and Trends use task-focused header copy, report-level instructional notes are removed, and growth measurements align in compact centered rows while preserving the details touch target.
 - M24 modern minimalist visual refresh: the full public and authenticated application now uses a neutral surface hierarchy, violet brand actions, semantic status colors, shared line icons, consistent mobile forms and tables, and explicit light/dark theme pairs without changing routes, APIs, persistence, or business rules.
+- M25 kindergarten documents: child-scoped daily care-sheet and weekly-menu image upload, replacement, authenticated viewing, deletion, PostgreSQL metadata/audit, local persistent storage, and coordinated database/image recovery are implemented; release verification is in progress.
 - Repository documentation: the root README provides an accurate Chinese product overview, Docker/VPS quick start, development checks, backup/restore entry points, security boundaries, and links to durable project records.
 
 ## Current task
 
-- All GrowLog MVP milestones M0–M24 are implemented and verified. Deferred P1/P2 work remains listed in `TASKS.md`.
+- M25 release verification is the active task. M0–M24 remain implemented and verified; deferred P1/P2 work remains listed in `TASKS.md`.
 
 ## Test record
 

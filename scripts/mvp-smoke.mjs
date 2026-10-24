@@ -71,6 +71,27 @@ async function api(path, options = {}) {
   return payload;
 }
 
+async function multipartApi(path, form, expected = 200) {
+  const response = await fetch(`${baseUrl}${path}`, {
+    method: "POST",
+    headers: {
+      accept: "application/json",
+      cookie: cookieHeader(),
+      origin,
+      "x-csrf-token": csrfToken
+    },
+    body: form,
+    redirect: "manual"
+  });
+  requestCount += 1;
+  const contentType = response.headers.get("content-type") ?? "";
+  assert.match(contentType, /^application\/json\b/);
+  const payload = await response.json();
+  assert.equal(response.status, expected, `POST ${path}: ${JSON.stringify(payload)}`);
+  assert.match(response.headers.get("cache-control") ?? "", /private\b.*\bno-store/);
+  return payload;
+}
+
 function assertError(payload, code) {
   assert.deepEqual(Object.keys(payload).sort(), ["error"]);
   assert.equal(payload.error.code, code);
@@ -200,6 +221,52 @@ const childUpdated = await api(`/api/children/${childId}`, {
   body: { notes: "M14 lifecycle verified" }
 });
 assert.equal(childUpdated.data.child.notes, "M14 lifecycle verified");
+
+const imageBytes = Uint8Array.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+const documentForm = (type, date, name) => {
+  const form = new FormData();
+  form.set("childId", childId);
+  form.set("type", type);
+  form.set("date", date);
+  form.set("image", new File([imageBytes], name, { type: "image/png" }));
+  return form;
+};
+const careDocument = await multipartApi(
+  "/api/kindergarten-documents",
+  documentForm("DAILY_CARE_SHEET", "2026-10-20", "care.png"),
+  201
+);
+assert.equal(careDocument.data.document.periodStart, "2026-10-20");
+assert.equal("storageKey" in careDocument.data.document, false);
+const careDocumentId = careDocument.data.document.id;
+const replacedCare = await multipartApi(
+  "/api/kindergarten-documents",
+  documentForm("DAILY_CARE_SHEET", "2026-10-20", "care-replacement.png")
+);
+assert.equal(replacedCare.data.document.id, careDocumentId);
+const menuDocument = await multipartApi(
+  "/api/kindergarten-documents",
+  documentForm("WEEKLY_MENU", "2026-10-25", "menu.png"),
+  201
+);
+assert.equal(menuDocument.data.document.periodStart, "2026-10-19");
+
+const documents = await api(`/api/kindergarten-documents?childId=${childId}`);
+assert.equal(documents.data.documents.length, 2);
+assert.ok(documents.data.documents.every((document) => !Object.hasOwn(document, "storageKey")));
+const imageResponse = await fetch(`${baseUrl}${replacedCare.data.document.imageUrl}`, {
+  headers: { cookie: cookieHeader() }, redirect: "manual"
+});
+requestCount += 1;
+assert.equal(imageResponse.status, 200);
+assert.equal(imageResponse.headers.get("content-type"), "image/png");
+assert.match(imageResponse.headers.get("cache-control") ?? "", /private\b.*\bno-store/);
+assert.equal(imageResponse.headers.get("x-content-type-options"), "nosniff");
+assert.deepEqual(new Uint8Array(await imageResponse.arrayBuffer()), imageBytes);
+await api(`/api/kindergarten-documents/${careDocumentId}`, { method: "DELETE" });
+await api(`/api/kindergarten-documents/${menuDocument.data.document.id}`, { method: "DELETE" });
+const emptyDocuments = await api(`/api/kindergarten-documents?childId=${childId}`);
+assert.equal(emptyDocuments.data.documents.length, 0);
 
 const prefix = `/api/children/${childId}`;
 await lifecycle({
@@ -332,5 +399,5 @@ console.log(JSON.stringify({
   status: "ok",
   requests: requestCount,
   childId,
-  verifiedDomains: ["growth", "sleep", "meal", "beverage", "activity", "emotion"]
+  verifiedDomains: ["kindergarten-documents", "growth", "sleep", "meal", "beverage", "activity", "emotion"]
 }));
