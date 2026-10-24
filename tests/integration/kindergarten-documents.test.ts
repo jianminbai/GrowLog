@@ -1,4 +1,7 @@
 import { PrismaClient } from "@prisma/client";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import {
@@ -7,6 +10,10 @@ import {
   listDocumentsForChild,
   upsertDocumentWithAudit
 } from "@/modules/kindergarten-documents/document-repository";
+import {
+  createLocalDocumentFileStore,
+  DocumentFileStoreError
+} from "@/modules/kindergarten-documents/document-file-store";
 
 const databaseUrl = process.env.DATABASE_URL;
 const databaseSuite = databaseUrl?.includes("growlog_test") ? describe : describe.skip;
@@ -28,9 +35,16 @@ databaseSuite("kindergarten document persistence", () => {
   });
 
   beforeEach(async () => {
-    await prisma.kindergartenDocument.deleteMany();
     await prisma.adminSession.deleteMany();
     await prisma.auditLog.deleteMany();
+    await prisma.emotionRecord.deleteMany();
+    await prisma.physicalActivity.deleteMany();
+    await prisma.mealItem.deleteMany();
+    await prisma.meal.deleteMany();
+    await prisma.beverageIntake.deleteMany();
+    await prisma.sleepSession.deleteMany();
+    await prisma.growthMeasurement.deleteMany();
+    await prisma.kindergartenDocument.deleteMany();
     await prisma.child.deleteMany();
     await prisma.household.deleteMany();
   });
@@ -128,5 +142,37 @@ databaseSuite("kindergarten document persistence", () => {
     expect(rows).toHaveLength(1);
     expect(keys).toContain(rows[0]?.storageKey);
     expect(await prisma.auditLog.count({ where: { entityType: "KindergartenDocument" } })).toBe(2);
+  });
+
+  it("keeps database and real files consistent when delete races replacement", async () => {
+    const { household, child } = await family();
+    const root = await mkdtemp(path.join(tmpdir(), "growlog-document-race-"));
+    const files = createLocalDocumentFileStore(root);
+    const bytes = Uint8Array.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+    try {
+      const initialKey = await files.write(bytes, "png");
+      const initial = await upsertDocumentWithAudit(prisma, household.id, image(child.id, initialKey), "admin");
+      const replacementKey = await files.write(bytes, "png");
+
+      const [replacement, deletion] = await Promise.all([
+        upsertDocumentWithAudit(prisma, household.id, image(child.id, replacementKey), "admin"),
+        deleteDocumentWithAudit(prisma, household.id, initial!.document.id, "admin")
+      ]);
+      if (replacement?.replacedStorageKey) await files.remove(replacement.replacedStorageKey);
+      if (deletion?.deletedStorageKey) await files.remove(deletion.deletedStorageKey);
+
+      const rows = await prisma.kindergartenDocument.findMany();
+      expect(rows).toHaveLength(rows.length === 0 ? 0 : 1);
+      if (rows.length === 1) {
+        expect(rows[0]?.storageKey).toBe(replacementKey);
+        await expect(files.read(replacementKey)).resolves.toEqual(bytes);
+      } else {
+        await expect(files.read(replacementKey)).rejects.toBeInstanceOf(DocumentFileStoreError);
+      }
+      await expect(files.read(initialKey)).rejects.toBeInstanceOf(DocumentFileStoreError);
+      expect(await prisma.auditLog.count({ where: { entityType: "KindergartenDocument" } })).toBe(3);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
   });
 });

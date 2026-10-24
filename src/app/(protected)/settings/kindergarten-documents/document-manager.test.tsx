@@ -90,14 +90,55 @@ describe("kindergarten document manager", () => {
     expect(screen.getByText("该日期已有保教单，上传后将替换原图。")).toBeInTheDocument();
   });
 
-  it("opens an accessible viewer, closes on Escape, and returns focus", async () => {
+  it("ignores stale history responses and clears draft uploads when the child changes", async () => {
+    let resolveFirst!: (response: Response) => void;
+    const firstResponse = new Promise<Response>((resolve) => { resolveFirst = resolve; });
+    const childTwoDocument = {
+      ...storedDocument,
+      id: "document-2",
+      childId: "child-2",
+      type: "WEEKLY_MENU" as const,
+      originalFileName: "menu.png",
+      imageUrl: "/api/kindergarten-documents/document-2/image?v=2"
+    };
+    fetchMock.mockImplementation((input) => {
+      const url = String(input);
+      if (url.includes("childId=child-1")) return firstResponse;
+      return Promise.resolve(new Response(JSON.stringify({ data: { documents: [childTwoDocument] } })));
+    });
+    render(<DocumentManager childOptions={[
+      { id: "child-1", name: "小满" },
+      { id: "child-2", name: "小禾" }
+    ]} />);
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(
+      "/api/kindergarten-documents?childId=child-1",
+      { cache: "no-store" }
+    ));
+    fireEvent.change(screen.getByLabelText("保教单日期"), { target: { value: "2026-10-20" } });
+    fireEvent.change(screen.getByLabelText("选择保教单图片"), {
+      target: { files: [new File([Uint8Array.from([1])], "draft.png", { type: "image/png" })] }
+    });
+    fireEvent.change(screen.getByLabelText("选择孩子"), { target: { value: "child-2" } });
+
+    expect(screen.getByLabelText("保教单日期")).toHaveValue("");
+    expect(screen.queryByRole("img", { name: "保教单上传预览" })).not.toBeInTheDocument();
+    expect(await screen.findByText(/menu\.png/)).toBeInTheDocument();
+    resolveFirst(new Response(JSON.stringify({ data: { documents: [storedDocument] } })));
+    await waitFor(() => expect(screen.queryByText(/保教单\.png/)).not.toBeInTheDocument());
+    expect(screen.getByText(/menu\.png/)).toBeInTheDocument();
+  });
+
+  it("opens a focus-contained viewer, closes from the focused control on Escape, and returns focus", async () => {
     render(<DocumentManager childOptions={[{ id: "child-1", name: "小满" }]} />);
     const opener = await screen.findByRole("button", { name: "查看 2026-10-20 保教单" });
     fireEvent.click(opener);
     const dialog = screen.getByRole("dialog", { name: "2026-10-20 保教单" });
     expect(dialog).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "新窗口查看原图" })).toHaveAttribute("href", storedDocument.imageUrl);
-    fireEvent.keyDown(dialog, { key: "Escape" });
+    const close = screen.getByRole("button", { name: "关闭图片" });
+    await waitFor(() => expect(close).toHaveFocus());
+    expect(screen.getByTestId("document-manager-content")).toHaveAttribute("inert");
+    fireEvent.keyDown(close, { key: "Escape" });
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(document.activeElement).toBe(opener);
   });

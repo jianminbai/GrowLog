@@ -91,7 +91,6 @@ ADMIN_PASSWORD_HASH='替换为上一步生成的完整Argon2id哈希'
 HOUSEHOLD_ID=family-home
 HOUSEHOLD_NAME=My family
 HOUSEHOLD_TIME_ZONE=Asia/Shanghai
-UPLOAD_DIR=/data/uploads
 
 SITE_ADDRESS=growlog.example.com
 HTTP_PORT=80
@@ -170,7 +169,7 @@ sha256sum -c /安全备份路径/growlog-YYYYMMDDTHHMMSSZ-uploads.tar.sha256
   /安全备份路径/growlog-YYYYMMDDTHHMMSSZ.manifest
 ```
 
-上传恢复默认写入独立的 `growlog_uploads_restore_verify` 卷。数据库与图片必须使用同一 manifest 配对验证；只恢复其中一部分会造成图片记录与文件不一致。脚本默认拒绝覆盖主数据库和主上传卷，恢复主环境需要明确设置 `ALLOW_RESTORE_OVER_PRIMARY=true` 并再次备份。
+上传恢复默认只创建新的独立 `growlog_uploads_restore_verify` 卷；若该卷已存在，脚本会拒绝覆盖。数据库与图片必须使用同一 manifest 配对验证；只恢复其中一部分会造成图片记录与文件不一致。脚本拒绝所有未标记为 GrowLog 上传用途的现有卷。确需替换已经存在的验证上传卷时设置 `ALLOW_REPLACE_EXISTING_UPLOAD_VOLUME=true`；恢复主上传卷还必须同时设置 `ALLOW_RESTORE_OVER_PRIMARY=true` 并再次备份。协调备份使用排他锁，且只会重启原本处于运行状态的应用。
 
 ## 本地开发
 

@@ -24,9 +24,6 @@ CREATE UNIQUE INDEX "KindergartenDocument_storageKey_key" ON "KindergartenDocume
 -- CreateIndex
 CREATE UNIQUE INDEX "KindergartenDocument_householdId_childId_type_periodStart_key" ON "KindergartenDocument"("householdId", "childId", "type", "periodStart");
 
--- CreateIndex
-CREATE INDEX "KindergartenDocument_householdId_childId_type_periodStart_idx" ON "KindergartenDocument"("householdId", "childId", "type", "periodStart");
-
 -- AddForeignKey
 ALTER TABLE "KindergartenDocument" ADD CONSTRAINT "KindergartenDocument_householdId_fkey" FOREIGN KEY ("householdId") REFERENCES "Household"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 

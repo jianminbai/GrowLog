@@ -126,4 +126,4 @@ The production dependency audit has no critical findings but reports transitive 
 
 ## ADR-032 — 幼儿园图片使用认证文件路由和本地持久卷
 
-保教单与菜单必须关联当前家庭的有效儿童。保教单以儿童和自然日唯一，菜单将提交日期按 UTC 安全算法归一到周一并以儿童和周唯一；同周期再次上传表示替换。PostgreSQL只保存类型、周期、原始显示文件名、随机存储键、MIME、字节数和时间戳，图片字节写入 `UPLOAD_DIR` 指向的 Docker 命名卷；文件不进入 `public/`，浏览器只能通过会话保护、家庭隔离、`private, no-store` 和 `nosniff` 的图片路由读取。完整 multipart 流在 11 MiB 处停止，单图上限为 10 MiB，并要求 JPEG、PNG 或 WebP 的声明 MIME 与魔数一致。创建、替换和删除审计只记录类型、周期和变更字段名，不写入文件名、存储键、路径或内容。数据库元数据和文件卷采用共享备份 ID、manifest 与校验和配对，默认恢复到独立数据库和验证卷；覆盖主数据库或主上传卷必须显式设置 `ALLOW_RESTORE_OVER_PRIMARY=true`。
+保教单与菜单必须关联当前家庭的有效儿童。保教单以儿童和自然日唯一，菜单将提交日期按 UTC 安全算法归一到周一并以儿童和周唯一；同周期再次上传表示替换。PostgreSQL只保存类型、周期、原始显示文件名、随机存储键、MIME、字节数和时间戳，图片字节写入 Docker Compose 固定挂载在 `/data/uploads` 的命名卷；文件不进入 `public/`，浏览器只能通过会话保护、家庭隔离、`private, no-store` 和 `nosniff` 的图片路由读取。完整 multipart 流在 11 MiB 处停止，单图上限为 10 MiB，并要求 JPEG、PNG 或 WebP 的声明 MIME 与魔数一致。创建、替换和删除审计只记录类型、周期和变更字段名，不写入文件名、存储键、路径或内容。数据库元数据和文件卷采用共享备份 ID、manifest 与校验和配对；协调备份使用排他锁和临时发布目录。上传卷恢复默认只创建新验证卷，现有卷必须具有 GrowLog 上传标签并显式设置 `ALLOW_REPLACE_EXISTING_UPLOAD_VOLUME=true`，覆盖主上传卷还需同时设置 `ALLOW_RESTORE_OVER_PRIMARY=true`。

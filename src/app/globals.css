@@ -1557,6 +1557,7 @@ h2 {
 .settings-account-copy > span:last-child { min-width: 0; display: grid; gap: 0.2rem; }
 .settings-account-card small { color: var(--muted); font-size: 0.74rem; }
 .document-manager { min-width: 0; display: grid; gap: 1.25rem; margin-top: 1.4rem; }
+.document-manager-content { min-width: 0; display: grid; gap: 1.25rem; }
 .document-child-picker { display: grid; gap: 0.45rem; color: var(--muted); font-size: 0.8rem; font-weight: 750; }
 .document-child-picker select { width: 100%; min-height: var(--control-min); border: 1px solid var(--line); border-radius: 0.9rem; background: var(--surface); color: var(--ink); padding: 0.7rem 0.85rem; }
 .document-upload-grid { min-width: 0; display: grid; grid-template-columns: 1fr; gap: 0.9rem; }
@@ -1577,6 +1578,7 @@ h2 {
 .document-upload-card button { background: var(--brand-violet); color: white; padding: 0.7rem 1rem; }
 .document-upload-card button:disabled, .document-delete-action:disabled { cursor: wait; opacity: 0.6; }
 .document-upload-preview { width: 100%; max-height: 15rem; border-radius: 0.9rem; background: var(--surface-muted); object-fit: contain; }
+.document-file-summary { color: var(--muted); font-size: 0.72rem; overflow-wrap: anywhere; }
 .document-replace-warning { margin: 0; border-radius: 0.8rem; background: var(--warning-bg); color: var(--warning-ink); padding: 0.7rem 0.8rem; font-size: 0.75rem; line-height: 1.5; }
 .document-history { min-width: 0; margin-top: 0.4rem; }
 .document-history-heading { margin-bottom: 0.75rem; }

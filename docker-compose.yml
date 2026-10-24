@@ -30,7 +30,7 @@ services:
       HOUSEHOLD_ID: ${HOUSEHOLD_ID:?Set HOUSEHOLD_ID}
       HOUSEHOLD_NAME: ${HOUSEHOLD_NAME:-My family}
       HOUSEHOLD_TIME_ZONE: ${HOUSEHOLD_TIME_ZONE:-Asia/Shanghai}
-      UPLOAD_DIR: ${UPLOAD_DIR:-/data/uploads}
+      UPLOAD_DIR: /data/uploads
     volumes:
       - uploads_data:/data/uploads
     depends_on:

@@ -19,7 +19,9 @@ FROM dependencies AS builder
 WORKDIR /app
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN ./node_modules/.bin/prisma generate && npm run build
+RUN --mount=type=secret,id=npm_ca,required=false,target=/run/secrets/npm_ca \
+    if [ -s /run/secrets/npm_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/npm_ca; fi; \
+    ./node_modules/.bin/prisma generate && npm run build
 
 FROM base AS runner
 WORKDIR /app

@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { chmod, mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { access, chmod, mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
@@ -24,7 +24,23 @@ async function workspace() {
   await writeFile(docker, `#!/bin/sh
 printf '%s\n' "$*" >> "$DOCKER_LOG"
 case "$*" in
-  *pg_dump*) printf 'database-dump' ;;
+  *'ps --status running --services'*)
+    if [ "\${FAKE_APP_RUNNING:-true}" = "true" ]; then printf 'app\n'; fi ;;
+  *'volume inspect --format'*)
+    if [ "\${FAKE_VOLUME_EXISTS:-false}" = "true" ]; then
+      printf '%s|%s|%s\n' "\${FAKE_VOLUME_COMPOSE_LABEL:-}" "\${FAKE_VOLUME_ROLE_LABEL:-}" "\${FAKE_VOLUME_PROJECT_LABEL:-}"
+    elif [ -f "$FAKE_VOLUME_CREATED" ]; then
+      printf '|uploads-restore|\n'
+    else
+      exit 1
+    fi ;;
+  *'volume create '*) : > "$FAKE_VOLUME_CREATED" ;;
+  *pg_dump*)
+    if [ "\${FAKE_BLOCK_DUMP:-false}" = "true" ]; then
+      : > "$FAKE_DUMP_READY"
+      while [ ! -f "$FAKE_DUMP_RELEASE" ]; do sleep 0.05; done
+    fi
+    printf 'database-dump' ;;
   *'run --rm --no-deps --entrypoint sh app'*) cat "$FAKE_UPLOAD_TAR" ;;
 esac
 `);
@@ -34,6 +50,7 @@ esac
   await writeFile(path.join(uploads, "image.png"), "image-bytes");
   const archive = path.join(root, "source-uploads.tar");
   await execFile("tar", ["-cf", archive, "-C", uploads, "."]);
+  await writeFile(path.join(root, "docker.log"), "");
   return {
     root,
     archive,
@@ -42,23 +59,32 @@ esac
       ...process.env,
       PATH: `${bin}:${process.env.PATH}`,
       DOCKER_LOG: path.join(root, "docker.log"),
-      FAKE_UPLOAD_TAR: archive
+      FAKE_UPLOAD_TAR: archive,
+      FAKE_VOLUME_CREATED: path.join(root, "volume-created")
     }
   };
 }
 
 describe("kindergarten document deployment", () => {
+  async function waitForFile(file: string) {
+    for (let attempt = 0; attempt < 100; attempt += 1) {
+      try { await access(file); return; } catch { await new Promise((resolve) => setTimeout(resolve, 20)); }
+    }
+    throw new Error(`Timed out waiting for ${file}`);
+  }
+
   it("mounts a private persistent upload directory into the application", async () => {
     const [compose, dockerfile, environment] = await Promise.all([
       readFile(path.join(repositoryRoot, "docker-compose.yml"), "utf8"),
       readFile(path.join(repositoryRoot, "Dockerfile"), "utf8"),
       readFile(path.join(repositoryRoot, ".env.production.example"), "utf8")
     ]);
-    expect(compose).toContain("UPLOAD_DIR: ${UPLOAD_DIR:-/data/uploads}");
+    expect(compose).toContain("UPLOAD_DIR: /data/uploads");
     expect(compose).toContain("uploads_data:/data/uploads");
     expect(compose).toMatch(/volumes:[\s\S]*uploads_data:/);
     expect(dockerfile).toContain("/data/uploads");
-    expect(environment).toContain("UPLOAD_DIR=/data/uploads");
+    expect(dockerfile.match(/mount=type=secret,id=npm_ca/g)).toHaveLength(2);
+    expect(environment).not.toContain("UPLOAD_DIR=");
     expect(compose).not.toContain("/app/public/uploads");
   });
 
@@ -83,6 +109,53 @@ describe("kindergarten document deployment", () => {
     await expect(readFile(`${uploads}.sha256`, "utf8")).resolves.toContain("acceptance-20261023-uploads.tar");
     expect(log).toContain("compose -f docker-compose.yml stop app");
     expect(log).toContain("compose -f docker-compose.yml up -d app");
+    expect(log).toContain("run --rm --no-deps --entrypoint sh app -c set -eu; tar -C /data/uploads -cf - .");
+  });
+
+  it("takes an exclusive backup lock and preserves an app that was already stopped", async () => {
+    const fixture = await workspace();
+    const backupDir = path.join(fixture.root, "backups");
+    await mkdir(backupDir);
+    const heldLock = path.join(fixture.root, "held-backup.lock");
+    await mkdir(heldLock);
+    await expect(execFile("sh", ["scripts/backup-all.sh", "locked"], {
+      cwd: repositoryRoot, env: { ...fixture.env, BACKUP_DIR: backupDir, BACKUP_LOCK_DIR: heldLock }
+    })).rejects.toMatchObject({ code: 75 });
+    await expect(readFile(fixture.log, "utf8")).resolves.toBe("");
+
+    await rm(heldLock, { recursive: true });
+    await execFile("sh", ["scripts/backup-all.sh", "stopped"], {
+      cwd: repositoryRoot,
+      env: { ...fixture.env, BACKUP_DIR: backupDir, FAKE_APP_RUNNING: "false" }
+    });
+    const log = await readFile(fixture.log, "utf8");
+    expect(log).not.toContain("stop app");
+    expect(log).not.toContain("up -d app");
+  });
+
+  it("uses one Compose-scoped lock across different backup directories", async () => {
+    const fixture = await workspace();
+    const ready = path.join(fixture.root, "dump-ready");
+    const release = path.join(fixture.root, "dump-release");
+    const lockRoot = path.join(fixture.root, "locks");
+    const first = execFile("sh", ["scripts/backup-all.sh", "first"], {
+      cwd: repositoryRoot,
+      env: {
+        ...fixture.env,
+        BACKUP_DIR: path.join(fixture.root, "backup-a"),
+        BACKUP_LOCK_ROOT: lockRoot,
+        FAKE_BLOCK_DUMP: "true",
+        FAKE_DUMP_READY: ready,
+        FAKE_DUMP_RELEASE: release
+      }
+    });
+    await waitForFile(ready);
+    await expect(execFile("sh", ["scripts/backup-all.sh", "second"], {
+      cwd: repositoryRoot,
+      env: { ...fixture.env, BACKUP_DIR: path.join(fixture.root, "backup-b"), BACKUP_LOCK_ROOT: lockRoot }
+    })).rejects.toMatchObject({ code: 75 });
+    await writeFile(release, "continue");
+    await first;
   });
 
   it("restores a verified safe archive into a separate volume by default", async () => {
@@ -100,7 +173,98 @@ describe("kindergarten document deployment", () => {
     });
 
     const log = await readFile(fixture.log, "utf8");
-    expect(log).toContain("volume create growlog_uploads_restore_verify");
+    expect(log).toContain("volume create --label com.growlog.volume-role=uploads-restore growlog_uploads_restore_verify");
+    expect(log).toContain("growlog_uploads_restore_verify:/restore");
+    expect(log.match(/volume inspect --format/g)).toHaveLength(2);
+  });
+
+  it("never removes an existing unrelated volume, even with destructive flags", async () => {
+    const fixture = await workspace();
+    const backupDir = path.join(fixture.root, "backups");
+    await execFile("sh", ["scripts/backup-all.sh", "volume-guard"], {
+      cwd: repositoryRoot, env: { ...fixture.env, BACKUP_DIR: backupDir }
+    });
+    await writeFile(fixture.log, "");
+
+    await expect(execFile("sh", [
+      "scripts/restore-uploads.sh",
+      path.join(backupDir, "volume-guard.manifest"),
+      "growlog_postgres_data"
+    ], {
+      cwd: repositoryRoot,
+      env: {
+        ...fixture.env,
+        FAKE_VOLUME_EXISTS: "true",
+        FAKE_VOLUME_COMPOSE_LABEL: "postgres_data",
+        ALLOW_REPLACE_EXISTING_UPLOAD_VOLUME: "true",
+        ALLOW_RESTORE_OVER_PRIMARY: "true"
+      }
+    })).rejects.toMatchObject({ code: 65 });
+
+    const log = await readFile(fixture.log, "utf8");
+    expect(log).toContain("volume inspect --format");
+    expect(log).not.toContain("volume rm");
+    expect(log).not.toContain("run --rm -i");
+  });
+
+  it("rejects another Compose project's uploads volume and locks each restore target", async () => {
+    const fixture = await workspace();
+    const backupDir = path.join(fixture.root, "backups");
+    await execFile("sh", ["scripts/backup-all.sh", "project-guard"], {
+      cwd: repositoryRoot, env: { ...fixture.env, BACKUP_DIR: backupDir }
+    });
+    const manifest = path.join(backupDir, "project-guard.manifest");
+    await writeFile(fixture.log, "");
+    await expect(execFile("sh", ["scripts/restore-uploads.sh", manifest, "other_uploads"], {
+      cwd: repositoryRoot,
+      env: {
+        ...fixture.env,
+        FAKE_VOLUME_EXISTS: "true",
+        FAKE_VOLUME_COMPOSE_LABEL: "uploads_data",
+        FAKE_VOLUME_PROJECT_LABEL: "another_project",
+        ALLOW_REPLACE_EXISTING_UPLOAD_VOLUME: "true",
+        ALLOW_RESTORE_OVER_PRIMARY: "true"
+      }
+    })).rejects.toMatchObject({ code: 65 });
+    expect(await readFile(fixture.log, "utf8")).not.toContain("run --rm -i");
+
+    const lockRoot = path.join(fixture.root, "restore-locks");
+    await mkdir(lockRoot);
+    await mkdir(path.join(lockRoot, "growlog_uploads_restore_verify.lock"));
+    await writeFile(fixture.log, "");
+    await expect(execFile("sh", ["scripts/restore-uploads.sh", manifest], {
+      cwd: repositoryRoot,
+      env: { ...fixture.env, RESTORE_LOCK_ROOT: lockRoot }
+    })).rejects.toMatchObject({ code: 75 });
+    expect(await readFile(fixture.log, "utf8")).toBe("");
+  });
+
+  it("requires an explicit flag before replacing a labeled upload volume", async () => {
+    const fixture = await workspace();
+    const backupDir = path.join(fixture.root, "backups");
+    await execFile("sh", ["scripts/backup-all.sh", "existing-upload"], {
+      cwd: repositoryRoot, env: { ...fixture.env, BACKUP_DIR: backupDir }
+    });
+    await writeFile(fixture.log, "");
+    const manifest = path.join(backupDir, "existing-upload.manifest");
+    const existingEnv = {
+      ...fixture.env,
+      FAKE_VOLUME_EXISTS: "true",
+      FAKE_VOLUME_ROLE_LABEL: "uploads-restore"
+    };
+
+    await expect(execFile("sh", ["scripts/restore-uploads.sh", manifest], {
+      cwd: repositoryRoot, env: existingEnv
+    })).rejects.toMatchObject({ code: 65 });
+    expect(await readFile(fixture.log, "utf8")).not.toContain("volume rm");
+
+    await writeFile(fixture.log, "");
+    await execFile("sh", ["scripts/restore-uploads.sh", manifest], {
+      cwd: repositoryRoot,
+      env: { ...existingEnv, ALLOW_REPLACE_EXISTING_UPLOAD_VOLUME: "true" }
+    });
+    const log = await readFile(fixture.log, "utf8");
+    expect(log).not.toContain("volume rm growlog_uploads_restore_verify");
     expect(log).toContain("growlog_uploads_restore_verify:/restore");
   });
 

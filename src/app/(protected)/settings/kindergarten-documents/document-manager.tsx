@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState, type ChangeEvent, type FormEv
 import { CSRF_COOKIE_NAME } from "@/modules/auth/auth-constants";
 
 type DocumentType = "DAILY_CARE_SHEET" | "WEEKLY_MENU";
+const kindergartenDocumentTypes: DocumentType[] = ["DAILY_CARE_SHEET", "WEEKLY_MENU"];
 
 type DocumentDto = {
   id: string;
@@ -61,28 +62,108 @@ export function DocumentManager({ childOptions }: { childOptions: Array<{ id: st
   const [pending, setPending] = useState<DocumentType | "delete" | null>(null);
   const [message, setMessage] = useState("");
   const [activeDocument, setActiveDocument] = useState<DocumentDto | null>(null);
+  const [fileInputVersions, setFileInputVersions] = useState<Record<DocumentType, number>>({
+    DAILY_CARE_SHEET: 0, WEEKLY_MENU: 0
+  });
   const openerRef = useRef<HTMLButtonElement | null>(null);
+  const contentRef = useRef<HTMLDivElement | null>(null);
+  const viewerRef = useRef<HTMLElement | null>(null);
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const previewsRef = useRef<string[]>([]);
+  const childIdRef = useRef(childId);
+  const requestGenerationRef = useRef(0);
 
-  const loadDocuments = useCallback(async () => {
+  const loadDocuments = useCallback(async (requestedChildId: string) => {
+    const generation = ++requestGenerationRef.current;
     setLoading(true);
     setLoadError("");
     try {
-      const response = await fetch(`/api/kindergarten-documents?childId=${encodeURIComponent(childId)}`, { cache: "no-store" });
+      const response = await fetch(`/api/kindergarten-documents?childId=${encodeURIComponent(requestedChildId)}`, { cache: "no-store" });
       if (!response.ok) throw new Error("load failed");
       const payload = await response.json() as { data: { documents: DocumentDto[] } };
+      if (generation !== requestGenerationRef.current || requestedChildId !== childIdRef.current) return;
       setDocuments(payload.data.documents);
     } catch {
+      if (generation !== requestGenerationRef.current || requestedChildId !== childIdRef.current) return;
       setLoadError("暂时无法读取资料，请稍后重试。");
     } finally {
-      setLoading(false);
+      if (generation === requestGenerationRef.current && requestedChildId === childIdRef.current) setLoading(false);
     }
-  }, [childId]);
+  }, []);
 
-  useEffect(() => { void loadDocuments(); }, [loadDocuments]);
+  useEffect(() => { void loadDocuments(childId); }, [childId, loadDocuments]);
   useEffect(() => () => {
     for (const preview of previewsRef.current) URL.revokeObjectURL(preview);
   }, []);
+
+  const closeViewer = useCallback(() => {
+    const opener = openerRef.current;
+    if (contentRef.current) {
+      contentRef.current.removeAttribute("inert");
+      contentRef.current.removeAttribute("aria-hidden");
+    }
+    setActiveDocument(null);
+    opener?.focus();
+  }, []);
+
+  useEffect(() => {
+    if (!activeDocument) return;
+    const content = contentRef.current;
+    content?.setAttribute("inert", "");
+    content?.setAttribute("aria-hidden", "true");
+    closeButtonRef.current?.focus();
+    const keydown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeViewer();
+        return;
+      }
+      if (event.key !== "Tab" || !viewerRef.current) return;
+      const controls = [...viewerRef.current.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
+      )];
+      if (controls.length === 0) return;
+      const first = controls[0]!;
+      const last = controls[controls.length - 1]!;
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", keydown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", keydown);
+      document.body.style.overflow = previousOverflow;
+      content?.removeAttribute("inert");
+      content?.removeAttribute("aria-hidden");
+    };
+  }, [activeDocument, closeViewer]);
+
+  function changeChild(nextChildId: string) {
+    requestGenerationRef.current += 1;
+    childIdRef.current = nextChildId;
+    setChildId(nextChildId);
+    setDocuments([]);
+    setLoadError("");
+    setLoading(true);
+    setMessage("");
+    setActiveDocument(null);
+    setUploads((current) => {
+      for (const type of kindergartenDocumentTypes) {
+        if (current[type].previewUrl) URL.revokeObjectURL(current[type].previewUrl);
+      }
+      return { DAILY_CARE_SHEET: emptyUpload(), WEEKLY_MENU: emptyUpload() };
+    });
+    setFileInputVersions((current) => ({
+      DAILY_CARE_SHEET: current.DAILY_CARE_SHEET + 1,
+      WEEKLY_MENU: current.WEEKLY_MENU + 1
+    }));
+  }
 
   function changeFile(type: DocumentType, event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0] ?? null;
@@ -116,8 +197,12 @@ export function DocumentManager({ childOptions }: { childOptions: Array<{ id: st
         body
       });
       if (!response.ok) throw new Error("upload failed");
+      if (childIdRef.current !== childId) return;
+      if (state.previewUrl) URL.revokeObjectURL(state.previewUrl);
+      setUploads((current) => ({ ...current, [type]: { ...current[type], file: null, previewUrl: "" } }));
+      setFileInputVersions((current) => ({ ...current, [type]: current[type] + 1 }));
       setMessage("上传成功");
-      await loadDocuments();
+      await loadDocuments(childId);
     } catch {
       setMessage("上传失败，请检查图片后重试。");
     } finally {
@@ -136,7 +221,7 @@ export function DocumentManager({ childOptions }: { childOptions: Array<{ id: st
       });
       if (!response.ok) throw new Error("delete failed");
       setMessage("已删除");
-      await loadDocuments();
+      await loadDocuments(childId);
     } catch {
       setMessage("删除失败，请稍后重试。");
     } finally {
@@ -147,11 +232,6 @@ export function DocumentManager({ childOptions }: { childOptions: Array<{ id: st
   function openViewer(record: DocumentDto, opener: HTMLButtonElement) {
     openerRef.current = opener;
     setActiveDocument(record);
-  }
-
-  function closeViewer() {
-    setActiveDocument(null);
-    openerRef.current?.focus();
   }
 
   const uploadCard = (type: DocumentType) => {
@@ -173,19 +253,20 @@ export function DocumentManager({ childOptions }: { childOptions: Array<{ id: st
           required
         /></label>
         <label>{labels[type].file}<input
+          key={`${childId}-${type}-${fileInputVersions[type]}`}
           type="file"
           accept="image/jpeg,image/png,image/webp"
           onChange={(event) => changeFile(type, event)}
           required
         /></label>
-        {state.previewUrl ? <Image
+        {state.previewUrl ? <><Image
           className="document-upload-preview"
           src={state.previewUrl}
           alt={`${labels[type].short}上传预览`}
           width={640}
           height={480}
           unoptimized
-        /> : null}
+        /><small className="document-file-summary">{state.file?.name} · {state.file ? sizeLabel(state.file.size) : ""}</small></> : null}
         {existing ? <p className="document-replace-warning">该{type === "DAILY_CARE_SHEET" ? "日期" : "周"}已有{labels[type].short}，上传后将替换原图。</p> : null}
         <button type="submit" disabled={pending !== null}>{pending === type ? "正在上传…" : labels[type].button}</button>
       </form>
@@ -193,7 +274,8 @@ export function DocumentManager({ childOptions }: { childOptions: Array<{ id: st
   };
 
   return <div className="document-manager">
-    <label className="document-child-picker">选择孩子<select value={childId} onChange={(event) => setChildId(event.target.value)}>
+    <div ref={contentRef} data-testid="document-manager-content" className="document-manager-content">
+    <label className="document-child-picker">选择孩子<select value={childId} disabled={pending !== null} onChange={(event) => changeChild(event.target.value)}>
       {childOptions.map((child) => <option value={child.id} key={child.id}>{child.name}</option>)}
     </select></label>
     <div className="document-upload-grid">{uploadCard("DAILY_CARE_SHEET")}{uploadCard("WEEKLY_MENU")}</div>
@@ -218,16 +300,17 @@ export function DocumentManager({ childOptions }: { childOptions: Array<{ id: st
           <button className="document-delete-action" type="button" disabled={pending !== null} aria-label={`删除 ${record.periodStart} ${labels[record.type].short}`} onClick={() => void remove(record)}>删除</button>
         </article>)}</div>}
     </section>
+    </div>
     {activeDocument ? <div className="document-viewer-backdrop" onClick={closeViewer}>
       <section
+        ref={viewerRef}
         className="document-viewer"
         role="dialog"
         aria-modal="true"
         aria-label={`${activeDocument.periodStart} ${labels[activeDocument.type].short}`}
         onClick={(event) => event.stopPropagation()}
-        onKeyDown={(event) => { if (event.key === "Escape") closeViewer(); }}
       >
-        <div className="document-viewer-header"><div><strong>{activeDocument.periodStart}</strong><span>{labels[activeDocument.type].short}</span></div><button type="button" onClick={closeViewer} aria-label="关闭图片">关闭</button></div>
+        <div className="document-viewer-header"><div><strong>{activeDocument.periodStart}</strong><span>{labels[activeDocument.type].short}</span></div><button ref={closeButtonRef} type="button" onClick={closeViewer} aria-label="关闭图片">关闭</button></div>
         <Image src={activeDocument.imageUrl} alt={`${activeDocument.periodStart} ${labels[activeDocument.type].short}大图`} width={1200} height={1600} unoptimized />
         <a href={activeDocument.imageUrl} target="_blank" rel="noreferrer">新窗口查看原图</a>
       </section>

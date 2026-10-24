@@ -20,7 +20,7 @@ docker compose --env-file /secure/path/growlog.env ps
 curl --fail https://example.com/api/health
 ```
 
-The app container applies checked-in Prisma migrations and idempotently creates or updates the configured household before starting. `/api/health` returns success only when PostgreSQL answers a query. PostgreSQL, uploaded kindergarten images, Caddy certificates, and Caddy configuration use named volumes. `UPLOAD_DIR` defaults to `/data/uploads` inside the app container and is mounted from `uploads_data`; uploads are never placed under `public/`.
+The app container applies checked-in Prisma migrations and idempotently creates or updates the configured household before starting. `/api/health` returns success only when PostgreSQL answers a query. PostgreSQL, uploaded kindergarten images, Caddy certificates, and Caddy configuration use named volumes. Compose fixes `UPLOAD_DIR` at `/data/uploads`, exactly where `uploads_data` is mounted, so an environment override cannot move files into the disposable container layer; uploads are never placed under `public/`.
 
 The image uses Node.js 24. If the build network is intercepted by an organization CA, pass that public CA to BuildKit as a temporary secret, then start Compose without rebuilding:
 
@@ -62,7 +62,7 @@ Restore the matching upload archive into the default verification volume. The co
 docker volume inspect growlog_uploads_restore_verify
 ```
 
-Use a temporary Compose override that mounts `growlog_uploads_restore_verify` at `/data/uploads` and points `DATABASE_URL` to `growlog_restore_verify`, start the verification app, authenticate, and open representative images from **设置 → 幼儿园资料**. Compare both database row counts and image checksums before accepting the backup. Replacing the live upload volume requires `ALLOW_RESTORE_OVER_PRIMARY=true` and the explicit target `growlog_uploads_data`; the script stops and restarts the app around that replacement.
+Use a temporary Compose override that mounts `growlog_uploads_restore_verify` at `/data/uploads` and points `DATABASE_URL` to `growlog_restore_verify`, start the verification app, authenticate, and open representative images from **设置 → 幼儿园资料**. Compare both database row counts and image checksums before accepting the backup. The normal restore path only creates a new verification volume. Replacing an existing volume requires `ALLOW_REPLACE_EXISTING_UPLOAD_VOLUME=true`, and the script first verifies Docker labels identify a GrowLog upload volume. Replacing the live upload volume additionally requires `ALLOW_RESTORE_OVER_PRIMARY=true`; the script stops and restarts the app only when it was running before replacement.
 
 The restore script validates the target name, recreates only that named database, restores with `--exit-on-error`, and prints the migration count. After reviewing the restored data, remove the verification database with `dropdb`. Replacing the configured primary database requires the explicit environment variable `ALLOW_RESTORE_OVER_PRIMARY=true`; stop the app before that disaster-recovery operation and take another backup first.
 

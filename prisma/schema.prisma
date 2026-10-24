@@ -292,7 +292,6 @@ model KindergartenDocument {
   updatedAt        DateTime                 @updatedAt
 
   @@unique([householdId, childId, type, periodStart])
-  @@index([householdId, childId, type, periodStart])
 }
 
 model AuditLog {

@@ -32,12 +32,12 @@
 - M22 compact longitudinal review: Footprints is now a read-only compact timeline without time-of-day or swipe editing, growth dates stay on one line, and Today compares compact values across today plus preceding 7/14/30-day windows while preserving unknown values.
 - M23 copy and table-density refinement: Today and Trends use task-focused header copy, report-level instructional notes are removed, and growth measurements align in compact centered rows while preserving the details touch target.
 - M24 modern minimalist visual refresh: the full public and authenticated application now uses a neutral surface hierarchy, violet brand actions, semantic status colors, shared line icons, consistent mobile forms and tables, and explicit light/dark theme pairs without changing routes, APIs, persistence, or business rules.
-- M25 kindergarten documents: child-scoped daily care-sheet and weekly-menu image upload, replacement, authenticated viewing, deletion, PostgreSQL metadata/audit, local persistent storage, and coordinated database/image recovery are implemented; release verification is in progress.
+- M25 kindergarten documents: child-scoped daily care-sheet and weekly-menu image upload, replacement, authenticated viewing, deletion, PostgreSQL metadata/audit, local persistent storage, and coordinated database/image recovery are implemented and verified.
 - Repository documentation: the root README provides an accurate Chinese product overview, Docker/VPS quick start, development checks, backup/restore entry points, security boundaries, and links to durable project records.
 
 ## Current task
 
-- M25 release verification is the active task. M0–M24 remain implemented and verified; deferred P1/P2 work remains listed in `TASKS.md`.
+- M0–M25 are implemented and verified. Only explicitly deferred P1/P2 work remains in `TASKS.md`.
 
 ## Test record
 
@@ -122,6 +122,11 @@
 - M24 review: independent review found no Critical issue and three Important contrast gaps; solid login focus rings, fully opaque small status labels, and a darker light-theme muted token fixed all three, with tests calculating contrast against every neutral surface. Browser verification then exposed nested Settings current-state and closed-disclosure geometry defects, both fixed with focused regressions (2026-10-23).
 - M24 final gate: a clean test-database reset and migration, 179/179 tests across 52 files with PostgreSQL enabled, lint with zero warnings, strict typecheck, production build, and diff checks all pass (2026-10-23).
 - M24 browser matrix: 164 checks across public and authenticated production pages, all five read-only reports, profile management, recovery, expanded Settings export menus, and all five expanded record editors passed at 320×568, 390×844, 430×932, and 768×1024 in light and dark themes; there was no page overflow, sub-16px input text, navigation breakpoint/current-state error, or fixed-navigation overlap, and 16 representative screenshots were visually reviewed (2026-10-23).
+- M25 RED→GREEN: bounded multipart/image validation, local atomic file storage, household-scoped metadata/audit persistence, authenticated handlers, Settings UI, deployment/recovery behavior, and delete-versus-replace database/file consistency are covered by focused tests, including expected failures before the implementation and review fixes (2026-10-24).
+- M25 review fixes: stale child-list responses cannot overwrite the selected child, switching children clears drafts and previews, the image viewer contains focus and handles Escape from the focused control, Compose fixes uploads to the mounted path, coordinated backups share a Compose-scoped lock across output directories, and upload restores reject unrelated projects/volumes, lock each target, recheck labels after creation, and restore verified existing volumes in place. Independent final review found no remaining Critical or Important issue (2026-10-24).
+- M25 browser verification: authenticated production upload/replace/view/delete/reload flows pass; 320×568, 390×844, 430×932, and 768×1024 in light and dark themes have zero page overflow, at least 16px input text, at least 44px visible controls, correct 760px navigation switching, and no bottom-navigation overlap; representative screenshots were visually inspected (2026-10-24).
+- M25 deployment acceptance: the CA-aware Node 24 image built successfully; a real isolated Compose stack retained the authenticated image after forced app-container recreation; coordinated backup restored into a separate database and upload volume and an independent app read the same 68 bytes; an isolated primary upload volume restored in place while its app container was stopped and restarted; a PostgreSQL volume was rejected with exit 65 even when both overwrite flags were supplied; the 65-request MVP smoke passed all seven record domains (2026-10-24).
+- M25 final gate: a clean test-database reset applied both migrations; 238/238 PostgreSQL-enabled tests across 60 files, lint with zero warnings, strict typecheck, production build, shell syntax, Compose resolution, JavaScript syntax, and diff checks pass (2026-10-24).
 
 ## Work implemented
 
@@ -156,6 +161,7 @@
 - Today and Trends headers now state the current task directly. Trend reports rely on chart/table labels and accessible point controls instead of repeating timezone, management, and pointer instructions. The growth measurement table uses a scoped centered-row style with reduced cell padding while its details summary remains touch sized.
 - The visual system now separates violet brand actions from green success, orange warning, and red danger states; shared stroke-based SVG icons replace mixed glyphs in primary navigation, report entry points, and Settings. Neutral canvas/surface tokens, 1.5rem panels, muted inputs, consistent focus rings, and compact mobile tables/forms apply across public and authenticated routes in both color schemes.
 - Primary navigation treats every nested Settings route as part of Settings. Closed export disclosures explicitly remove submenu geometry, while opened disclosures remain within the protected shell's bottom safe space so fixed mobile navigation cannot cover their final action.
+- Kindergarten documents keep image bytes behind authenticated, household-scoped routes and store only metadata plus random keys in PostgreSQL. Daily care sheets and Monday-normalized weekly menus replace within their child/period, while Settings provides upload preview, protected viewing, deletion, and child-safe asynchronous state. Compose uses a fixed upload mount; paired backups use shared manifests/checksums and Compose-scoped exclusion, and restores require target locks plus verified volume roles/projects before extracting.
 
 ## Blockers
 
