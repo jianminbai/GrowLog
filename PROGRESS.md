@@ -127,6 +127,8 @@
 - M25 browser verification: authenticated production upload/replace/view/delete/reload flows pass; 320×568, 390×844, 430×932, and 768×1024 in light and dark themes have zero page overflow, at least 16px input text, at least 44px visible controls, correct 760px navigation switching, and no bottom-navigation overlap; representative screenshots were visually inspected (2026-10-24).
 - M25 deployment acceptance: the CA-aware Node 24 image built successfully; a real isolated Compose stack retained the authenticated image after forced app-container recreation; coordinated backup restored into a separate database and upload volume and an independent app read the same 68 bytes; an isolated primary upload volume restored in place while its app container was stopped and restarted; a PostgreSQL volume was rejected with exit 65 even when both overwrite flags were supplied; the 65-request MVP smoke passed all seven record domains (2026-10-24).
 - M25 final gate: a clean test-database reset applied both migrations; 238/238 PostgreSQL-enabled tests across 60 files, lint with zero warnings, strict typecheck, production build, shell syntax, Compose resolution, JavaScript syntax, and diff checks pass (2026-10-24).
+- M26 RED→GREEN: the growth-report regression first failed because the measurement table lacked a fixed-column behavior marker; the table now keeps the date header and every date cell at the left edge during horizontal scrolling, with opaque theme-aware row backgrounds and a divider (2026-10-24).
+- M26 final gate: 14/14 focused report tests and the full 218-passed/20-skipped suite pass; lint with zero warnings, strict typecheck, production build, and diff checks pass (2026-10-24).
 
 ## Work implemented
 
@@ -162,6 +164,7 @@
 - The visual system now separates violet brand actions from green success, orange warning, and red danger states; shared stroke-based SVG icons replace mixed glyphs in primary navigation, report entry points, and Settings. Neutral canvas/surface tokens, 1.5rem panels, muted inputs, consistent focus rings, and compact mobile tables/forms apply across public and authenticated routes in both color schemes.
 - Primary navigation treats every nested Settings route as part of Settings. Closed export disclosures explicitly remove submenu geometry, while opened disclosures remain within the protected shell's bottom safe space so fixed mobile navigation cannot cover their final action.
 - Kindergarten documents keep image bytes behind authenticated, household-scoped routes and store only metadata plus random keys in PostgreSQL. Daily care sheets and Monday-normalized weekly menus replace within their child/period, while Settings provides upload preview, protected viewing, deletion, and child-safe asynchronous state. Compose uses a fixed upload mount; paired backups use shared manifests/checksums and Compose-scoped exclusion, and restores require target locks plus verified volume roles/projects before extracting.
+- The growth measurement table keeps its `YYYY-MM-DD` column fixed inside the existing table-level horizontal scroller. Opaque light/dark theme surfaces and a column divider prevent scrolled values from showing through the fixed cells; other report tables are unchanged.
 
 ## Blockers
 

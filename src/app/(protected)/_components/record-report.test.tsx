@@ -54,7 +54,7 @@ describe("read-only child reports", () => {
     expect(within(latestRow).getAllByRole("cell")[2]).toHaveTextContent("4");
     expect(within(latestRow).getByText("查看详情")).toBeInTheDocument();
     expect(within(latestRow).getByText(/家中.*站立测量.*儿童身高尺.*早晨测量/)).toBeInTheDocument();
-    expect(latestRow.closest("table")).toHaveClass("measurement-table");
+    expect(latestRow.closest("table")).toHaveClass("measurement-table", "sticky-first-column");
     expect(screen.queryByText(/移动光标、触摸或聚焦数据点/)).not.toBeInTheDocument();
     expect(screen.queryByText(/时间按家庭时区/)).not.toBeInTheDocument();
   });
