@@ -23,6 +23,7 @@ RUN ./node_modules/.bin/prisma generate && npm run build
 
 FROM base AS runner
 WORKDIR /app
+RUN mkdir -p /data/uploads && chmod 700 /data/uploads
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
     PORT=3000 \

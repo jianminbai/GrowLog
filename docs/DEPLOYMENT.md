@@ -20,7 +20,7 @@ docker compose --env-file /secure/path/growlog.env ps
 curl --fail https://example.com/api/health
 ```
 
-The app container applies checked-in Prisma migrations and idempotently creates or updates the configured household before starting. `/api/health` returns success only when PostgreSQL answers a query. PostgreSQL, Caddy certificates, and Caddy configuration use named volumes.
+The app container applies checked-in Prisma migrations and idempotently creates or updates the configured household before starting. `/api/health` returns success only when PostgreSQL answers a query. PostgreSQL, uploaded kindergarten images, Caddy certificates, and Caddy configuration use named volumes. `UPLOAD_DIR` defaults to `/data/uploads` inside the app container and is mounted from `uploads_data`; uploads are never placed under `public/`.
 
 The image uses Node.js 24. If the build network is intercepted by an organization CA, pass that public CA to BuildKit as a temporary secret, then start Compose without rebuilding:
 
@@ -38,11 +38,11 @@ Run from the repository root with the same Compose environment:
 ```sh
 POSTGRES_USER=growlog POSTGRES_DB=growlog \
   docker compose --env-file /secure/path/growlog.env exec -T postgres pg_isready
-POSTGRES_USER=growlog POSTGRES_DB=growlog \
-  ./scripts/backup.sh
+POSTGRES_USER=growlog POSTGRES_DB=growlog BACKUP_DIR=/secure/backups \
+  ./scripts/backup-all.sh
 ```
 
-The script writes a timestamped custom-format dump under `backups/`, verifies that it is non-empty, and writes a SHA-256 sidecar. Store both files on separate protected storage.
+The coordinated script briefly stops the app to pause database and image writes, then creates a PostgreSQL custom-format dump, an upload-volume tar archive, SHA-256 sidecars, and a shared manifest under one backup ID. Its exit trap restarts the app even when a backup step fails. Copy the complete bundle off the VPS; a database dump without its matching image archive leaves document metadata pointing to missing images, while an image archive without its database dump cannot restore ownership and dates.
 
 ## Restore and verify
 
@@ -54,6 +54,15 @@ POSTGRES_USER=growlog POSTGRES_DB=growlog \
 docker compose exec -T postgres psql -U growlog -d growlog_restore_verify \
   -c 'SELECT COUNT(*) FROM "_prisma_migrations";'
 ```
+
+Restore the matching upload archive into the default verification volume. The command verifies both halves against the manifest and rejects absolute paths, parent traversal, links, and special tar entries before invoking Docker:
+
+```sh
+./scripts/restore-uploads.sh backups/growlog-YYYYMMDDTHHMMSSZ.manifest
+docker volume inspect growlog_uploads_restore_verify
+```
+
+Use a temporary Compose override that mounts `growlog_uploads_restore_verify` at `/data/uploads` and points `DATABASE_URL` to `growlog_restore_verify`, start the verification app, authenticate, and open representative images from **设置 → 幼儿园资料**. Compare both database row counts and image checksums before accepting the backup. Replacing the live upload volume requires `ALLOW_RESTORE_OVER_PRIMARY=true` and the explicit target `growlog_uploads_data`; the script stops and restarts the app around that replacement.
 
 The restore script validates the target name, recreates only that named database, restores with `--exit-on-error`, and prints the migration count. After reviewing the restored data, remove the verification database with `dropdb`. Replacing the configured primary database requires the explicit environment variable `ALLOW_RESTORE_OVER_PRIMARY=true`; stop the app before that disaster-recovery operation and take another backup first.
 

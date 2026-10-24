@@ -17,6 +17,7 @@ GrowLog 的定位是家庭记录工具，不提供疾病诊断、成人身高预
 - 所有健康记录的编辑、软删除与恢复
 - 仅显示字段名称的审计历史
 - JSON 和分领域 CSV 数据导出
+- 按孩子上传、查看和替换每日保教单与每周菜单图片
 - PWA 安装、离线提示和安全缓存策略
 - PostgreSQL 持久化、数据库感知健康检查
 - Docker Compose、Caddy 自动 HTTPS、备份与恢复
@@ -40,6 +41,7 @@ flowchart LR
     A --> P[Prisma]
     P --> D[(PostgreSQL)]
     N --> E[JSON / CSV 导出]
+    N --> U[(上传图片卷)]
 ```
 
 ## 使用 Docker 快速启动
@@ -89,6 +91,7 @@ ADMIN_PASSWORD_HASH='替换为上一步生成的完整Argon2id哈希'
 HOUSEHOLD_ID=family-home
 HOUSEHOLD_NAME=My family
 HOUSEHOLD_TIME_ZONE=Asia/Shanghai
+UPLOAD_DIR=/data/uploads
 
 SITE_ADDRESS=growlog.example.com
 HTTP_PORT=80
@@ -145,15 +148,16 @@ curl --fail http://localhost:8080/api/health
 
 ## 备份与恢复
 
-备份脚本生成 PostgreSQL custom-format 文件和 SHA-256 校验文件。使用仓库外环境文件时，先将变量载入当前 shell：
+协调备份脚本会短暂停止应用写入，并生成同一备份 ID 下的 PostgreSQL custom-format 文件、上传图片 tar、manifest 和 SHA-256 校验文件。使用仓库外环境文件时，先将变量载入当前 shell：
 
 ```sh
 set -a
 . /安全路径/growlog.env
 set +a
 
-BACKUP_DIR=/安全备份路径 ./scripts/backup.sh
+BACKUP_DIR=/安全备份路径 ./scripts/backup-all.sh
 sha256sum -c /安全备份路径/growlog-YYYYMMDDTHHMMSSZ.dump.sha256
+sha256sum -c /安全备份路径/growlog-YYYYMMDDTHHMMSSZ-uploads.tar.sha256
 ```
 
 恢复时应先使用独立数据库名验证：
@@ -162,9 +166,11 @@ sha256sum -c /安全备份路径/growlog-YYYYMMDDTHHMMSSZ.dump.sha256
 ./scripts/restore.sh \
   /安全备份路径/growlog-YYYYMMDDTHHMMSSZ.dump \
   growlog_restore_verify
+./scripts/restore-uploads.sh \
+  /安全备份路径/growlog-YYYYMMDDTHHMMSSZ.manifest
 ```
 
-脚本默认拒绝覆盖主数据库。恢复到主数据库需要明确设置 `ALLOW_RESTORE_OVER_PRIMARY=true`，执行前应停止应用并再次备份。
+上传恢复默认写入独立的 `growlog_uploads_restore_verify` 卷。数据库与图片必须使用同一 manifest 配对验证；只恢复其中一部分会造成图片记录与文件不一致。脚本默认拒绝覆盖主数据库和主上传卷，恢复主环境需要明确设置 `ALLOW_RESTORE_OVER_PRIMARY=true` 并再次备份。
 
 ## 本地开发
 

@@ -30,6 +30,9 @@ services:
       HOUSEHOLD_ID: ${HOUSEHOLD_ID:?Set HOUSEHOLD_ID}
       HOUSEHOLD_NAME: ${HOUSEHOLD_NAME:-My family}
       HOUSEHOLD_TIME_ZONE: ${HOUSEHOLD_TIME_ZONE:-Asia/Shanghai}
+      UPLOAD_DIR: ${UPLOAD_DIR:-/data/uploads}
+    volumes:
+      - uploads_data:/data/uploads
     depends_on:
       postgres:
         condition: service_healthy
@@ -64,3 +67,4 @@ volumes:
   postgres_data:
   caddy_data:
   caddy_config:
+  uploads_data:
