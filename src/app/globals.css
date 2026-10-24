@@ -141,9 +141,19 @@ textarea {
 }
 
 input:is([type="date"], [type="datetime-local"], [type="month"], [type="week"], [type="time"]) {
+  display: block;
   width: 100%;
   min-width: 0;
   max-width: 100%;
+  inline-size: 100%;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+@supports (width: -webkit-fill-available) {
+  input:is([type="date"], [type="datetime-local"], [type="month"], [type="week"], [type="time"]) {
+    width: -webkit-fill-available;
+  }
 }
 
 .preview {

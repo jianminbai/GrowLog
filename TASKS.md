@@ -67,6 +67,8 @@ Status keys: `[ ]` pending, `[~]` in progress, `[x]` verified.
   - Acceptance: the growth measurement table keeps its date header and date cells visible while the remaining columns scroll horizontally; fixed cells use opaque theme-aware backgrounds and a clear divider; other report tables keep their existing scrolling behavior; focused/full tests, lint, typecheck, and production build pass.
 - [x] M27 — Constrain native date controls on narrow screens.
   - Acceptance: all native date, date-time, month, week, and time inputs can shrink to their form container and never exceed its width; existing touch sizing and browser-native picker behavior remain intact; the CSS regression, full tests, lint, typecheck, and production build pass.
+- [~] M28 — Align native date controls in iOS WebKit.
+  - Acceptance: date and date-time inputs use physical and logical inline constraints plus WebKit available-width sizing so their right edge aligns with adjacent controls on narrow iPhones; the native picker appearance remains enabled; focused/full tests, lint, typecheck, and production build pass.
 
 ## Deferred after MVP
 

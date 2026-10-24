@@ -97,6 +97,9 @@ describe("mobile UI CSS contract", () => {
 
   it("lets every native date and time control shrink within a narrow form", () => {
     expect(css).toMatch(/input:is\(\[type="date"\],\s*\[type="datetime-local"\],\s*\[type="month"\],\s*\[type="week"\],\s*\[type="time"\]\)\s*\{[^}]*width:\s*100%[^}]*min-width:\s*0[^}]*max-width:\s*100%/);
+    expect(css).toMatch(/input:is\(\[type="date"\],\s*\[type="datetime-local"\],\s*\[type="month"\],\s*\[type="week"\],\s*\[type="time"\]\)\s*\{[^}]*display:\s*block[^}]*inline-size:\s*100%[^}]*min-inline-size:\s*0[^}]*max-inline-size:\s*100%/);
+    expect(css).toMatch(/@supports\s*\(width:\s*-webkit-fill-available\)\s*\{\s*input:is\([^}]+\)\s*\{[^}]*width:\s*-webkit-fill-available/);
+    expect(css).not.toMatch(/(?:-webkit-)?appearance:\s*none/);
   });
 
   it("accounts for the mobile safe area and desktop navigation breakpoint", () => {

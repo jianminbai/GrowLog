@@ -37,7 +37,7 @@
 
 ## Current task
 
-- M0–M27 are implemented and verified. Only explicitly deferred P1/P2 work remains in `TASKS.md`.
+- M0–M27 are implemented and verified. M28 is implemented and awaits post-deployment iPhone WebKit verification.
 
 ## Test record
 
@@ -131,6 +131,8 @@
 - M26 final gate: 14/14 focused report tests and the full 218-passed/20-skipped suite pass; lint with zero warnings, strict typecheck, production build, and diff checks pass (2026-10-24).
 - M27 RED→GREEN: the mobile CSS contract first failed because native date controls had `width: 100%` through form styles but retained their browser intrinsic minimum width. A shared rule now allows date, date-time, month, week, and time inputs to shrink to zero intrinsic minimum while remaining capped at their form container (2026-10-24).
 - M27 final gate: all 11 current date/date-time input sites are covered by the shared selector; 23/23 focused CSS-contract tests and the full 219-passed/20-skipped suite pass; lint with zero warnings, strict typecheck, production build, and diff checks pass (2026-10-24).
+- M28 RED→GREEN: an iPhone screenshot showed `datetime-local` still extending beyond adjacent inputs, proving physical width constraints alone did not override WebKit's native logical intrinsic width. The shared rule now adds block layout, logical inline min/max sizing, and a supported `-webkit-fill-available` override without disabling native appearance (2026-10-24).
+- M28 implementation gate: 23/23 focused CSS-contract tests and the full 219-passed/20-skipped suite pass; lint with zero warnings, strict typecheck, production build, and diff checks pass. The cloud network policy returned `Domain forbidden` for both Playwright WebKit download hosts, so the screenshot-specific iPhone boundary and native picker still require post-deployment device verification (2026-10-24).
 
 ## Work implemented
 
@@ -168,11 +170,12 @@
 - Kindergarten documents keep image bytes behind authenticated, household-scoped routes and store only metadata plus random keys in PostgreSQL. Daily care sheets and Monday-normalized weekly menus replace within their child/period, while Settings provides upload preview, protected viewing, deletion, and child-safe asynchronous state. Compose uses a fixed upload mount; paired backups use shared manifests/checksums and Compose-scoped exclusion, and restores require target locks plus verified volume roles/projects before extracting.
 - The growth measurement table keeps its `YYYY-MM-DD` column fixed inside the existing table-level horizontal scroller. Opaque light/dark theme surfaces and a column divider prevent scrolled values from showing through the fixed cells; other report tables are unchanged.
 - Native date and time inputs share one width constraint that overrides browser intrinsic minimum sizing on narrow screens without removing the platform date picker or changing field values.
+- iOS WebKit receives an additional available-inline-width constraint so localized date-time text cannot make the native control wider than its form column.
 
 ## Blockers
 
-- None.
+- M28 cannot be marked verified until the updated build is checked on an iPhone: the date-time control must align with adjacent fields and tapping it must still open the native picker. This cloud environment cannot download the temporary WebKit runtime required for an equivalent automated check.
 
 ## Next step
 
-- Begin only explicitly deferred P1/P2 work; the next maintenance priority remains the isolated Prisma 7 and Next.js 16 upgrade.
+- Deploy M28, fully close and reopen the installed iPhone PWA, then verify the activity date-time field's right edge and native picker. After that acceptance, mark M28 complete before starting deferred P1/P2 work.
