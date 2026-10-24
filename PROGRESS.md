@@ -37,7 +37,7 @@
 
 ## Current task
 
-- M0–M25 are implemented and verified. Only explicitly deferred P1/P2 work remains in `TASKS.md`.
+- M0–M27 are implemented and verified. Only explicitly deferred P1/P2 work remains in `TASKS.md`.
 
 ## Test record
 
@@ -129,6 +129,8 @@
 - M25 final gate: a clean test-database reset applied both migrations; 238/238 PostgreSQL-enabled tests across 60 files, lint with zero warnings, strict typecheck, production build, shell syntax, Compose resolution, JavaScript syntax, and diff checks pass (2026-10-24).
 - M26 RED→GREEN: the growth-report regression first failed because the measurement table lacked a fixed-column behavior marker; the table now keeps the date header and every date cell at the left edge during horizontal scrolling, with opaque theme-aware row backgrounds and a divider (2026-10-24).
 - M26 final gate: 14/14 focused report tests and the full 218-passed/20-skipped suite pass; lint with zero warnings, strict typecheck, production build, and diff checks pass (2026-10-24).
+- M27 RED→GREEN: the mobile CSS contract first failed because native date controls had `width: 100%` through form styles but retained their browser intrinsic minimum width. A shared rule now allows date, date-time, month, week, and time inputs to shrink to zero intrinsic minimum while remaining capped at their form container (2026-10-24).
+- M27 final gate: all 11 current date/date-time input sites are covered by the shared selector; 23/23 focused CSS-contract tests and the full 219-passed/20-skipped suite pass; lint with zero warnings, strict typecheck, production build, and diff checks pass (2026-10-24).
 
 ## Work implemented
 
@@ -165,6 +167,7 @@
 - Primary navigation treats every nested Settings route as part of Settings. Closed export disclosures explicitly remove submenu geometry, while opened disclosures remain within the protected shell's bottom safe space so fixed mobile navigation cannot cover their final action.
 - Kindergarten documents keep image bytes behind authenticated, household-scoped routes and store only metadata plus random keys in PostgreSQL. Daily care sheets and Monday-normalized weekly menus replace within their child/period, while Settings provides upload preview, protected viewing, deletion, and child-safe asynchronous state. Compose uses a fixed upload mount; paired backups use shared manifests/checksums and Compose-scoped exclusion, and restores require target locks plus verified volume roles/projects before extracting.
 - The growth measurement table keeps its `YYYY-MM-DD` column fixed inside the existing table-level horizontal scroller. Opaque light/dark theme surfaces and a column divider prevent scrolled values from showing through the fixed cells; other report tables are unchanged.
+- Native date and time inputs share one width constraint that overrides browser intrinsic minimum sizing on narrow screens without removing the platform date picker or changing field values.
 
 ## Blockers
 

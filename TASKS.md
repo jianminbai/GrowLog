@@ -65,6 +65,8 @@ Status keys: `[ ]` pending, `[~]` in progress, `[x]` verified.
   - Acceptance: Settings offers separate daily care-sheet and weekly-menu JPEG/PNG/WebP uploads for active children; one care sheet is stored per child/day and one menu per child/Monday-based week, with same-period uploads replacing the prior image; multipart bodies are bounded before parsing, file signatures match MIME, private random storage keys never enter API responses, and authenticated image reads are private/no-store; list/view/delete and replacement are household scoped and audited without filenames, paths, or file content; Docker persists files in a named volume and coordinated database/image backup and guarded restore are verified; focused/full tests, lint, typecheck, production build, mobile browser checks, persistence/recovery acceptance, and independent review pass.
 - [x] M26 — Fixed measurement-date column in growth trends.
   - Acceptance: the growth measurement table keeps its date header and date cells visible while the remaining columns scroll horizontally; fixed cells use opaque theme-aware backgrounds and a clear divider; other report tables keep their existing scrolling behavior; focused/full tests, lint, typecheck, and production build pass.
+- [x] M27 — Constrain native date controls on narrow screens.
+  - Acceptance: all native date, date-time, month, week, and time inputs can shrink to their form container and never exceed its width; existing touch sizing and browser-native picker behavior remain intact; the CSS regression, full tests, lint, typecheck, and production build pass.
 
 ## Deferred after MVP
 

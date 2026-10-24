@@ -95,6 +95,10 @@ describe("mobile UI CSS contract", () => {
     expect(css).toMatch(/\.profile-form input,[\s\S]*font-size:\s*16px/);
   });
 
+  it("lets every native date and time control shrink within a narrow form", () => {
+    expect(css).toMatch(/input:is\(\[type="date"\],\s*\[type="datetime-local"\],\s*\[type="month"\],\s*\[type="week"\],\s*\[type="time"\]\)\s*\{[^}]*width:\s*100%[^}]*min-width:\s*0[^}]*max-width:\s*100%/);
+  });
+
   it("accounts for the mobile safe area and desktop navigation breakpoint", () => {
     expect(css).toContain("env(safe-area-inset-bottom)");
     expect(css).toMatch(/@media\s*\(min-width:\s*760px\)/);

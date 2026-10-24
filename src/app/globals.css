@@ -140,6 +140,12 @@ textarea {
   font-family: inherit;
 }
 
+input:is([type="date"], [type="datetime-local"], [type="month"], [type="week"], [type="time"]) {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
 .preview {
   margin-top: clamp(2.5rem, 7vw, 5rem);
   border: 1px solid var(--line);
